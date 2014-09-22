@@ -1,0 +1,21 @@
+                CHANGES in `gzippath' VERSION 0.1_7   (2012-8-20)
+
+  o  change glmcd on how the response variable y is scaled for family other than gaussian
+
+  o 8-25-2012 modification on gzipath_0.1-9.tar.gz
+    b0 should be the average of response variable y for non-standardized case, in an agreement with the so determined lambda max for which beta = 0. This is correct in R function lmnet, see zipath_0.1-2_08_10_2012.tar.gz
+
+                CHANGES in `gzipath' VERSION 0.1_13   (2013-11-24)
+
+  o for weighted penalized regression glmreg_fit, with standardize=TRUE, the weights are normalized to n*weights/sum(weights). Now added standardize=FALSE and the weights are not normalized. 
+  o zipath function was modified to incorporate glmreg_fit for weighted penalized Poisson and Negative Binomial regression. The tuning parameters were changed based on modified glmreg_fit. 
+                
+                CHANGES in `gzipath' VERSION 0.1_14   (2014-5-8)
+
+  o for rescale=TRUE and penatly="mnet" or "snet" in zipath, data driven lambda.zero[1] (i.e., the maximum value of lambda in zero component) is too small, now changed to 0.5*sqrt(lambda.zero[1]). This may be modified if the maximum value of lambda in glmreg was changed in the similar situations. 
+
+                CHANGES in `gzipath' VERSION 0.1_14   (2014-6-9)
+
+  o change package name to `mpath'
+
+ 

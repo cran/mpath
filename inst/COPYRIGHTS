@@ -1,0 +1,26 @@
+zipath, predprob and vuong.test derived from package pscl
+Author: Simon Jackman, with contributions from Alex Tahk, Achim Zeileis, Christina Maimone and Jim Fearon
+License GPL-2
+
+glmregNB derived from glm.nb in package MASS 
+Authors@R: c(person("Brian", "Ripley", role = c("aut", "cre", "cph"),
+        email = "ripley@stats.ox.ac.uk"), person("Kurt", "Hornik", role
+        = "trl", comment = "partial port ca 1998"), person("Albrecht",
+        "Gebhardt", role = "trl", comment = "partial port ca 1998"),
+        person("David", "Firth", role = "ctb"))
+License: GPL-2 | GPL-3
+
+balanced.folds copied from pamr version 1.54
+Author: T. Hastie, R. Tibshirani, Balasubramanian Narasimhan, Gil Chu
+License GPL-2
+
+convexMin modified from ncvreg ersion: 3.1-0
+Author: Patrick Breheny
+License GPL-2
+
+several functions inspired by package sandwich version 2.3.0
+Author: Thomas Lumley [aut], Achim Zeileis [aut, cre] 
+Maintainer: Achim Zeileis <Achim.Zeileis at R-project.org> 
+License: GPL-2 
+
+

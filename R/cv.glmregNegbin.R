@@ -1,0 +1,49 @@
+cv.glmregNB <- function(formula, data, weights, lambda=NULL, 
+nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE, 
+...){
+    call <- match.call()
+ mf <- Call <- match.call()
+                                     m <- match(c("formula", "data", "subset", "weights", "na.action",
+                                                "etastart", "mustart", "offset"), names(mf), 0)
+                                            mf <- mf[c(1, m)]
+                                            mf$drop.unused.levels <- TRUE
+                                            mf[[1L]] <- as.name("model.frame")
+                                            mf <- eval.parent(mf)
+                                            Terms <- attr(mf, "terms")
+                                            Y <- model.response(mf, "numeric")
+  ## null model support
+                                            X <- if (!is.empty.model(Terms)) model.matrix(Terms, mf, contrasts) else matrix(,NROW(Y),0)
+  nobs <- n <- length(Y)
+  nvars <- m <- dim(X) - 1
+ weights <- model.weights(mf)
+ if(!length(weights)) weights <- rep(1, nrow(mf))
+  if(any(weights < 0)) stop("negative weights not allowed")
+
+  K <- nfolds
+      glmregNB.obj <- do.call("glmregNB", list(formula, data, weights, lambda=lambda, ...))
+    lambda <- glmregNB.obj$lambda
+    nlambda <- length(lambda)
+    if(missing(foldid))
+    all.folds <- cv.folds(n, K)
+    else all.folds <- foldid 
+    fraction <- seq(nlambda)
+    residmat <- matrix(NA, nlambda, K)
+    for(i in seq(K)) {
+      if(trace)
+        cat("\n CV Fold", i, "\n\n")
+      omit <- all.folds[[i]]
+### changed 5/20/2013 fixed theta
+      fitcv <- do.call("glmregNB", list(formula, data[-omit,], weights[-omit], lambda=lambda, theta.est=FALSE, theta0=glmregNB.obj$theta, trace=trace, ...))
+### remove the first column, which is for intercept
+      fitcv$terms <- NULL ### logLik requires data frame if terms is not NULL
+      residmat[, i] <- logLik(fitcv, newx=X[omit,-1, drop=FALSE], Y[omit], weights=weights[omit])
+
+   }
+    cv <- apply(residmat, 1, mean)
+    cv.error <- sqrt(apply(residmat, 1, var)/K)
+    obj<-list(fit=glmregNB.obj, residmat=residmat, fraction = fraction, cv = cv, cv.error = cv.error, foldid=all.folds)
+    class(obj) <- "cv.glmreg"
+    if(plot.it) plot(obj,se=se)
+    obj
+  }
+
