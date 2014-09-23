@@ -17,5 +17,11 @@
                 CHANGES in `gzipath' VERSION 0.1_14   (2014-6-9)
 
   o change package name to `mpath'
+                
+                CHANGES in `mpath' VERSION 0.1_15   (2014-9-23)
+
+  o apply patch from Martyn Plummer <plummerm@iarc.fr> to replace isna and lgamma to avoid failure on some platforms
+
+ 
 
  

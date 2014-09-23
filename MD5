@@ -1,6 +1,6 @@
-7fc6c04fb0d9ee9ae8073bc0c5ba844d *DESCRIPTION
+d945beaafe7a3b37dbd4cc98fc85cd6a *DESCRIPTION
 76a09519dc512b75134d634889f53c4e *NAMESPACE
-c2ea77fe57eaee2c2f546e8f9c3579d6 *NEWS
+8d16122a130753579ffa67d944e5901c *NEWS
 91b4d5848989a31cd0518229f6dccd34 *R/balanced.folds.R
 19035d7b722d9eb021e0d16f6b60e663 *R/be_zeroinfl1.R
 220541460aa6c105efbab64bc9935663 *R/convexMin.R
@@ -52,8 +52,9 @@ a7a958b45d64ebfdecfbcfda12f5071d *man/se.Rd
 4684d8c21a2c07fa56e78bf6ca0b6449 *man/vuong.Rd
 6fabe2a0d486d5e7de18ea396de4bffc *man/zipath.Rd
 24451fdc961f31d4428dbf6cf5af8b18 *src/Makevars
+7cf4033bf9528eb2d178ed5018cd1b62 *src/cfuns.c
 0d15ce76ca29f9c91269d6ba5d8918ed *src/lmnetGLM.f
 63b070784b24513fd235d3f6316637b0 *src/lmnetGaussian.f
-95d836ce2d3380f59a1ee5cb6398ce08 *src/midloop.f
+640a32e9d6d0d0b232487ef04247bdb1 *src/midloop.f
 87363bdd7ac38bbac16c2825b2c0cc6a *src/mutil.f
 7df590175406107708aa21b238ffdc86 *src/outloop.f

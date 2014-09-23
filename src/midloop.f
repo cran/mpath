@@ -255,6 +255,8 @@ C dev
 
       integer n, family, i
       double precision dev, y(n), mu(n), theta, weights(n),tmp
+      integer cisnan
+      external cisnan
  
       dev = 0.0D0
       do 10 i=1, n
@@ -282,13 +284,13 @@ C dev
         dev=dev+2*(weights(i)*(y(i)*dlog(max(1.0D0,y(i))/mu(i))-
      +  (y(i)+theta)*dlog((y(i)+theta)/(mu(i) + theta)))) 
       endif
-      if(isnan(dev)) then
+      if(cisnan(dev).NE.0) then
       call intpr("i=", -1, i, 1)
       call dblepr("y(i)=", -1, y(i), 1)
       call dblepr("mu(i)=", -1, mu(i), 1)
       call dblepr("theta=", -1, theta, 1)
       call dblepr("dev=", -1, dev, 1)
-      call exit
+      exit
       endif
   10  continue
       return
@@ -300,6 +302,8 @@ CCC ref R/loglik.R
 
       integer n, family, i, y0
       double precision ll, y(n), mu(n), theta, w(n)
+      double precision rlgamma
+      external rlgamma
 
       ll = 0
       do 10 i=1,n
@@ -309,8 +313,8 @@ CCC ref R/loglik.R
       else 
       y0=0
       endif
-       ll=ll + w(i) * (lgamma(theta+y(i))-lgamma(theta)-
-     +   lgamma(y(i)+1)+
+       ll=ll + w(i) * (rlgamma(theta+y(i))-rlgamma(theta)-
+     +   rlgamma(y(i)+1)+
      +   theta*log(theta) + y(i)*log(mu(i)+y0) - (theta + y(i))*
      +   log(theta +  mu(i)))
       else if(family .EQ. 1)then !gaussian
@@ -320,7 +324,7 @@ CCC ref R/loglik.R
         ll=ll + w(i)*(y(i)*log(mu(i)/(1-mu(i)))+log(1-mu(i)))
         endif
         else if(family .EQ. 3) then !poisson
-        ll=ll + w(i)*(-mu(i) + y(i)*log(mu(i))-lgamma(y(i)+1))
+        ll=ll + w(i)*(-mu(i) + y(i)*log(mu(i))-rlgamma(y(i)+1))
       endif
  10   continue
       return
