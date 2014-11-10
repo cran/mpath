@@ -102,14 +102,18 @@ C dev
 C compute deviance dev
       call deveval(n, yold, mu, theta, weights, family, dev)
 C      if(dev.LT.0.0001)then
+C      if(dev/nulldev .LT.0.01 .OR. dev.LT.0.0001)then
+      if(family .EQ. 2)then
       if(dev/nulldev .LT.0.01 .OR. dev.LT.0.0001)then
-C      call dblepr("saturated model, residual deviance = ", -1, dev, 1)
-C      call dblepr("saturated model, null deviance = ", -1, nulldev, 1)
-C      call rwarn("saturated model, exiting ...")
+      call dblepr("saturated model, residual deviance = ", -1, dev, 1)
+      call dblepr("saturated model, null deviance = ", -1, nulldev, 1)
+      call intpr("family", -1, family, 1)
+      call rwarn("saturated model, exiting ...")
       satu = 1
        call DCOPY(m, betaold, 1, beta, 1)
        b0 = b0old
        theta = thetaold
+      endif
       endif
       del = dabs(dev - olddev)
         convmid = converged

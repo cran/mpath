@@ -13,6 +13,7 @@ standardize = TRUE, family = c("poisson", "negbin","geometric"),
 link = c("logit", "probit", "cloglog", "cauchit", "log"), 
 penalty = c("enet", "mnet", "snet"), start = NULL, model = TRUE, 
 y = TRUE, x = FALSE, nlambda = 100, lambda.count = NULL,lambda.zero = NULL, 
+ penalty.factor.count=NULL, penalty.factor.zero=NULL,
 lambda.count.min.ratio = .0001, lambda.zero.min.ratio = .1, 
 alpha.count = 1, alpha.zero = alpha.count, gamma.count = 3, 
 gamma.zero = gamma.count, rescale=FALSE, init.theta, theta.fixed=FALSE,
@@ -44,6 +45,9 @@ maxit.theta = 1, reltol = 1e-5, eps.bino=1e-5, shortlist=FALSE, trace = FALSE, .
     program compute its own \code{lambda.count} and \code{lambda.zero} sequence based on
     \code{nlambda} and \code{lambda.min.ratio}.} 
   \item{lambda.zero}{A user supplied \code{lambda.zero} sequence.}
+ \item{penalty.factor.count, penalty.factor.zero}{These are numeric vectors with the same length as predictor variables. that multiply \code{lambda.count, lambda.zero}, respectively, to allow differential shrinkage of coefficients. Can be 0 for some variables, which implies
+    no shrinkage, and that variable is always included in the
+    model. Default is same shrinkage for all variables.}
  \item{lambda.count.min.ratio, lambda.zero.min.ratio}{Smallest value for \code{lambda.count} 
        and \code{lambda.zero}, respectively, as a fraction of
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest

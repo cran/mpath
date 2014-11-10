@@ -20,8 +20,11 @@
                 
                 CHANGES in `mpath' VERSION 0.1_15   (2014-9-23)
 
-  o apply patch from Martyn Plummer <plummerm@iarc.fr> to replace isna and lgamma to avoid failure on some platforms
+  o apply patch from Martyn Plummer <plummerm@iarc.fr> to replace isna and lgamma in src Fortran file to avoid failure on some platforms
+                
+                CHANGES in `mpath' VERSION 0.1_16   (2014-10-25)
 
- 
-
+  o change src/midloop.f, now saturated model only applies to logistic regression
+  o add penalty.factor.count and penalty.factor.zero in zipath function to allow different penalties for each of the variables.
+  o add vignette to illustrate analysis of German health care demand
  

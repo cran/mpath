@@ -2,7 +2,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                    family = c("poisson", "negbin", "geometric"),
                    link = c("logit", "probit", "cloglog", "cauchit", "log"),
                    penalty = c("enet", "mnet", "snet"),
-                   start = NULL, model = TRUE, y = TRUE, x = FALSE, nlambda=100, lambda.count=NULL, lambda.zero=NULL, lambda.count.min.ratio=.0001, lambda.zero.min.ratio=.1, alpha.count=1, alpha.zero=alpha.count, gamma.count=3, gamma.zero=gamma.count, rescale=FALSE, init.theta, theta.fixed=FALSE, EM=TRUE, maxit.em=200, convtype=c("count", "both"), maxit= 1000, maxit.theta =1, reltol = 1e-5, eps.bino=1e-5, shortlist=FALSE, trace=FALSE, ...)
+                   start = NULL, model = TRUE, y = TRUE, x = FALSE, nlambda=100, lambda.count=NULL, lambda.zero=NULL, penalty.factor.count=NULL, penalty.factor.zero=NULL, lambda.count.min.ratio=.0001, lambda.zero.min.ratio=.1, alpha.count=1, alpha.zero=alpha.count, gamma.count=3, gamma.zero=gamma.count, rescale=FALSE, init.theta, theta.fixed=FALSE, EM=TRUE, maxit.em=200, convtype=c("count", "both"), maxit= 1000, maxit.theta =1, reltol = 1e-5, eps.bino=1e-5, shortlist=FALSE, trace=FALSE, ...)
 {
     if(!attr(terms(formula), "intercept"))
         stop("non-intercept model is not implemented")
@@ -421,7 +421,8 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
         kx <- NCOL(X)
         kz <- NCOL(Z)
     }
-
+    if(is.null(penalty.factor.count)) penalty.factor.count <- rep(1, dim(Xnew)[2])
+    if(is.null(penalty.factor.zero)) penalty.factor.zero <- rep(1, dim(Znew)[2])
 ### get lambda -begin
     if(is.null(lambda.count) && is.null(lambda.zero)){
         mui <- predict(fit0, type="count")
@@ -434,23 +435,23 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
         probi[Y1] <- 0
         if(dim(Xnew)[2] > 1){
             if(family=="poisson"){
-                lambda.count <- glmreg_fit(Xnew, Y, weights=weights*(1-probi)/n, family="poisson", nlambda=nlambda, lambda.min.ratio = lambda.min.ratio, alpha=alpha.count, maxit=1, standardize=FALSE, ...)$lambda
+                lambda.count <- glmreg_fit(Xnew, Y, weights=weights*(1-probi)/n, family="poisson", penalty.factor=penalty.factor.count, nlambda=nlambda, lambda.min.ratio = lambda.min.ratio, alpha=alpha.count, maxit=1, standardize=FALSE, ...)$lambda
             }
             else if(family=="geometric"){
-                lambda.count <- glmreg_fit(Xnew, Y, weights=weights*(1-probi)/n, family="negbin", nlambda=nlambda, lambda.min.ratio=lambda.min.ratio,alpha=alpha.count, theta=1, maxit=1, standardize=FALSE, ...)$lambda
+                lambda.count <- glmreg_fit(Xnew, Y, weights=weights*(1-probi)/n, family="negbin", penalty.factor=penalty.factor.count, nlambda=nlambda, lambda.min.ratio=lambda.min.ratio,alpha=alpha.count, theta=1, maxit=1, standardize=FALSE, ...)$lambda
                 theta <- 1
             }   else if(family=="negbin"){
                 if(theta.fixed){
-                    lambda.count <- glmreg_fit(Xnew, Y, weights=weights*(1-probi)/n, family="negbin", theta=init.theta, nlambda=nlambda, lambda.min.ratio=lambda.min.ratio, alpha=alpha.count, maxit=1, standardize=FALSE, ...)$lambda
+                    lambda.count <- glmreg_fit(Xnew, Y, weights=weights*(1-probi)/n, family="negbin", penalty.factor=penalty.factor.count, theta=init.theta, nlambda=nlambda, lambda.min.ratio=lambda.min.ratio, alpha=alpha.count, maxit=1, standardize=FALSE, ...)$lambda
                 }
                 else{
-                    lambda.count <- glmregNB(Y~Xnew, weights=weights*(1-probi)/n, nlambda=nlambda, lambda.min.ratio=lambda.min.ratio, alpha=alpha.count, rescale=FALSE, standardize=FALSE, maxit=1, maxit.theta=2, ...)$lambda
+                    lambda.count <- glmregNB(Y~Xnew, weights=weights*(1-probi)/n, penalty.factor=penalty.factor.count, nlambda=nlambda, lambda.min.ratio=lambda.min.ratio, alpha=alpha.count, rescale=FALSE, standardize=FALSE, maxit=1, maxit.theta=2, ...)$lambda
                 }
             }
         }
         else lambda.count <- rep(0, nlambda)
         if(dim(Znew)[2] > 1){
-            lambda.zero <- glmreg_fit(Znew, probi, weights=weights, family="binomial", penalty=penalty, rescale=rescale, nlambda=nlambda, lambda.min.ratio=lambda.zero.min.ratio, alpha=alpha.zero, maxit=1, eps.bino=eps.bino, ...)$lambda
+            lambda.zero <- glmreg_fit(Znew, probi, weights=weights, family="binomial", penalty=penalty, penalty.factor=penalty.factor.zero, rescale=rescale, nlambda=nlambda, lambda.min.ratio=lambda.zero.min.ratio, alpha=alpha.zero, maxit=1, eps.bino=eps.bino, ...)$lambda
        # if(penalty %in% c("mnet", "snet") && !rescale) 
        #   {###it seems lambda.zero[1] too small, thus ...
        #    lmax <- 0.632 * sqrt(lambda.zero[1])
@@ -505,7 +506,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                     countcoef = model_count$coefficients
                 }
                 else{
-                    capture.output(model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize = FALSE, lambda=lambda.count[k], alpha=alpha.count,gamma=gamma.count, rescale=rescale, maxit=maxit,
+                    capture.output(model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize = FALSE, penalty.factor=penalty.factor.count, lambda=lambda.count[k], alpha=alpha.count,gamma=gamma.count, rescale=rescale, maxit=maxit,
                                         #                                         start=start$count, mustart=mui, etastart=g(mui, family="poisson"),  
                                                              family = "poisson", penalty=penalty, trace=trace))
                     countcoef = c(model_count$b0, model_count$beta)
@@ -525,7 +526,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                     zerocoef = model_zero$coefficients
                 }
                 else{
-                    capture.output(model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=standardize, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit, 
+                    capture.output(model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=standardize, penalty.factor=penalty.factor.zero, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit, 
                                         #                                        start=start$zero, mustart=model_zero$fitted.value, etastart=g(model_zero$fitted.value, family="binomial", eps.bino=eps.bino),
                                                             family = "binomial", penalty=penalty, trace=trace, eps.bino=eps.bino))
                     zerocoef = c(model_zero$b0, model_zero$beta)
@@ -589,7 +590,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                     countcoef = model_count$coefficients
                 }
                 else{
-                    model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize=FALSE, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count,rescale=rescale, maxit=maxit, #start=start$count, mustart=mui, etastart=g(mui,family="negbin"),
+                    model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize=FALSE, penalty.factor=penalty.factor.count, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count,rescale=rescale, maxit=maxit, #start=start$count, mustart=mui, etastart=g(mui,family="negbin"),
                                               family = "negbin", theta=1, penalty=penalty)
                     countcoef = c(model_count$b0, model_count$beta)
                 }
@@ -599,7 +600,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                     zerocoef = model_zero$coefficients
                 }
                 else{
-                    model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=standardize, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit,
+                    model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=standardize, penalty.factor=penalty.factor.zero, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit,
                                         #start=start$zero, mustart=model_zero$fitted.value, etastart=g(model_zero$fitted.value, family="binomial", eps.bino=eps.bino),
                                              family = "binomial", penalty=penalty, eps.bino=eps.bino)
                     zerocoef = c(model_zero$b0, model_zero$beta)
@@ -659,10 +660,10 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                     countcoef = model_count$coefficients
                 }        else{ 
                     if(theta.fixed)
-                        capture.output(model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize=FALSE, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count,rescale=rescale, maxit=maxit,
+                        capture.output(model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize=FALSE, penalty.factor=penalty.factor.count, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count,rescale=rescale, maxit=maxit,
                                         #                      start=start$count, mustart=mui, etastart=g(mui,family="negbin"),
                                                                  family = "negbin", theta=init.theta, penalty=penalty, trace=trace, ...))
-                    else capture.output(model_count <- glmregNB(Y ~ X[,-1], standardize=FALSE, weights = weights * (1-probi)/n, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count, rescale=rescale, maxit.theta = maxit.theta, maxit=maxit,
+                    else capture.output(model_count <- glmregNB(Y ~ X[,-1], standardize=FALSE, weights = weights * (1-probi)/n, penalty.factor=penalty.factor.count, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count, rescale=rescale, maxit.theta = maxit.theta, maxit=maxit,
 ### not inclued line otherwise not accurate###
                                         #   start=start$count, mustart=mui, etastart=g(mui,family="negbin"),
                                                                 init.theta=start$theta, penalty=penalty, trace=trace, ...))
@@ -674,9 +675,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                     zerocoef = model_zero$coefficients
                 }
                 else{
-                                        #capture.output(model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=TRUE, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit,
-                                        #if(nlambda < 100 && k <= 13) cat("k==", k, "\n")
-                    (model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=TRUE, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit,
+                    capture.output(model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=TRUE, penalty.factor=penalty.factor.zero, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit,
 ### not inclued line otherwise not accurate###
                                         #start=start$zero, mustart=model_zero$fitted.value, etastart=g(model_zero$fitted.value, family="binomial", eps.bino=eps.bino),
                                               family = "binomial", penalty=penalty, trace=trace, eps.bino=eps.bino, ...))
@@ -1112,7 +1111,7 @@ model.matrix.zipath <- function(object, model = c("count", "zero"), ...) {
 }
 
 ### evaluation of penalty function
-###consider enet: \lambda_1 |theta| + 1/2 * \lambda_2 theta^2, mnet and snet penatly
+###consider enet: \lambda_1 |theta| + 1/2 * \lambda_2 theta^2, mnet and snet penalty
 pen_eval <- function(theta, lone, ltwo, gamma,
                      penalty = c("enet", "mnet", "snet")){
     if(lone < 0 || ltwo < 0) stop("lone and ltwo should be non-negative values\n")

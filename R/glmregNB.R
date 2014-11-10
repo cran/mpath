@@ -110,10 +110,12 @@ if(standardize){
        #fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, start = start, etastart=eta, mustart = mu, lambda=lambda[k],alpha=alpha,gamma=gamma,rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace, penalty=penalty)
       t0 <- th
       mu <- fit$fitted.values
-      if(theta.est)
+      if(theta.est){
 #      th <- theta.ml(Y, mu, sum(w), w, limit=maxit.theta,
       th <- theta.ml(Y, mu, sum(w), w,
                      trace = trace)
+#      if(inherits(th, "try-error")) browser()
+}
       else th <- theta0[k]
       start <- c(fit$b0, fit$beta)
       del <- t0 - th
