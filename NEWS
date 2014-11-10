@@ -27,4 +27,8 @@
   o change src/midloop.f, now saturated model only applies to logistic regression
   o add penalty.factor.count and penalty.factor.zero in zipath function to allow different penalties for each of the variables.
   o add vignette to illustrate analysis of German health care demand
- 
+  
+                CHANGES in `mpath' VERSION 0.1_17   (2014-11-10)
+
+  o fix a bug in function estfunReg, which is supposed to work only for one penalty parameter 
+  o fix a bug in src/lmnetGaus.f, computing meanx 

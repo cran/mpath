@@ -1355,15 +1355,20 @@ breadReg.zipath <- function(x, which, log=FALSE, ...){
 estfunReg <- function(x, ...)
     UseMethod("estfunReg")
 
-estfunReg.zipath <- function(x, log=FALSE, ...) {
+estfunReg.zipath <- function(x, which=1, log=FALSE, ...) {
     ## extract data
+    if(length(which)!=1) stop("argument which should be one integer only\n")
     Y <- if(is.null(x$y)) model.response(model.frame(x)) else x$y
     X <- model.matrix(x, model = "count")
     Z <- model.matrix(x, model = "zero")
     beta <- coef(x, model = "count")
     gamma <- coef(x, model = "zero")
-    theta <- x$theta
-
+    if(x$nlambda > 1){
+     beta <- beta[,which]
+     gamma <- gamma[,which]
+    }
+    if(x$family=="negbin")
+      theta <- x$theta[which]
     offset <- x$offset
     if(is.list(offset)) {
         offsetx <- offset$count

@@ -88,13 +88,13 @@ C  input: others except the aboved mentioned output
       subroutine lmnetGaus(x, y, n, m, weights, w, lambda, alpha, 
      +gam, 
      +thresh, maxit, eps, standardize, family, 
-     +trace,penalty,normx,xd,beta, b0, 
+     +trace,penalty, normx,xd,beta, b0, 
      +avg, yhat, jj, rescale, converged)
 
       implicit none
       double precision x(n, m), y(n), weights(n), lambda(m),
      +meanx(m), normx(m), xd(m),yhat(n),resid(n),
-     +alpha, gam, thresh, eps, avg, wsum,w(n),
+     +alpha, gam, thresh, eps, avg, wsum,w(n), mu(n),
      + wtnew(n), b0, beta(m), ddot
       integer maxit, standardize, trace, penalty, n,m,i,j,jj,converged,
      +family, rescale 
@@ -107,6 +107,18 @@ C  input: others except the aboved mentioned output
       else 
        b0 = avg
       endif
+      wsum=0
+C compute weighted means sum(weights_i*y_i)
+      mu = ddot(n, y, 1, weights, 1)
+      do 20 i=1, n
+      wsum = wsum + weights(i)
+  20  continue
+      do 30 i=1, n
+      wtnew(i) = weights(i)/wsum
+  30  continue
+C compute weighted column averages meanx = x^(transpose) * wtnew
+      call DGEMV('T',n, m, 1.0D0, x, n, wtnew, 1, 0.0D0, meanx, 1)
+
       call loop_gaussian(x,y, n,m,penalty,thresh,eps,maxit,standardize,
      +beta,b0,
      +resid,xd,lambda,alpha,gam,weights,avg,meanx,trace,jj,rescale, 

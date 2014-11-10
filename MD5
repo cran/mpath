@@ -1,6 +1,6 @@
-b7696bea0e5a7bf4c7adaa83ccae4dff *DESCRIPTION
+2664f1e4088c1d1b994e00a1046b9acb *DESCRIPTION
 76a09519dc512b75134d634889f53c4e *NAMESPACE
-3a3332bb632dd78f4af6f608ab4385c6 *NEWS
+f63ba9c541309009537db9041cc59d3e *NEWS
 91b4d5848989a31cd0518229f6dccd34 *R/balanced.folds.R
 19035d7b722d9eb021e0d16f6b60e663 *R/be_zeroinfl1.R
 220541460aa6c105efbab64bc9935663 *R/convexMin.R
@@ -21,13 +21,13 @@ f1231bf816c0ed3ef4b215de95c1975d *R/predict.glmreg.R
 fe5ce52ce6b530b8d030d80fdfdd6daa *R/rzi.R
 2c56435e8850f2013ecef53ef24ca86e *R/tuning_zipath.R
 ca7d942cdbba1354127cf975cd0e0f87 *R/vuong.R
-5465b6107124de354c247af1d4e38f8a *R/zipath.R
+89facb0db42f45ebc020a90236e7fc46 *R/zipath.R
 d41d8cd98f00b204e9800998ecf8427e *ToDo
-bbdcea6da510a5fc2cd6fbb7cdb3b66a *build/vignette.rds
+3f56066147bef948ef2936e56fb4fb96 *build/vignette.rds
 6ed716db344e8dc18484e58ce7ad84c5 *inst/COPYRIGHTS
 d3e0453e0854403d050b8dcecaca21b0 *inst/doc/german.R
 814600bc9c3d41a6fe3290bee2446f8f *inst/doc/german.Rnw
-a651695063df12b0b102c3a080546f5f *inst/doc/german.pdf
+94478bd8cfa00cce9847d1c78b767a46 *inst/doc/german.pdf
 be8c44d905b11f38fe8e6e410278706f *man/be_zeroinfl.Rd
 e250487506cc1663b7911094f51a102f *man/breadReg.Rd
 704fcdf5f5842a8b0741b109a1c9ebb7 *man/conv2glmreg.Rd
@@ -45,7 +45,7 @@ d931f1ed28ffcaa0ff60e3956ec3b5bd *man/cv.glmreg.Rd
 d093c6d90a040a2efd86699b53d8bed4 *man/methods.Rd
 ab09323ac29439288ffe3ca4236bde0c *man/mpath-internal.Rd
 a9ef5c9d4641c18484c4361d0188f7d9 *man/p_zipath.Rd
-17df0664579d5fac2333eeea9f877558 *man/plot.glmreg.Rd
+004add3bd04b00c1e723b2e2fef4380e *man/plot.glmreg.Rd
 9318bcaeab140218384172fc13febbc1 *man/predict.glmreg.Rd
 00792506193df556b360b3fc21695d85 *man/predict.zipath.Rd
 e145f962adc7975bcfdd0595a695a04f *man/rzi.Rd
@@ -58,7 +58,7 @@ a7a958b45d64ebfdecfbcfda12f5071d *man/se.Rd
 24451fdc961f31d4428dbf6cf5af8b18 *src/Makevars
 7cf4033bf9528eb2d178ed5018cd1b62 *src/cfuns.c
 0d15ce76ca29f9c91269d6ba5d8918ed *src/lmnetGLM.f
-63b070784b24513fd235d3f6316637b0 *src/lmnetGaussian.f
+f98a7436776686ad30c225ae2a0a458b *src/lmnetGaussian.f
 acfc609ed4391be96d788ced790f07f8 *src/midloop.f
 87363bdd7ac38bbac16c2825b2c0cc6a *src/mutil.f
 7df590175406107708aa21b238ffdc86 *src/outloop.f
