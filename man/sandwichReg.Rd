@@ -31,7 +31,7 @@ them to a sandwich with meat between two slices of bread. By default
 \seealso{\code{\link{breadReg}}, \code{\link{meatReg}}}
 
 \references{
-Zhu Wang, Shuangge Ma and Ching-Yun Wang (2014) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, manuscript
+Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, Biometrical Journal. Article first published online June 8, 2015
 }
 \author{Zhu Wang <zwang@connecticutchildrens.org>}
 

@@ -3,8 +3,8 @@ glmregNB <- function(formula, data, weights, nlambda=100, lambda=NULL, lambda.mi
 {
   if(!theta.est)
    if(length(theta0)!=nlambda)
-   stop("length of theta0 must be the same as nlambda if theta.est=TRUE\n")
-   else if(any(theta0) <= 0)
+   stop("length of theta0 must be the same as nlambda if theta.est=FALSE\n")
+   else if(any(theta0 <= 0))
    stop("theta0 must be positive\n") 
    penalty <- match.arg(penalty)
   if(penalty=="enet") convex=FALSE

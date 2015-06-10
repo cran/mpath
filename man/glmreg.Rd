@@ -75,7 +75,8 @@ Breheny, P. and Huang, J. (2011) \emph{Coordinate descent
   biological feature selection}. \emph{Ann. Appl. Statist.}, \bold{5}: 232-253.
 
 Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014) 
-\emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}, in press
+\emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}.
+2014 Apr 17. [Epub ahead of print]
 }
 
 \author{Zhu Wang <zwang@connecticutchildrens.org>}

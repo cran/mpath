@@ -40,20 +40,20 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,...)
 }
 \value{an object of class \code{"cv.glmregNB"} is returned, which is a
   list with the ingredients of the cross-validation fit.
-  \item{lambda}{the values of \code{lambda} used in the fits.}
-  \item{cvm}{The mean cross-validated error - a vector of length
-    \code{length(lambda)}.}
-  \item{cvsd}{estimate of standard error of \code{cvm}.}
-  \item{cvup}{upper curve = \code{cvm+cvsd}.}
-  \item{cvlo}{lower curve = \code{cvm-cvsd}.}
-  \item{nzero}{number of non-zero coefficients at each \code{lambda}.}
  \item{fit}{a fitted glmregNB object for the full data.}
-  \item{lambda.min}{value of \code{lambda} that gives minimum
-    \code{cvm}.}
+  \item{residmat}{matrix of log-likelihood values with row values for \code{lambda} and column values for \code{k}th cross-validation}
+  \item{cv}{The mean cross-validated log-likelihood values - a vector of length
+    \code{length(lambda)}.}
+  \item{cv.error}{The standard error of cross-validated log-likelihood values - a vector of length
+    \code{length(lambda)}.}
+  \item{fraction}{a vector of \code{lambda} values with length of \code{lambda}}
+  \item{foldid}{indicators of data used in each cross-validation, for reproductive purposes}
+  \item{lambda.which}{index of \code{lambda} that gives maximum \code{cv} value.}
+  \item{lambda.optim}{value of \code{lambda} that gives maximum \code{cv} value.}
 }
 \references{
 Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)
-\emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}, in press 
+\emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print] 
 }
 \author{Zhu Wang <zwang@connecticutchildrens.org>}
 \seealso{\code{\link{glmregNB}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.glmregNB"} object.}

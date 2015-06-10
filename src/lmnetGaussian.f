@@ -124,19 +124,20 @@ C compute weighted column averages meanx = x^(transpose) * wtnew
      +resid,xd,lambda,alpha,gam,weights,avg,meanx,trace,jj,rescale, 
      +converged)
       jj = jj - 1
-      if(standardize.EQ.1)then
-      do 200 j=1, m
-      beta(j) = beta(j)/normx(j)
-      if(dabs(beta(j)) .LT. 1e-10)then
-      beta(j) = 0
-      endif
-  200 continue
-      endif
-      b0 = 0
-      do 210 j=1, m
-      b0 = b0 + meanx(j) * beta(j)
-  210 continue
-      b0 = avg - b0
+C      if(standardize.EQ.1)then
+C      do 200 j=1, m
+C      beta(j) = beta(j)/normx(j)
+C      if(dabs(beta(j)) .LT. 1e-10)then
+C      beta(j) = 0
+C      endif
+C  200 continue
+C      endif
+CCCC changed 4/22/2015
+C      b0 = 0
+C      do 210 j=1, m
+C      b0 = b0 + meanx(j) * beta(j)
+C  210 continue
+C      b0 = avg - b0
 
       return
       end

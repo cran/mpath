@@ -33,7 +33,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,
         cat("\n CV Fold", i, "\n\n")
       omit <- all.folds[[i]]
 ### changed 5/20/2013 fixed theta
-      fitcv <- do.call("glmregNB", list(formula, data[-omit,], weights[-omit], lambda=lambda, theta.est=FALSE, theta0=glmregNB.obj$theta, trace=trace, ...))
+      fitcv <- do.call("glmregNB", list(formula, data[-omit,], weights[-omit], nlambda=nlambda, lambda=lambda, theta.est=FALSE, theta0=glmregNB.obj$theta, trace=trace, ...))
 ### remove the first column, which is for intercept
       fitcv$terms <- NULL ### logLik requires data frame if terms is not NULL
       residmat[, i] <- logLik(fitcv, newx=X[omit,-1, drop=FALSE], Y[omit], weights=weights[omit])
@@ -41,7 +41,8 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,
    }
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
-    obj<-list(fit=glmregNB.obj, residmat=residmat, fraction = fraction, cv = cv, cv.error = cv.error, foldid=all.folds)
+    lambda.which <- which.max(cv)
+    obj<-list(fit=glmregNB.obj, residmat=residmat, fraction = fraction, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
     class(obj) <- "cv.glmreg"
     if(plot.it) plot(obj,se=se)
     obj

@@ -48,24 +48,23 @@ The method for \code{\link[stats]{coef}} by default
   list with the components of the cross-validation fit.
  \item{fit}{a fitted zipath object for the full data.}
  \item{residmat}{matrix for cross-validated log-likelihood at each \code{(count.lambda, zero.lambda)} sequence}
-  \item{bic}{The cross-validated BIC value - a vector of length
-    \code{length(count.lambda)}.}
+  \item{bic}{matrix of BIC values with row values for \code{lambda} and column values for \code{k}th cross-validation}
  \item{fraction}{a sequence from 1:\code{nlambda}. \code{nlambda} is the same as the argument if any one of \code{(count.lambda, zero.lambda)} is missing; otherwise \code{nlambda=length(count.lambda)}}
   \item{cv}{The mean cross-validated log-likelihood - a vector of length
     \code{length(count.lambda)}.}
   \item{cv.error}{estimate of standard error of \code{cv}.}
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
     identifying what fold each observation is in.} 
- \item{lambda.which}{index of \code{(count.lambda, zero.lambda)} that gives minimum \code{cv}.}
- \item{lambda.optim}{value of \code{(count.lambda, zero.lambda)} that gives minimum \code{cv}.}
+ \item{lambda.which}{index of \code{(count.lambda, zero.lambda)} that gives maximum \code{cv}.}
+ \item{lambda.optim}{value of \code{(count.lambda, zero.lambda)} that gives maximum \code{cv}.}
 }
 \references{
-Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)      \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}, in press
+Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)      \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
 
 Zhu Wang, Shuangge Ma, Ching-Yun Wang, Michael Zappitelli, Prasad Devarajan and Chirag R. Parikh (2014)
-\emph{EM for Regularized Zero Inflated Regression Models with Applications to Postoperative Morbidity after Cardiac Surgery in Children}, \emph{Statistics in Medicine}, in press
+\emph{EM for Regularized Zero Inflated Regression Models with Applications to Postoperative Morbidity after Cardiac Surgery in Children}, \emph{Statistics in Medicine}. 2014 Apr 17. [Epub ahead of print]
 
-Zhu Wang, Shuangge Ma and Ching-Yun Wang (2014) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, manuscript
+Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, Biometrical Journal. Article first published online June 8, 2015
 }
 
 \author{Zhu Wang <zwang@connecticutchildrens.org>}

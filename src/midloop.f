@@ -164,8 +164,8 @@ C      parameter (ep=1e-5)
        else if(family.EQ.4)then
            if(mu(i) .LT. ep)then
            mu(i) = ep
-           else if(mu(i) .GT. 1000)then
-            mu(i) = 1000
+C           else if(mu(i) .GT. 1000)then  ### changed 5/29/15
+C            mu(i) = 1000
            endif
            w(i) = mu(i)/(1 + 1/theta * mu(i))
       endif
@@ -203,10 +203,11 @@ C mu
        else if(family.EQ.4)then
         if(eta(i) .LT. log(1e-5))then
         mu(i) = 1e-5
-        else if(eta(i) .LT. log(1000D0))then
+        else
+C        else if(eta(i) .LT. log(1000D0))then  ### changed 5/29/15
         mu(i) = exp(eta(i))
-        else 
-        mu(i) = 1000
+C        else 
+C        mu(i) = 1000
         endif
        endif
    10 continue

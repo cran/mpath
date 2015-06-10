@@ -35,8 +35,8 @@ convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
   sample size \code{nobs} relative to the number of variables
   \code{nvars}. If \code{nobs > nvars}, the default is \code{0.001},
   close to zero.  If \code{nobs < nvars}, the default is \code{0.05}.}
-  \item{alpha}{The L2 penalty mixing parameter, with
-    \eqn{0\le\alpha\le 1}. \code{alpha=1} is lasso (mcp, scad) penalty; and \code{alpha=0} the ridge penalty.}
+  \item{alpha}{The \eqn{L_2} penalty mixing parameter, with
+    \eqn{0<\le alpha\le 1}. \code{alpha=1} is lasso (mcp, scad) penalty; and \code{alpha=0} the ridge penalty. However, if \code{alpha=0}, one must provide \code{lambda} values.}
  \item{gamma}{The tunning parameter of the \code{snet} or \code{mnet} penalty.}
  \item{rescale}{logical value, if TRUE, adaptive rescaling of the penalty parameter for \code{penalty="mnet"} or \code{penalty="snet"} with \code{family} other than "gaussian". See reference}
   \item{standardize}{logical value for x variable standardization, prior to
@@ -97,7 +97,7 @@ Breheny, P. and Huang, J. (2011) \emph{Coordinate descent
   biological feature selection}. \emph{Ann. Appl. Statist.}, \bold{5}: 232-253.
 
 Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)
-\emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}, in press
+\emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
 }
 
 \author{Zhu Wang <zwang@connecticutchildrens.org>}

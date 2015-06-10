@@ -865,10 +865,6 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                      theta = theta)
     else
         rval <- list(coefficients = list(count = coefc, zero = coefz),
-                                        #                covLoglik=covLoglik,
-                                        #                hes=hes,
-                                        #                se=se,
-                                        #                vcov = vcov,
                      residuals = res,
                      fitted.values = Yhat,
                      satu = model_zero$satu,
@@ -989,12 +985,12 @@ predict.zipath <- function(object, newdata, which=1:object$nlambda, type = c("re
                         nbetazero=nonzeroCoef(nbetazero[-1,,drop=FALSE],bystep=TRUE)))
         else return(list(nbetacount=which(abs(nbetacount[-1]) > 0), nbetazero=which(abs(nbetazero[-1]) > 0)))
     }
-    predict.zeroinfl1(object, newdata, which, type,
+    predictzeroinfl1(object, newdata, which, type,
                       na.action = na.pass, at = at, ...)
 }
 
 ### based on pscl package predict.zeroinfl function
-predict.zeroinfl1 <- function(object, newdata, which=1:object$nlambda, type = c("response", "prob", "count", "zero"),
+predictzeroinfl1 <- function(object, newdata, which=1:object$nlambda, type = c("response", "prob", "count", "zero"),
                               na.action = na.pass, at = NULL, ...)
 {
     type <- match.arg(type)

@@ -44,9 +44,9 @@ Nicolai Meinshausen, Lukas Meier and Peter Buehlmann (2013)
 \emph{p-Values for High-Dimensional Regression}, \emph{Journal of the American Statistical Association}, \bold{104(488)}, 1671--1681
 
 Zhu Wang, Shuangge Ma, Ching-Yun Wang, Michael Zappitelli, Prasad Devarajan and Chirag R. Parikh (2014)
-\emph{EM for Regularized Zero Inflated Regression Models with Applications to Postoperative Morbidity after Cardiac Surgery in Children,} \emph{Statistics in Medicine}, in press
+\emph{EM for Regularized Zero Inflated Regression Models with Applications to Postoperative Morbidity after Cardiac Surgery in Children,} \emph{Statistics in Medicine}. 2014 Apr 17. [Epub ahead of print]
 
-Zhu Wang, Shuangge Ma and Ching-Yun Wang (2014) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, manuscript
+Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, Biometrical Journal. Article first published online June 8, 2015
 }
 
 \author{Zhu Wang <zwang@connecticutchildrens.org>}

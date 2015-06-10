@@ -32,3 +32,12 @@
 
   o fix a bug in function estfunReg, which is supposed to work only for one penalty parameter 
   o fix a bug in src/lmnetGaus.f, computing meanx 
+                
+                CHANGES in `mpath' VERSION 0.1_18   (2015-2-26)
+
+  o vignette file was updated to be consistent with the corresponding paper Wang et al (2015)
+  o fix bugs in cv.glmreg.Rd, cv.glmregNB.Rd and cv.zipath.Rd
+  o in findlam function, verify 0 < alpha <= 1
+  o fix a bug with intercept estimate for family="gaussian"
+  o remove the threshold value mu=1000 for family=4 in midloop.f, lines 167 and 207
+  o change function name predict.zeroinfl1 to predictzeroinfl1

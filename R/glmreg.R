@@ -81,13 +81,16 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
     stop("'family' not recognizied\n")
   }
   if(family == "gaussian") rescale <- FALSE
-  if(family!="gaussian" && y < 0)
-    stop("except for gaussian family, response should be nonnegative")
+  #if(family!="gaussian" && y < 0)
+  #  stop("except for gaussian family, response should be nonnegative")
     if (gamma <= 1 && penalty=="mnet") stop("gamma must be greater than 1 for the mnet penalty")
     if (gamma <= 2 && penalty=="snet") stop("gamma must be greater than 2 for the snet penalty")
-    if (alpha <= 0 || alpha > 1){
+    if (alpha < 0 || alpha > 1){
     cat("alpha=", alpha)
   stop("alpha must be greater than 0 and less than or equal to 1")
+}
+    if (alpha == 0 && is.null(lambda)){
+  stop("not designed for alpha=0 and lambda=NULL\n")
 }
   if(!is.null(etastart) && !is.null(mustart)){
    if((length(etastart) != length(mustart)) || length(etastart) != length(y))
@@ -106,8 +109,12 @@ if(missing(weights)) weights=rep(1,nobs)
   if( !is.null(weights) && any(weights < 0) ){
     stop("negative weights not allowed")
 }
-  if(family=="binomial" && any(y > 1))
+  if(family=="binomial"){
+   if(is.factor(y))
+   y <- as.integer(y) - 1
+   if(any(y > 1))
     stop("response should be between 0 and 1 for family=binomial")
+  }
   if(family=="negbin"){
   if(missing(theta))
   stop("theta has to be provided for family='negbin'\n")
@@ -274,14 +281,23 @@ if(missing(weights)) weights=rep(1,nobs)
   else pll <- NULL
   convex.min <- if (convex && all(weights==1)) convexMin(rbind(b0, beta), xx, penalty, gamma, lambda*(1-alpha), family, theta=theta) else NULL
   if(convex && any(weights!=1)) warnings("code for convex region implemented for weights=1 only\n")
-    if (family != "gaussian" && standardize){ 
+   if (standardize){ 
+   #if (family != "gaussian" && standardize){ 
   beta <- as.matrix(beta/as.vector(normx))
   b0 <- b0 - crossprod(meanx,beta)
+  if (family == "gaussian")
+   b0 <- mean(y) + b0    ### changed 4/22/2015
   }
   else normx <- NULL
   resdev <- tmp$resdev[good]
   yhat <- matrix(tmp$ypre, ncol=nlambda)[,good] 
   theta <- rep(theta, nlambda)
+  if(is.null(dim(beta)))
+  names(beta) <- colnames(x)
+  else{
+  rownames(beta) <- colnames(x)
+  colnames(beta) <- lambda
+}
   RET <- list(family=family,standardize=standardize, satu=tmp$satu, lambda=lambda[good], nlambda=length(lambda[good]), beta=beta, b0=b0, meanx=meanx, normx=normx, theta=theta[good], nulldev=nulldev, resdev=resdev, pll = pll, fitted.values=yhat, converged=tmp$convout[good], convex.min=convex.min, penalty.factor=penalty.factor, gamma=gamma, alpha=alpha)
   if(x.keep) RET$x <- x
   if(y.keep) RET$y <- y
@@ -361,6 +377,9 @@ init <- function(wt, y, family){
 }
 
 findlam <- function(x, y, weights, family, theta=NULL,mu, w, z, alpha, penalty.factor, eps.bino=1e-5, standardize=TRUE){ 
+  if (alpha <= 0 || alpha > 1){
+  stop("alpha must be greater than 0 and less than or equal to 1, but alpha=", alpha)
+}
   if(standardize)
   weights <- weights/sum(weights)
   penfac <- penalty.factor/sum(penalty.factor) * dim(x)[2]
