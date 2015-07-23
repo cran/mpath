@@ -10,7 +10,7 @@ se(x, which, log=TRUE, \dots)
 }
 \arguments{
  \item{x}{a fitted model object.}
- \item{which}{which penality parameter(s)?}
+ \item{which}{which penalty parameter(s)?}
  \item{log}{if TRUE, the computed standard error is for log(theta) for negative binomial regression, otherwise, for theta.}
  \item{\dots}{arguments passed to methods.}
 }

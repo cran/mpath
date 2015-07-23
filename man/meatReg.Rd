@@ -9,7 +9,7 @@ meatReg(x, which, \dots)
 }
 \arguments{
  \item{x}{a fitted model object. Currently only implemented for \code{zipath} object with \code{family="negbin"}}
- \item{which}{which penality parameter(s)?}
+ \item{which}{which penalty parameter(s)?}
  \item{\dots}{arguments passed to the \code{\link{estfunReg}} function.}
 }
 

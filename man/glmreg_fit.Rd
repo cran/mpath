@@ -1,11 +1,11 @@
 \name{glmreg_fit}
 \alias{glmreg_fit}
-\title{Internal function to fit a GLM with lasso (or elasticnet), snet and mnet regularization}
+\title{Internal function to fit a GLM with lasso (or elastic net), snet and mnet regularization}
 \description{
     Fit a generalized linear model via penalized maximum likelihood.  The
-  regularization path is computed for the lasso (or elasticnet penalty), snet and mnet penalty, at a grid
+  regularization path is computed for the lasso (or elastic net penalty), snet and mnet penalty, at a grid
   of values for the regularization parameter lambda. Fits
-  linear, logistic, poisson and negative binomial (fixed scale parameter) regression models.
+  linear, logistic, Poisson and negative binomial (fixed scale parameter) regression models.
   }
 \usage{
 glmreg_fit(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, 
@@ -31,13 +31,13 @@ convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
   \item{lambda}{A user supplied \code{lambda} sequence}
   \item{lambda.min.ratio}{Smallest value for \code{lambda}, as a fraction of
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest
-  value for which all coefficients are zero except the intercept). Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}. If \code{rescale=TRUE}, \code{lambda.max} is the same for \code{penatly="mnet" or "snet"}. Otherwise, some modifications are required. For instance, for small \code{gamma} value, half of the square root (if \code{lambda.max} is too small) of the computed \code{lambda.max} can be used when \code{penalty="mnet" or "snet"}. The default of \code{lambda.min.ratio} depends on the
+  value for which all coefficients are zero except the intercept). Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}. If \code{rescale=TRUE}, \code{lambda.max} is the same for \code{penalty="mnet" or "snet"}. Otherwise, some modifications are required. For instance, for small \code{gamma} value, half of the square root (if \code{lambda.max} is too small) of the computed \code{lambda.max} can be used when \code{penalty="mnet" or "snet"}. The default of \code{lambda.min.ratio} depends on the
   sample size \code{nobs} relative to the number of variables
   \code{nvars}. If \code{nobs > nvars}, the default is \code{0.001},
   close to zero.  If \code{nobs < nvars}, the default is \code{0.05}.}
   \item{alpha}{The \eqn{L_2} penalty mixing parameter, with
     \eqn{0<\le alpha\le 1}. \code{alpha=1} is lasso (mcp, scad) penalty; and \code{alpha=0} the ridge penalty. However, if \code{alpha=0}, one must provide \code{lambda} values.}
- \item{gamma}{The tunning parameter of the \code{snet} or \code{mnet} penalty.}
+ \item{gamma}{The tuning parameter of the \code{snet} or \code{mnet} penalty.}
  \item{rescale}{logical value, if TRUE, adaptive rescaling of the penalty parameter for \code{penalty="mnet"} or \code{penalty="snet"} with \code{family} other than "gaussian". See reference}
   \item{standardize}{logical value for x variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
@@ -66,7 +66,7 @@ convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
   The sequence of models implied by \code{lambda} is fit by coordinate
   descent. For \code{family="gaussian"} this is the lasso, mcp or scad sequence if
   \code{alpha=1}, else it is the enet, mnet or snet sequence.
- For the other families, this is a lasso (mcp, scad) or elasticnet (mnet, snet) regularization path
+ For the other families, this is a lasso (mcp, scad) or elastic net (mnet, snet) regularization path
   for fitting the generalized linear regression
   paths, by maximizing the appropriate penalized log-likelihood.
   Note that the objective function for \code{"gaussian"} is \deqn{1/2*

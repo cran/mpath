@@ -7,7 +7,7 @@
 \alias{coef.cv.glmreg}
 \title{Cross-validation for glmreg}
 \description{Does k-fold cross-validation for glmreg, produces a plot,
-  and returns cross-validated loglikelihood values for \code{lambda}}
+  and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
 \method{cv.glmreg}{formula}(formula, data, weights, offset=NULL, ...)
 \method{cv.glmreg}{matrix}(x, y, weights, offset=NULL, ...)

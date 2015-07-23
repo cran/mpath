@@ -2,7 +2,7 @@
 \alias{cv.glmreg_fit}
 \title{Internal function of cross-validation for glmreg}
 \description{Internal function to conduct k-fold cross-validation for glmreg, produces a plot,
-  and returns cross-validated loglikelihood values for \code{lambda}}
+  and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
 cv.glmreg_fit(x, y, weights, lambda=NULL, balance=TRUE, 
 family=c("gaussian", "binomial", "poisson", "negbin"), 
@@ -20,7 +20,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE, ...)
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
     identifying what fold each observation is in. If supplied,
     \code{nfold} can be missing and will be ignored.}
- \item{plot.it}{ a logical value, to plot the estimated loglikelihood values if \code{TRUE}. }
+ \item{plot.it}{ a logical value, to plot the estimated log-likelihood values if \code{TRUE}. }
   \item{se}{ a logical value, to plot with standard errors. }
   \item{trace}{ if \code{TRUE}, shows cross-validation progress}
   \item{\dots}{Other arguments that can be passed to \code{glmreg}.}

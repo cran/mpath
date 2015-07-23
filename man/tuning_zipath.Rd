@@ -30,8 +30,8 @@ maxit.theta=1, gamma.count=3, gamma.zero=3, ...)
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest
   value for which all coefficients are zero except the intercepts). This lambda.max can be a surrogate value for \code{penalty="mnet"} or \code{"snet"}}
  \item{maxit.theta}{For family="negbin", the maximum iteration allowed for estimating scale parameter theta. Note, the default value 1 is for computing speed purposes, and is typically too small and less desirable in real data analysis}
-  \item{gamma.count}{The tunning parameter of the \code{snet} or \code{mnet} penalty for the count part of model.}
-  \item{gamma.zero}{The tunning parameter of the \code{snet} or \code{mnet} penalty for the zero part of model.}
+  \item{gamma.count}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the count part of model.}
+  \item{gamma.zero}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the zero part of model.}
   \item{...}{Other arguments passing to \code{zipath}}
 }
 \details{

@@ -2,7 +2,7 @@
 \alias{cv.glmregNB}
 \title{Cross-validation for glmregNB}
 \description{Does k-fold cross-validation for glmregNB, produces a plot,
-  and returns cross-validated loglikelihood values for \code{lambda}}
+  and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
 cv.glmregNB(formula, data, weights, lambda=NULL,
 nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,...)
@@ -20,7 +20,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,...)
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
     identifying what fold each observation is in. If supplied,
     \code{nfold} can be missing.}
- \item{plot.it}{ a logical value, to plot the estimated loglikelihood values if \code{TRUE}. }
+ \item{plot.it}{ a logical value, to plot the estimated log-likelihood values if \code{TRUE}. }
   \item{se}{ a logical value, to plot with standard errors. }
   \item{trace}{ if \code{TRUE}, shows cross-validation progress}
   \item{\dots}{Other arguments that can be passed to \code{glmregNB}.}

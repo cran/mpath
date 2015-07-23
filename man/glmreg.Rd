@@ -6,12 +6,12 @@
 \alias{logLik.glmreg}
 \alias{deviance.glmreg}
 
-\title{fit a GLM with lasso (or elasticnet), snet or mnet regularization}
+\title{fit a GLM with lasso (or elastic net), snet or mnet regularization}
 \description{
     Fit a generalized linear model via penalized maximum likelihood.  The
-  regularization path is computed for the lasso (or elasticnet penalty), scad (or snet) and mcp (or mnet penalty), at a grid
+  regularization path is computed for the lasso (or elastic net penalty), scad (or snet) and mcp (or mnet penalty), at a grid
   of values for the regularization parameter lambda. Fits
-  linear, logistic, poisson and negative binomial (fixed scale parameter) regression models.
+  linear, logistic, Poisson and negative binomial (fixed scale parameter) regression models.
   }
 \usage{
 \method{glmreg}{formula}(formula, data, weights, offset=NULL, contrasts=NULL, 
@@ -41,7 +41,7 @@ x.keep=FALSE, y.keep=TRUE, ...)
   The sequence of models implied by \code{lambda} is fit by coordinate
   descent. For \code{family="gaussian"} this is the lasso, mcp or scad sequence if
   \code{alpha=1}, else it is the enet, mnet or snet sequence.
- For the other families, this is a lasso (mcp, scad) or elasticnet (mnet, snet) regularization path
+ For the other families, this is a lasso (mcp, scad) or elastic net (mnet, snet) regularization path
   for fitting the generalized linear regression
   paths, by maximizing the appropriate penalized log-likelihood.
   Note that the objective function for \code{"gaussian"} is \deqn{1/2*

@@ -2,7 +2,7 @@
 \alias{conv2zipath}
 
 \title{convert zeroinfl object to class zipath}
-\description{convert zeroinfl object to class zipath, which then can be used to predict newdata}
+\description{convert zeroinfl object to class zipath, which then can be used to predict new data}
 
 \usage{
 conv2zipath(object, family=c("poisson", "negbin", "geometric"))

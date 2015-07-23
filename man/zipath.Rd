@@ -2,7 +2,7 @@
 \alias{zipath}
 \alias{print.zipath}
 
-\title{Fit zero-inflated count data linear model with lasso (or elasticnet), snet or mnet regularization}
+\title{Fit zero-inflated count data linear model with lasso (or elastic net), snet or mnet regularization}
 \description{
   Fit zero-inflated regression models for count data via penalized maximum likelihood.
 }
@@ -52,12 +52,12 @@ maxit.theta = 1, reltol = 1e-5, eps.bino=1e-5, shortlist=FALSE, trace = FALSE, .
        and \code{lambda.zero}, respectively, as a fraction of
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest
   value for which all coefficients are zero except the intercepts).
-Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}. If \code{rescale=TRUE}, \code{lambda.max} is the same for \code{penatly="mnet" or "snet"}. Otherwise, some modifications are required. In the current implementation, for small \code{gamma} value, the square root of the computed \code{lambda.zero[1]} is used when \code{penalty="mnet" or "snet"}. 
+Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}. If \code{rescale=TRUE}, \code{lambda.max} is the same for \code{penalty="mnet" or "snet"}. Otherwise, some modifications are required. In the current implementation, for small \code{gamma} value, the square root of the computed \code{lambda.zero[1]} is used when \code{penalty="mnet" or "snet"}. 
 }
-  \item{alpha.count}{The elasticnet mixing parameter for the count part of model.}  
-  \item{alpha.zero}{The elasticnet mixing parameter for the zero part of model.}  
-  \item{gamma.count}{The tunning parameter of the \code{snet} or \code{mnet} penalty for the count part of model.}
-  \item{gamma.zero}{The tunning parameter of the \code{snet} or \code{mnet} penalty for the zero part of model.}
+  \item{alpha.count}{The elastic net mixing parameter for the count part of model.}  
+  \item{alpha.zero}{The elastic net mixing parameter for the zero part of model.}  
+  \item{gamma.count}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the count part of model.}
+  \item{gamma.zero}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the zero part of model.}
   \item{rescale}{logical value, if TRUE, adaptive rescaling}
   \item{init.theta}{The initial value of \code{theta} for \code{family="negbin"}.} 
   \item{theta.fixed}{Logical value only used for \code{family="negbin"}. If \code{TRUE}, \code{theta} is not updated.}
@@ -65,7 +65,7 @@ Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}.
 \item{convtype}{convergency type, default is for count component only for speedy computation} 
 \item{maxit.em}{Maximum number of EM algorithm}
 \item{maxit}{Maximum number of coordinate descent algorithm}
- \item{maxit.theta}{Maximum number of iterations for estimating \code{theta} scaling paramter if family="negbin". Default value \code{maxit.theta} may be increased, yet may slow the algorithm}
+ \item{maxit.theta}{Maximum number of iterations for estimating \code{theta} scaling parameter if family="negbin". Default value \code{maxit.theta} may be increased, yet may slow the algorithm}
  \item{eps.bino}{a lower bound of probabilities to be claimed as zero, for computing weights and related values when \code{family="binomial"}.}
 \item{reltol}{Convergence criteria, default value 1e-5 may be reduced to make more accurate yet slow}
 \item{shortlist}{logical value, if TRUE, limited results return}

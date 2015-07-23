@@ -1,10 +1,10 @@
 \name{glmregNB}
 \alias{glmregNB}
 \alias{glmregNegbin}
-\title{fit a negative binomial model with lasso (or elasticnet), snet and mnet regularization}
+\title{fit a negative binomial model with lasso (or elastic net), snet and mnet regularization}
 \description{
     Fit a negative binomial linear model via penalized maximum likelihood. The
-  regularization path is computed for the lasso (or elasticnet penalty), snet and mnet penalty, at a grid
+  regularization path is computed for the lasso (or elastic net penalty), snet and mnet penalty, at a grid
   of values for the regularization parameter lambda. 
   }
 \usage{
@@ -33,7 +33,7 @@ x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
 }
  \item{alpha}{The L2 penalty mixing parameter, with
     \eqn{0\le\alpha\le 1}. \code{alpha=1} is lasso (mcp, scad) penalty; and \code{alpha=0} the ridge penalty.}
-\item{gamma}{The tunning parameter of the \code{snet} or \code{mnet} penalty.}
+\item{gamma}{The tuning parameter of the \code{snet} or \code{mnet} penalty.}
  \item{rescale}{logical value, if TRUE, adaptive rescaling of the penalty parameter for \code{penalty="mnet"} or \code{penalty="snet"} with \code{family} other than "gaussian". See reference}
   \item{standardize}{Logical flag for x variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
@@ -65,7 +65,7 @@ x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
 }
 \details{
  The sequence of models implied by \code{lambda} is fit by coordinate
-  descent. This is a lasso (mcp, scad) or elasticnet (mnet, snet) regularization path
+  descent. This is a lasso (mcp, scad) or elastic net (mnet, snet) regularization path
   for fitting the negative binomial linear regression
   paths, by maximizing the penalized log-likelihood.
   Note that the objective function is 
@@ -103,6 +103,9 @@ Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Pra
 data("bioChemists", package = "pscl")
 fm_nb <- glmregNB(art ~ ., data = bioChemists)
 coef(fm_nb)
+### ridge regression
+fm <- glmregNB(art ~ ., alpha=0, data = bioChemists, lambda=seq(0.001, 1, by=0.01))
+fm <- cv.glmregNB(art ~ ., alpha=0, data = bioChemists, lambda=seq(0.001, 1, by=0.01))
 }
 }
 \keyword{models}

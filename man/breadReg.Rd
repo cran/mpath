@@ -11,7 +11,7 @@ breadReg(x, which, \dots)
 }
 \arguments{
  \item{x}{a fitted model object.}
- \item{which}{which penality parameter(s)?}
+ \item{which}{which penalty parameter(s)?}
  \item{\dots}{arguments passed to methods.}
 }
 

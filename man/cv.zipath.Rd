@@ -3,7 +3,7 @@
 \alias{coef.cv.zipath}
 \title{Cross-validation for zipath}
 \description{Does k-fold cross-validation for zipath, produces a plot,
-  and returns cross-validated loglikelihood values for \code{lambda}}
+  and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
 cv.zipath(formula, data, weights, nlambda=100, lambda.count=NULL, lambda.zero=NULL,
 nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,...)
@@ -23,7 +23,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,...)
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
     identifying what fold each observation is in. If supplied,
     \code{nfold} can be missing and will be ignored.}
- \item{plot.it}{ a logical value, to plot the estimated loglikelihood values if \code{TRUE}. }
+ \item{plot.it}{ a logical value, to plot the estimated log-likelihood values if \code{TRUE}. }
   \item{se}{ a logical value, to plot with standard errors. }
   \item{trace}{ if \code{TRUE}, shows cross-validation progress }
   \item{\dots}{Other arguments that can be passed to \code{zipath}.}
@@ -75,6 +75,9 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 data("bioChemists", package = "pscl")
 fm_zip <- cv.zipath(art ~ . | ., data = bioChemists, family = "poisson", nlambda=10)
 coef(fm_zip)
+### prediction from the best model
+fm_zip_predict <- predict(object=fm_zip$fit, which=fm_zip$lambda.which, type="response", 
+model=c("full"))
 fm_znb <- cv.zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)
 coef(fm_znb)
 }

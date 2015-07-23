@@ -23,8 +23,8 @@ gamma.count = 3, gamma.zero = 3, prop=0.5, trace=TRUE, B=10, ...)
   \item{standardize}{logical value, should variables be standardized?}
   \item{family}{family to fit \code{zipath}}
   \item{penalty}{penalty considered as one of \code{enet, mnet, snet}.}
- \item{gamma.count}{The tunning parameter of the \code{snet} or \code{mnet} penalty for the count part of model.}
-  \item{gamma.zero}{The tunning parameter of the \code{snet} or \code{mnet} penalty for the zero part of model.}  
+ \item{gamma.count}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the count part of model.}
+  \item{gamma.zero}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the zero part of model.}  
   \item{prop}{proportion of data split, default is 50/50 split}
   \item{trace}{logical value, if TRUE, print detailed calculation results}
   \item{B}{number of repeated multi-split replications} 
