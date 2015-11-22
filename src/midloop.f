@@ -323,7 +323,7 @@ CCC ref R/loglik.R
      +   theta*log(theta) + y(i)*log(mu(i)+y0) - (theta + y(i))*
      +   log(theta +  mu(i)))
       else if(family .EQ. 1)then !gaussian
-       ll=ll - w(i)*(y(i)-mu(i)**2)
+       ll=ll - w(i)*(y(i)-mu(i))**2 !changed 11/21/15
        else if(family .EQ. 2) then !binomial
         if(mu(i) .GT. 0 .AND. mu(i) .LT. 1)then
         ll=ll + w(i)*(y(i)*log(mu(i)/(1-mu(i)))+log(1-mu(i)))

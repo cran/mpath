@@ -46,3 +46,9 @@
 
   o editorial changes to files in man directory 
 
+                CHANGES in `mpath' VERSION 0.1_20   (2015-7-23)
+
+  o rebuild static_german.pdf, updating a reference
+  o fix a bug in loss function for family="gaussian"
+
+

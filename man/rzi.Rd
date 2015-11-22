@@ -24,9 +24,9 @@ rzi(n, x, z, a, b, theta=1, family=c("poisson", "negbin", "geometric"), infl=TRU
 \value{numeric vector of zero-inflated count response}
 \references{
 Zhu Wang, Shuangge Ma, Ching-Yun Wang, Michael Zappitelli, Prasad Devarajan and Chirag R. Parikh (2014)
-\emph{EM for Regularized Zero Inflated Regression Models with Applications to Postoperative Morbidity after Cardiac Surgery in Children,} \emph{Statistics in Medicine}. 2014 Apr 17. [Epub ahead of print]
+\emph{EM for Regularized Zero Inflated Regression Models with Applications to Postoperative Morbidity after Cardiac Surgery in Children}, \emph{Statistics in Medicine}. 33(29):5192-208.
 
-Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, Biometrical Journal. Article first published online June 8, 2015
+Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, \emph{Biometrical Journal}. 57(5):867-84.
 }
 
 \author{Zhu Wang <zwang@connecticutchildrens.org>}
