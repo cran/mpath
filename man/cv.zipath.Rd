@@ -6,7 +6,7 @@
   and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
 cv.zipath(formula, data, weights, nlambda=100, lambda.count=NULL, lambda.zero=NULL,
-nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,...)
+nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
 \method{coef}{cv.zipath}(object, which=object$lambda.which, model = c("full", "count", "zero"), \dots)
 }
 \arguments{
@@ -25,7 +25,8 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,...)
     \code{nfold} can be missing and will be ignored.}
  \item{plot.it}{ a logical value, to plot the estimated log-likelihood values if \code{TRUE}. }
   \item{se}{ a logical value, to plot with standard errors. }
-  \item{trace}{ if \code{TRUE}, shows cross-validation progress }
+ \item{n.cores}{The number of CPU cores to use. The cross-validation loop
+  will attempt to send different CV folds off to different cores.}
   \item{\dots}{Other arguments that can be passed to \code{zipath}.}
  \item{object}{object of class \code{cv.zipath}.}
  \item{which}{Indices of the pair of penalty parameters \code{lambda.count} and \code{lambda.zero} at which

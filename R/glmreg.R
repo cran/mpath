@@ -296,7 +296,8 @@ if(missing(weights)) weights=rep(1,nobs)
   names(beta) <- colnames(x)
   else{
   rownames(beta) <- colnames(x)
-  colnames(beta) <- lambda
+  # colnames(beta) <- lambda
+  colnames(beta) <- round(lambda,digits=4)
 }
   RET <- list(family=family,standardize=standardize, satu=tmp$satu, lambda=lambda[good], nlambda=length(lambda[good]), beta=beta, b0=b0, meanx=meanx, normx=normx, theta=theta[good], nulldev=nulldev, resdev=resdev, pll = pll, fitted.values=yhat, converged=tmp$convout[good], convex.min=convex.min, penalty.factor=penalty.factor, gamma=gamma, alpha=alpha)
   if(x.keep) RET$x <- x

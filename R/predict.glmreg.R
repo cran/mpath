@@ -42,7 +42,7 @@ if(!is.null(object$terms)){
   eta <- matrix(res$eta, ncol=nlambda)
   mu <- matrix(res$mu, ncol=nlambda)
   colnames(eta) <- colnames(mu) <- colnames(object$beta[,which])
-  pihat <- exp(eta)/(1+exp(eta))
+  #pihat <- exp(eta)/(1+exp(eta))
     if (object$family=="gaussian" | type=="link") return(eta)
     if (type=="response") return(mu)
 	if (object$family=="binomial" & type=="class") return(eta>0)

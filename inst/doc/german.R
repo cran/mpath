@@ -85,7 +85,7 @@ dat <- cbind(dt, tmp)
 ## foldid <- split(sample(1:n), rep(1:K, length = n))
 ## fitcv <- cv.zipath(docvisits ~ . | ., data = dat, family = "negbin", nlambda=100, 
 ## lambda.count=fit.lasso$lambda.count[1:30], lambda.zero= fit.lasso$lambda.zero[1:30],
-## maxit.em=300, maxit.theta=1, theta.fixed=FALSE, trace=FALSE, penalty="enet", rescale=FALSE, foldid=foldid)
+## maxit.em=300, maxit.theta=1, theta.fixed=FALSE, penalty="enet", rescale=FALSE, foldid=foldid, n.cores=2)
 ## cat("cross-validated loglik", max(fitcv$cv))
 
 
@@ -123,7 +123,7 @@ dat <- cbind(dt, tmp)
 ###################################################
 ## fitcv <- cv.zipath(docvisits ~ . | ., data = dat, family = "negbin", gamma.count=2.7, gamma.zero=2.7, 
 ## lambda.count=tmp$lambda.count[1:30], lambda.zero= tmp$lambda.zero[1:30],
-## maxit.em=300, maxit.theta=1, theta.fixed=FALSE, trace=FALSE, penalty="mnet", rescale=FALSE, foldid=foldid)
+## maxit.em=300, maxit.theta=1, theta.fixed=FALSE, penalty="mnet", rescale=FALSE, foldid=foldid, n.cores=2)
 ## cat("cross-validated loglik", max(fitcv$cv))
 
 
@@ -161,7 +161,7 @@ dat <- cbind(dt, tmp)
 ###################################################
 ## fitcv <- cv.zipath(docvisits ~ . | ., data = dat, family = "negbin", gamma.count=2.5, gamma.zero=2.5, 
 ## lambda.count=tmp$lambda.count[1:30], lambda.zero= tmp$lambda.zero[1:30],
-## maxit.em=300, maxit.theta=1, theta.fixed=FALSE, trace=FALSE, penalty="snet", rescale=FALSE, foldid=foldid)
+## maxit.em=300, maxit.theta=1, theta.fixed=FALSE, penalty="snet", rescale=FALSE, foldid=foldid, n.cores=2)
 ## cat("cross-validated loglik", max(fitcv$cv))
 
 

@@ -1,5 +1,5 @@
 cv.glmregNB <- function(formula, data, weights, lambda=NULL, 
-nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE, 
+nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
 ...){
     call <- match.call()
  mf <- Call <- match.call()
@@ -27,17 +27,15 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,
     all.folds <- cv.folds(n, K)
     else all.folds <- foldid 
     fraction <- seq(nlambda)
-    residmat <- matrix(NA, nlambda, K)
-    for(i in seq(K)) {
-      if(trace)
-        cat("\n CV Fold", i, "\n\n")
+    registerDoParallel(cores=n.cores)
+    i <- 1  ###needed to pass R CMD check with parallel code below
+    residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
       omit <- all.folds[[i]]
 ### changed 5/20/2013 fixed theta
-      fitcv <- do.call("glmregNB", list(formula, data[-omit,], weights[-omit], nlambda=nlambda, lambda=lambda, theta.est=FALSE, theta0=glmregNB.obj$theta, trace=trace, ...))
+      fitcv <- do.call("glmregNB", list(formula, data[-omit,], weights[-omit], nlambda=nlambda, lambda=lambda, theta.est=FALSE, theta0=glmregNB.obj$theta, ...))
 ### remove the first column, which is for intercept
       fitcv$terms <- NULL ### logLik requires data frame if terms is not NULL
-      residmat[, i] <- logLik(fitcv, newx=X[omit,-1, drop=FALSE], Y[omit], weights=weights[omit])
-
+      logLik(fitcv, newx=X[omit,-1, drop=FALSE], Y[omit], weights=weights[omit])
    }
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)

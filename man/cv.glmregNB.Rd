@@ -5,7 +5,7 @@
   and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
 cv.glmregNB(formula, data, weights, lambda=NULL,
-nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,...)
+nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
 }
 \arguments{
   \item{formula}{symbolic description of the model}
@@ -22,7 +22,8 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, trace=FALSE,...)
     \code{nfold} can be missing.}
  \item{plot.it}{ a logical value, to plot the estimated log-likelihood values if \code{TRUE}. }
   \item{se}{ a logical value, to plot with standard errors. }
-  \item{trace}{ if \code{TRUE}, shows cross-validation progress}
+ \item{n.cores}{The number of CPU cores to use. The cross-validation loop
+  will attempt to send different CV folds off to different cores.}
   \item{\dots}{Other arguments that can be passed to \code{glmregNB}.}
 }
 \details{The function runs \code{glmregNB} \code{nfolds}+1 times; the

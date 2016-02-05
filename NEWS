@@ -12,7 +12,7 @@
                 
                 CHANGES in `gzipath' VERSION 0.1_14   (2014-5-8)
 
-  o for rescale=TRUE and penalty="mnet" or "snet" in zipath, data driven lambda.zero[1] (i.e., the maximum value of lambda in zero component) is too small, now changed to 0.5*sqrt(lambda.zero[1]). This may be modified if the maximum value of lambda in glmreg was changed in the similar situations. 
+  o for rescale=TRUE and penalty="mnet" or "snet" in zipath, data driven lambda.zero[1] (i.e., the maximum value of lambda in zero component) is too small, now changed to 0.5*sqrt(lambda.zero[1]). This may    be modified if the maximum value of lambda in glmreg was changed in the similar situations. 
 
                 CHANGES in `gzipath' VERSION 0.1_14   (2014-6-9)
 
@@ -51,4 +51,12 @@
   o rebuild static_german.pdf, updating a reference
   o fix a bug in loss function for family="gaussian"
 
+                CHANGES in `mpath' VERSION 0.1_21   (2015-11-23)
 
+  o minor changes to print lambda 4 digits
+
+               CHANGES in `bst' VERSION 0.2-1 (12-09-2015)
+
+  o add parallel computing for cross-validation in cross-validation function
+  o remove vuong test, based on Wilson (2015), The misuse of the Vuong test for non-nested models to test for
+    zero-inflation, Economics Letters, 127: 51:53
