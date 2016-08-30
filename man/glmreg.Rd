@@ -68,6 +68,7 @@ An object with S3 class \code{"glmreg"} for the various types of models.
   \item{nobs}{number of observations}
   \item{pll}{penalized log-likelihood values for standardized coefficients in the IRLS iterations.}
   \item{pllres}{penalized log-likelihood value for the estimated model on the original scale of coefficients}
+  \item{fitted.values}{predicted values depending on \code{standardize}, internal use only}
 }
 \references{
 Breheny, P. and Huang, J. (2011) \emph{Coordinate descent

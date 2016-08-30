@@ -1,9 +1,9 @@
       subroutine preprocess(x,y,n,m,weights,family,standardize,normx,xd,
      +mu)
       implicit none
+      integer i,j,n,m, standardize,family
       double precision x(n,m),y(n),weights(n),normx(m), xd(m), 
      +wtnew(n),meanx(m),mu,wsum,ddot,xtmp(n,m)
-      integer i,j,n,m, standardize,family
 
       do i=1, n
       do j=1,m
@@ -85,19 +85,19 @@ C   mu
 C   yhat
 C   jj
 C  input: others except the aboved mentioned output
-      subroutine lmnetGaus(x, y, n, m, weights, w, lambda, alpha, 
+      subroutine lmnetGaus(x, y, n, m, weights, lambda, alpha, 
      +gam, 
-     +thresh, maxit, eps, standardize, family, 
-     +trace,penalty, normx,xd,beta, b0, 
-     +avg, yhat, jj, rescale, converged)
+     +thresh, maxit, eps, standardize, 
+     +penalty, xd,beta, b0, 
+     +avg, jj, rescale, converged)
 
       implicit none
+      integer maxit, standardize, penalty, n,m,i,jj,converged,
+     +rescale 
       double precision x(n, m), y(n), weights(n), lambda(m),
-     +meanx(m), normx(m), xd(m),yhat(n),resid(n),
-     +alpha, gam, thresh, eps, avg, wsum,w(n), mu(n),
+     +meanx(m), xd(m), resid(n),
+     +alpha, gam, thresh, eps, avg, wsum, mu(n),
      + wtnew(n), b0, beta(m), ddot
-      integer maxit, standardize, trace, penalty, n,m,i,j,jj,converged,
-     +family, rescale 
 
       do i=1, n
       resid(i) = y(i)
@@ -121,7 +121,7 @@ C compute weighted column averages meanx = x^(transpose) * wtnew
 
       call loop_gaussian(x,y, n,m,penalty,thresh,eps,maxit,standardize,
      +beta,b0,
-     +resid,xd,lambda,alpha,gam,weights,avg,meanx,trace,jj,rescale, 
+     +resid,xd,lambda,alpha,gam,weights,avg,meanx, jj,rescale, 
      +converged)
       jj = jj - 1
 C      if(standardize.EQ.1)then
@@ -183,7 +183,7 @@ C      b0 = avg - b0
        subroutine scad(z, t, lone, ltwo, gam, rescale, res)
        implicit none
        integer rescale
-       double precision z, v, t, lone, ltwo, gam, res
+       double precision z, t, lone, ltwo, gam, res
        
        if(rescale .EQ. 1) then
        if(dabs(z) .LE. lone   + lone * (1+ltwo)) then
@@ -236,9 +236,9 @@ C                    endif
 
       subroutine loop_gaussian(x, y, n, m, penalty, thresh, eps, maxit, 
      + standardize, beta, b0, resid,xd, lambda, alpha, gam,wtold,avg, 
-     + meanx, trace, jj, rescale, converged)
+     + meanx, jj, rescale, converged)
       implicit none
-      integer trace, n, m, maxit, standardize, jj, i,j,penalty,converged
+      integer n, m, maxit, standardize, jj, i,j,penalty,converged
       integer rescale
       double precision x(n, m), y(n), thresh, eps,beta(m),beta_old(m) 
       double precision lambda(m), alpha, gam, wtold(n), avg, meanx(m)

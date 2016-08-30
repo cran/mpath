@@ -85,6 +85,19 @@ Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}.
   \code{\link[stats]{logLik}}, \code{\link[stats]{residuals}}, 
   \code{\link[stats]{predict}}. See \code{\link{predict.zipath}} for more details
   on all methods.
+
+  The program may terminate with the following message:
+
+\code{Error in: while (j <= maxit.em && !converged)} \code{\{ :}\cr
+\code{ Missing value, where TRUE/FALSE is necessary}\cr
+\code{Calls: zipath}\cr
+\code{Additionally: Warning:}\cr
+\code{In glmreg_fit(Znew, probi, weights = weights, standardize = standardize,  :}\cr
+\code{ saturated model, exiting ...}\cr
+\code{Execution halted}\cr
+
+  One possible reason is that the fitted model is too complex for the data. There are two suggestions to overcome the error. One is to reduce the number of variables. Second, find out what lambda values caused the problem and omit them. Try with other lambda values instead.
+
 }
 
 \value{

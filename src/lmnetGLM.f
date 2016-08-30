@@ -14,33 +14,12 @@ C  w
 C  z
 C  X
 C  y
-C  
-      subroutine lmnetGLM(x, y, z,n, m, weights, w,mu, lambda, alpha, 
-     +gam, 
-     +thresh, maxit, eps, standardize, family, 
-     +trace,penalty,normx,beta, b0, 
-     +yhat, jj, rescale, converged, theta, pll)
 
-      implicit none
-      double precision x(n, m), y(n), weights(n), lambda(m),
-     +normx(m), xd(m),yhat(n),
-     +alpha, gam, thresh, eps, wsum,w(n),
-     + wtnew(n), b0, beta(m), ddot,mu(n),z(n), theta, pll
-      integer maxit, standardize, trace, penalty, n,m,i,j,jj,converged,
-     +family, rescale 
-
-      call loop_glm(x,y,z,n,m,w,mu, penalty,thresh,eps,maxit,
-     +standardize,family,beta,b0,lambda,alpha,gam, 
-     +weights,trace,jj,rescale, converged, theta, pll)
-
-      return
-      end
-
-      subroutine loop_glm(x,y,z,n,m,w,mu, penalty,thresh, eps, maxit, 
+      subroutine loop_glm(x,y,z,n,m,w,mu, penalty,thresh, eps, 
      + standardize, family, beta, b0, lambda, alpha, gam,
      + wtold, trace, jj, rescale, converged, theta, pll)
       implicit none
-      integer trace, n, m, maxit, standardize,family, jj, i,j,penalty,
+      integer trace, n, m, standardize,family, jj, i,j,penalty,
      +converged, rescale
       double precision x(n, m), y(n), thresh, eps,beta(m),beta_old(m) 
       double precision lambda(m), alpha, gam, wtold(n)
@@ -153,9 +132,9 @@ C compute penalized log-likelihood value, this is only practical useful if resca
       subroutine evalpll(y,x,n,m,beta,b0,family, theta, weights, alpha,
      +gam,lambda, penalty, pll)     
       implicit none
+      integer penalty, n,m,i,j, family 
       double precision x(n, m), y(n), weights(n), lambda(m),eta(n),
      +yhat(n), alpha, gam, b0, beta(m), mu(n), theta, pll, ll
-      integer penalty, n,m,i,j,jj,family 
 
       do 220 i = 1, n
          yhat(i) = b0
@@ -167,7 +146,7 @@ C compute penalized log-likelihood value, this is only practical useful if resca
       call linkinv(n, eta, family, mu)
       call loglikFor(n, y, mu, theta, weights, family, ll)
 C compute penalty value pll
-      call penGLM(beta, n, m, lambda, alpha, gam,
+      call penGLM(beta, m, lambda, alpha, gam,
      +penalty, pll)
       pll = ll - pll
 

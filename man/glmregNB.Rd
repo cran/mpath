@@ -51,7 +51,7 @@ x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
  \item{trace}{If \code{TRUE}, fitting progress is reported}
  \item{start, etastart, mustart, \dots}{ arguments for the \code{link{glmreg}} function}
  \item{init.theta}{ initial scaling parameter \code{theta}}
- \item{theta.est}{Estimate scale parameter theta? Default is TRUE}
+ \item{theta.est}{Estimate scale parameter theta? Default is TRUE. Note, the algorithm may become slow. In this case, one may use \code{glmreg} function with \code{family="negbin"}, and a fixed \code{theta}}.
  \item{theta0}{initial scale parameter vector theta, with length \code{nlambda} if \code{theta.est=FALSE}. Default is NULL}
 \item{convex}{Calculate index for which objective function ceases to
     be locally convex? Default is FALSE and only useful if \code{penalty="mnet" or "snet"}.}

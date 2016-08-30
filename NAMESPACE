@@ -57,4 +57,3 @@ S3method(se, zipath)
 S3method(predprob, zipath)
 S3method(coef, cv.zipath)
 S3method(print, summary.zipath)
-

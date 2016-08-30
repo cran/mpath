@@ -54,7 +54,7 @@
   \item{lambda.which}{index of \code{lambda} that gives maximum \code{cv} value.}
   \item{lambda.optim}{value of \code{lambda} that gives maximum \code{cv} value.}
 }
-\references{                                                                                              Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)      \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
+\references{Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)      \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
 }
 \author{Zhu Wang <zwang@connecticutchildrens.org>}
 

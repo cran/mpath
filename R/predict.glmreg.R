@@ -1,4 +1,4 @@
-predict.glmreg=function(object,newx,which=1:length(object$lambda), type=c("link","response","class", "coefficients","nonzero"), na.action=na.pass, ...){
+predict.glmreg <- function(object,newx,which=1:length(object$lambda), type=c("link","response","class", "coefficients","nonzero"), na.action=na.pass, ...){
  type=match.arg(type)
   if(missing(newx)){
     if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")

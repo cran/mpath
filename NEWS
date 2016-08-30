@@ -60,3 +60,20 @@
   o add parallel computing for cross-validation in cross-validation function
   o remove vuong test, based on Wilson (2015), The misuse of the Vuong test for non-nested models to test for
     zero-inflation, Economics Letters, 127: 51:53
+
+               CHANGES in `bst' VERSION 0.2-3 (08-10-2016)
+
+  o change the format of b0 and beta in glmreg function when standardize=FALSE, to be consistent with standardize=TRUE
+  o for findlam function in glmreg.R, change
+    if(standardize) 
+        weights <- weights/sum(weights)
+    
+    to 
+    
+    if(family=="gaussian" || standardize)     
+        weights <- weights/sum(weights)
+
+    This corrects an error in glmreg with family="gaussian" and standardize=FALSE
+  o In src/lmnetGLM.f, remove lmnetGLM subroutine, which was not used anymore
+  o fix subroutines in lmnetGLM.f, lmnetGaussian.f, midloop.f and outloop.f regarding gfortran warning messages with an email request from cran.R-project on August 28, 2016 
+

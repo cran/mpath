@@ -29,13 +29,13 @@ C dev
      +satu, ep, pll, normx, xd, avg)
      
       implicit none
+      integer standardize, trace, penalty, maxit, i, j, jj, nmid, n, 
+     +family, innermaxit, m,converged,convmid, satu, rescale
       double precision x(n,m),y(n), mu(n), z(n), eta(n), wt(n), w(n), 
      +del,olddev,weights(n),xold(n,m), yold(n),normx(m),xd(m), 
      +thresh, nulldev, dev, theta, thetaold, wtw(n), lamk(m), alpha, 
      +gam, eps, beta(m), betaold(m), b0, b0old, yhat(n),avg, ep, 
-     +pll(maxit), ll
-      integer standardize, trace, penalty, maxit, i, j, jj, nmid, n, 
-     +family, innermaxit, m,converged,convmid, satu, rescale
+     +pll(maxit)
 
       do 5 jj=1, maxit
       pll(jj)=0
@@ -73,11 +73,11 @@ C dev
      +normx, xd, avg)
       endif
       if(family .EQ. 1)then
-      call lmnetGaus(x, z, n, m, wtw, w, lamk, alpha, gam, thresh, 
-     +innermaxit, eps, standardize, family, trace, penalty, normx, xd, 
-     +beta, b0, avg, yhat,nmid,rescale, converged)
+      call lmnetGaus(x, z, n, m, wtw, lamk, alpha, gam, thresh, 
+     +innermaxit, eps, standardize, penalty, xd, 
+     +beta, b0, avg, nmid,rescale, converged)
       else 
-      call loop_glm(x, y, z, n, m, w, mu, penalty, thresh, eps, 1, 
+      call loop_glm(x, y, z, n, m, w, mu, penalty, thresh, eps, 
      +standardize, family, beta, b0, lamk, alpha, gam, 
      +weights, trace, nmid, rescale, converged, theta, pll(jj))
       endif
@@ -142,8 +142,8 @@ C w
       subroutine glmlink(n, mu, family, theta, w, ep)
    
       implicit none
-      double precision mu(n), theta, ep, w(n)
       integer i, n, family
+      double precision mu(n), theta, ep, w(n)
 C      parameter (ep=1e-5)
 
       do 10 i=1, n
@@ -339,9 +339,9 @@ CCC ref R/loglik.R
 C predict value eta = a0 + x * b
       subroutine pred(n,m, nlambda,x,b,a0,family, eta,mu)
       implicit none
+          integer n,m,nlambda,family,k,i,j
           double precision b(m,nlambda),a0(nlambda),eta(n,nlambda)
           double precision mu(n,nlambda),x(n,m)
-          integer n,m,nlambda,family,k,i,j
           external linkinv
 
           do 30 k=1,nlambda
@@ -382,10 +382,10 @@ C predict value eta = a0 + x * b
       return
       end
 
-      subroutine penGLM(start,n,m,lambda, alpha, gam, penalty, pen)
+      subroutine penGLM(start, m,lambda, alpha, gam, penalty, pen)
       implicit none
+      integer m, j, penalty
       double precision start(m), lambda(m), alpha, gam, res, pen
-      integer n, m, j, penalty
 
       pen = 0
        do 10 j=1, m

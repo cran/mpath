@@ -20,7 +20,7 @@ C ypre: yhat
      +satu, good
       double precision x(n,m), y(n), wt(n), lam(m, nlambda),alpha,
      +gam, theta,mu(n),eta(n), nulldev,thresh, eps, b(m,nlambda),
-     +bz(nlambda),xold(n,m), yold(n), start(m+1), pendev(maxit),
+     +bz(nlambda),xold(n,m), yold(n), start(m+1), 
      +resdev(nlambda), v(n), ypre(n,nlambda), lamk(m), beta(m), b0,dev,
      +weights(n),yhat(n),ep, pll(maxit), outpll(maxit, nlambda),
      +normx(m),xd(m),avg 
