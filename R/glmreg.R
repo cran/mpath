@@ -308,7 +308,6 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
 ###penalized log-likelihood function value for rescaled beta
     penval <- .Fortran("penGLM", 
                        start=as.double(beta),
-                       n=as.integer(n),
                        m=as.integer(m),
                        lambda=as.double(rep(RET$lambda, m)),
                        alpha=as.double(alpha),

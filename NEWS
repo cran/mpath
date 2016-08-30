@@ -55,13 +55,13 @@
 
   o minor changes to print lambda 4 digits
 
-               CHANGES in `bst' VERSION 0.2-1 (12-09-2015)
+               CHANGES in `mpath' VERSION 0.2-1 (12-09-2015)
 
   o add parallel computing for cross-validation in cross-validation function
   o remove vuong test, based on Wilson (2015), The misuse of the Vuong test for non-nested models to test for
     zero-inflation, Economics Letters, 127: 51:53
 
-               CHANGES in `bst' VERSION 0.2-3 (08-10-2016)
+               CHANGES in `mpath' VERSION 0.2-3 (08-10-2016)
 
   o change the format of b0 and beta in glmreg function when standardize=FALSE, to be consistent with standardize=TRUE
   o for findlam function in glmreg.R, change
@@ -76,4 +76,9 @@
     This corrects an error in glmreg with family="gaussian" and standardize=FALSE
   o In src/lmnetGLM.f, remove lmnetGLM subroutine, which was not used anymore
   o fix subroutines in lmnetGLM.f, lmnetGaussian.f, midloop.f and outloop.f regarding gfortran warning messages with an email request from cran.R-project on August 28, 2016 
+
+               CHANGES in `mpath' VERSION 0.2-4 (08-30-2016)
+  
+  o after a change of penGLM subroutine in midloop.f (removing unused argument n), glmreg.R and zipath.R were changed when invoking penGLM. 
+
 

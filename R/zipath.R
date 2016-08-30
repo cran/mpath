@@ -103,7 +103,6 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
         if(m > 0)
             pencount <- .Fortran("penGLM",
                                  start=as.double(start$count[-1]),
-                                 n=as.integer(n),
                                  m=as.integer(length(start$count[-1])),
                                  lambda=as.double(rep(lambda.count[k], m)),
                                  alpha=as.double(alpha.count),
@@ -116,7 +115,6 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
         if(m > 0)
             penzero <- .Fortran("penGLM",
                                 start=as.double(start$zero[-1]),
-                                n=as.integer(n),
                                 m=as.integer(length(start$zero[-1])),
                                 lambda=as.double(rep(lambda.zero[k], m)),
                                 alpha=as.double(alpha.zero),

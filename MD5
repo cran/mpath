@@ -1,6 +1,6 @@
-f3ffe837b52223b3771376ef44c95674 *DESCRIPTION
+a8f55cf4aee0cc247ccb22413d3dc9af *DESCRIPTION
 2c43f0fc000c3126d9abf6877bf6ea68 *NAMESPACE
-245f1fdeb7713214d5c61d7a8a423151 *NEWS
+fdbbd1bb340577c8730f102f7a8ffc7c *NEWS
 91b4d5848989a31cd0518229f6dccd34 *R/balanced.folds.R
 19035d7b722d9eb021e0d16f6b60e663 *R/be_zeroinfl1.R
 220541460aa6c105efbab64bc9935663 *R/convexMin.R
@@ -8,7 +8,7 @@ b95781575d594b4bfa18a73c788a1364 *R/cv.glmreg.R
 5f09c1d799dcfe5f10461b1dfc6c2f45 *R/cv.glmregNegbin.R
 baa80a6f5ae2dff138b1c1e6572920cb *R/cv.zipath.R
 b708fed09f53b06bdc606f7cca20e971 *R/error.bars.R
-3b5342255848e93c28b3bad675d7a064 *R/glmreg.R
+c56dc70dd86754b30ff13da9f0ac0a6b *R/glmreg.R
 67af254ee14e0c647ddc550ecff60b25 *R/glmregNB.R
 f5d7d5651bede88be3a5f34f7f14fad3 *R/loglik.R
 6684f22b30267a67cd0f746753abdfd7 *R/model_offset_2.R
@@ -20,12 +20,12 @@ f5d7d5651bede88be3a5f34f7f14fad3 *R/loglik.R
 382e142f428d3a566be075d5c689b322 *R/predprob.glmreg.R
 fe5ce52ce6b530b8d030d80fdfdd6daa *R/rzi.R
 2c56435e8850f2013ecef53ef24ca86e *R/tuning_zipath.R
-b96eb948831eaa91ad19b8b9fc2ada6f *R/zipath.R
+93edf00767f21208516cb548badcd960 *R/zipath.R
 54354c8c44734b4dcc5eb288a9cf3ee5 *build/vignette.rds
 a6ed7eeca70bd726d3c35572af2dd466 *inst/COPYRIGHTS
 c427a918e8a5b009323fa33ddbf8f713 *inst/doc/german.R
 7173dee955771662ffbca3ca9bfc76c8 *inst/doc/german.Rnw
-a103a4f23432b554a1c7bd5aa873c78b *inst/doc/german.pdf
+62b47ce92acb6d6dee17042f29f12b9d *inst/doc/german.pdf
 7b62a800bfa9b8efdf6e066617b4e048 *inst/doc/static_german.pdf
 ccb40dbfb9e1fff4365fa98a9e7ad9ad *inst/doc/static_german.pdf.asis
 2eb79941fd7b7ccabe60de6faf9f9b62 *man/be_zeroinfl.Rd
