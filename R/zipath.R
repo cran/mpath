@@ -104,24 +104,24 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
             pencount <- .Fortran("penGLM",
                                  start=as.double(start$count[-1]),
                                  m=as.integer(length(start$count[-1])),
-                                 lambda=as.double(rep(lambda.count[k], m)),
+                                 lambda=as.double(lambda.count[k]*penalty.factor.count),
                                  alpha=as.double(alpha.count),
                                  gam=as.double(gamma.count),
                                  penalty=as.integer(pentype),
                                  pen=as.double(0),
-                                 package="mpath")$pen
+                                 PACKAGE="mpath")$pen
         m=length(start$zero[-1])
         penzero <- 0
         if(m > 0)
             penzero <- .Fortran("penGLM",
                                 start=as.double(start$zero[-1]),
                                 m=as.integer(length(start$zero[-1])),
-                                lambda=as.double(rep(lambda.zero[k], m)),
+                                lambda=as.double(lambda.zero[k]*penalty.factor.zero),
                                 alpha=as.double(alpha.zero),
                                 gam=as.double(gamma.zero),
                                 penalty=as.integer(pentype),
                                 pen=as.double(0),
-                                package="mpath")$pen
+                                PACKAGE="mpath")$pen
         return(n*(pencount + penzero))
     } 
 
@@ -207,7 +207,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                                eps = as.double(eps),
                                thresh = as.double(thresh),
                                converged = as.integer(0),
-                               package = "mpath")$converged
+                               PACKAGE = "mpath")$converged
         if(type=="count") return(checkcount)
         else
             if(checkcount==0) return(FALSE)
@@ -219,7 +219,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                                       eps = as.double(eps),
                                       thresh = as.double(thresh),
                                       converged = as.integer(0),
-                                      package = "mpath")$converged
+                                      PACKAGE = "mpath")$converged
                 return(checkzero)
             }
     }

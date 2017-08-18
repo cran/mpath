@@ -47,7 +47,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
     \code{length(lambda)}.}
   \item{cv.error}{The standard error of cross-validated log-likelihood values - a vector of length
     \code{length(lambda)}.}
-  \item{fraction}{a vector of \code{lambda} values with length of \code{lambda}}
+\item{lambda}{a vector of \code{lambda} values} 
   \item{foldid}{indicators of data used in each cross-validation, for reproductive purposes}
   \item{lambda.which}{index of \code{lambda} that gives maximum \code{cv} value.}
   \item{lambda.optim}{value of \code{lambda} that gives maximum \code{cv} value.}

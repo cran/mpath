@@ -81,4 +81,38 @@
   
   o after a change of penGLM subroutine in midloop.f (removing unused argument n), glmreg.R and zipath.R were changed when invoking penGLM. 
 
-
+               CHANGES in `mpath' VERSION 0.3-1 (09-16-2016)
+  
+  o add ncl and nclreg, and relevant files for nonconvex-based models
+  o fix a bug computing penval in glmreg, add penalty.factor when calling penGLM in glmreg and zipath. These bugs don't affect the previous analysis results
+               
+               CHANGES in `mpath' VERSION 0.3-2 (07-14-2017)
+  
+  o  To register native routines and to disable symbol search.
+     $cd mpath
+     $R
+     > tools::package_native_routine_registration_skeleton(".")
+     copy and paste the full output in a packagename_init.c (i.e., mpath_init.c) file to be put in src/
+  o  change convergence criteria in nclreg.R
+     d1 <- sum((fk_old - fk)^2)
+     #d1 <- sum((fk_old - fk)^2)/sum(fk_old^2) ### this can cause a problem if fk_old is zero
+  o  another change of convergence criteria in nclreg.R: comment out the following lines
+                 #if(k > 1){
+                         #    if(los[k] > los[k-1]){
+                              #k <- iter
+                              #}
+                         #}
+  o  fix a bug in nclreg.R: lambda.min.ratio was not used in computing lambda with glmreg_fit
+  o  in nclreg.R, computing solution path stops if the numbers in exponential function become too big (infinite) 
+     if(any(is.nan(h))){ # exit loop 
+                    stopit <- TRUE
+                    break
+            }
+  o  add type.init and relevant arguments in nclreg_fit function to have three types of initial parameters and lambda values
+  o  replace fraction with lambda in cv.glmreg.R, cv.nclreg.R, cv.zipath.R and cv.glmregNB.R. This only affects the values of x-axis in plots, but not cross-validation results
+  o  add type.path to have two different updating methods when computing solution paths 
+               
+               CHANGES in `mpath' VERSION 0.3-3 (08-17-2017)
+  
+  o  cycle through active set 
+  o  add midloopGLM.f for GLM to separate from midloop.f for gaussian family

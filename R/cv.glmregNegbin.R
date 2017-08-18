@@ -26,7 +26,6 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2,
     if(missing(foldid))
     all.folds <- cv.folds(n, K)
     else all.folds <- foldid 
-    fraction <- seq(nlambda)
     registerDoParallel(cores=n.cores)
     i <- 1  ###needed to pass R CMD check with parallel code below
     residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
@@ -40,7 +39,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2,
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.max(cv)
-    obj<-list(fit=glmregNB.obj, residmat=residmat, fraction = fraction, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
+    obj<-list(fit=glmregNB.obj, residmat=residmat, lambda = lambda, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
     class(obj) <- "cv.glmreg"
     if(plot.it) plot(obj,se=se)
     obj

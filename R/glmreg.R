@@ -107,7 +107,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
         stop("'weights' must be a numeric vector")
     ## check weights and offset
     if( !is.null(weights) && any(weights < 0) ){
-	    stop("negative weights not allowed")
+        stop("negative weights not allowed")
     }
     if(family=="binomial"){
         if(is.factor(y))
@@ -165,7 +165,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
                       theta=as.double(theta),
                       w = as.double(0),
                       ep = as.double(eps.bino),
-                      package="mpath")$w
+                      PACKAGE="mpath")$w
         z <- .Fortran("zeval",
                       n=as.integer(n),
                       y=as.double(y),
@@ -174,14 +174,14 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
                       w=as.double(rep(w,n)),
                       family=as.integer(famtype),
                       z=as.double(rep(0,n)),
-                      package="mpath")$z
+                      PACKAGE="mpath")$z
         lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, mu=mu, w=w, z=z, alpha=alpha, penalty.factor=penalty.factor, standardize=standardize) 
                                         #    if(penalty %in% c("mnet", "snet") && !rescale) lmax <- 0.5 * sqrt(lmax)
 	lpath <- seq(log(lmax), log(lambda.min.ratio * lmax), length.out=nlambda)
         lambda <- exp(lpath)
     }
     else nlambda <- length(lambda)
-### ref: McCullagh and Nelder, 2nd edition, 1989, page 121
+    ### ref: McCullagh and Nelder, 2nd edition, 1989, page 121
     if(length(mu) != n)
         mu <- rep(mu, n)
     nulldev <- .Fortran("deveval",
@@ -192,7 +192,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
                         weights=as.double(weights),
                         family=as.integer(famtype),
                         dev=as.double(0),
-                        package="mpath")$dev
+                        PACKAGE="mpath")$dev
     beta <- matrix(0, ncol=nlambda, nrow=m)
     if(is.null(start))
         startv <- 0
@@ -265,7 +265,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
                     good=as.integer(nlambda),
                     ep = as.double(eps.bino),
                     outpll = as.double(matrix(0, maxit, nlambda)),
-                    package="mpath") 
+                    PACKAGE="mpath") 
     if(nlambda > 1 || tmp$satu==0)
         good <- 1:tmp$good # only those non-saturated models
     else if(tmp$satu==1)
@@ -306,15 +306,18 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
     class(RET) <- "glmreg"
     RET$twologlik <- try(2*logLik(RET, newx=x, y=y, weights=weights))
 ###penalized log-likelihood function value for rescaled beta
-    penval <- .Fortran("penGLM", 
-                       start=as.double(beta),
-                       m=as.integer(m),
-                       lambda=as.double(rep(RET$lambda, m)),
-                       alpha=as.double(alpha),
-                       gam=as.double(gamma),
-                       penalty=as.integer(pentype),
-                       pen=as.double(0.0),
-                       package="mpath")$pen
+    penval <- rep(NA, nlambda)
+    for(j in 1:nlambda){
+        penval[j] <- .Fortran("penGLM", 
+                              start=as.double(beta[,j]),
+                              m=as.integer(m),
+                              lambda=as.double(RET$lambda[j]*penalty.factor),
+                              alpha=as.double(alpha),
+                              gam=as.double(gamma),
+                              penalty=as.integer(pentype),
+                              pen=as.double(0.0),
+                              PACKAGE="mpath")$pen
+    }
     RET$penval <- penval
     if(standardize)
         RET$pllres <- RET$twologlik/2 - n*penval
@@ -401,7 +404,7 @@ findlam <- function(x, y, weights, family, theta=NULL,mu, w, z, alpha, penalty.f
                       theta = as.double(fit$theta),
                       w = as.double(rep(0, length(y))),
                       ep = as.double(eps.bino),
-                      package="mpath")$w
+                      PACKAGE="mpath")$w
         resid <- .Fortran("zeval",
                           n = as.integer(length(y)),
                           y = as.double(y),
@@ -410,7 +413,7 @@ findlam <- function(x, y, weights, family, theta=NULL,mu, w, z, alpha, penalty.f
                           w = as.double(w),
                           family = as.integer(4),
                           z = as.double(rep(0, length(y))),
-                          package="mpath")$z
+                          PACKAGE="mpath")$z
     }
     else{
         if(length(acvar) < length(penalty.factor))
@@ -425,7 +428,7 @@ findlam <- function(x, y, weights, family, theta=NULL,mu, w, z, alpha, penalty.f
         one <- rep(1, length(y))
         normx <- sqrt(drop(one %*% (x^2)))
         x <- scale(xx, meanx, normx)
-        lmax <- max(abs(crossprod(x,weights*w*resid))/(penfac*alpha))
+	lmax <- max(abs(crossprod(x,weights*w*resid))/(penfac*alpha))
     }
     else
         lmax <- max(abs(crossprod(x,weights*w*resid))/(penfac*alpha))
@@ -458,7 +461,7 @@ deviance.glmreg <- function(object, newx, y, weights, na.action=na.pass, ...){
                            weights=as.double(weights),
                            family= as.integer(famtype),
                            dev=as.double(0),
-                           package="mpath")$dev
+                           PACKAGE="mpath")$dev
     return(dev)
 }
 

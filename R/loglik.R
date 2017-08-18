@@ -34,7 +34,7 @@ w <- weights
  family=as.integer(famtype),
  eta=as.double(matrix(0, nobs, nlambda)),
  mu=as.double(matrix(0, nobs, nlambda)),
- package="mpath")
+ PACKAGE="mpath")
  mu <- matrix(res$mu, ncol=nlambda) 
  th <- object$theta
  if(nlambda > 1 && length(object$theta) ==1)
@@ -50,7 +50,7 @@ w <- weights
   w=as.double(w), 
   family=as.integer(famtype),
   ll=as.double(0),
-  package="mpath")$ll
+  PACKAGE="mpath")$ll
  return(res)
 }
 

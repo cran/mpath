@@ -50,7 +50,7 @@
  \item{cv.error}{estimate of standard error of \code{cv}.}
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
     identifying what fold each observation is in.}
-  \item{fraction}{a vector of \code{lambda} values with length of \code{lambda}}
+ \item{lambda}{a vector of \code{lambda} values} 
   \item{lambda.which}{index of \code{lambda} that gives maximum \code{cv} value.}
   \item{lambda.optim}{value of \code{lambda} that gives maximum \code{cv} value.}
 }

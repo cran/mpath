@@ -31,7 +31,6 @@ cv.zipath <- function(formula, data, weights, nlambda=100, lambda.count=NULL, la
         all.folds <- foldid
         K <- nfolds <- length(foldid)
     }
-    fraction <- seq(nlambda)
     bic <- matrix(NA, nlambda, K)
     registerDoParallel(cores=n.cores)
     i <- 1  ###needed to pass R CMD check with parallel code below
@@ -43,7 +42,7 @@ cv.zipath <- function(formula, data, weights, nlambda=100, lambda.count=NULL, la
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.max(cv)
-    obj<-list(fit=zipath.obj, residmat=residmat, bic=bic, fraction = fraction, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = list(count=lambda.count[lambda.which], zero=lambda.zero[lambda.which]))
+    obj<-list(fit=zipath.obj, residmat=residmat, bic=bic, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = list(count=lambda.count[lambda.which], zero=lambda.zero[lambda.which]))
     class(obj) <- c("cv.zipath", "cv.glmreg")
     if(plot.it) plot(obj,se=se)
     obj

@@ -1,19 +1,13 @@
-"cv.folds" <-
-    function(n, folds = 10)
-    {
-        split(sample(1:n), rep(1:folds, length = n))
-    }
+cv.nclreg <- function(x, ...) UseMethod("cv.nclreg", x)
 
-cv.glmreg <- function(x, ...) UseMethod("cv.glmreg", x)
-
-cv.glmreg.default <- function(x, ...) {
+cv.nclreg.default <- function(x, ...) {
     if (extends(class(x), "Matrix"))
-        return(cv.glmreg.matrix(x = x, ...))
+        return(cv.nclreg.matrix(x = x, ...))
     stop("no method for objects of class ", sQuote(class(x)),
          " implemented")
 }
 
-cv.glmreg.formula <- function(formula, data, weights, offset=NULL, ...){
+cv.nclreg.formula <- function(formula, data, weights, offset=NULL, ...){
     ## extract x, y, etc from the model formula and frame
     if(!attr(terms(formula, data=data), "intercept"))
         stop("non-intercept model is not implemented")
@@ -54,34 +48,35 @@ cv.glmreg.formula <- function(formula, data, weights, offset=NULL, ...){
     }
 ### End of addition 08/07/2012 
 
-    RET <- cv.glmreg_fit(X[,-1], Y, weights,...)
+    RET <- cv.nclreg_fit(X[,-1], Y, weights,...)
     RET$call <- match.call()
     return(RET)
 }
-cv.glmreg.matrix <- function(x, y, weights, offset=NULL, ...){
-    RET <- cv.glmreg_fit(x, y, weights,...)
+cv.nclreg.matrix <- function(x, y, weights, offset=NULL, ...){
+    RET <- cv.nclreg_fit(x, y, weights,...)
     RET$call <- match.call()
     return(RET)
 }
 
-cv.glmreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE, 
-                          family=c("gaussian", "binomial", "poisson", "negbin"), 
-                          nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
+cv.nclreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE, 
+                          rfamily=c("clossR", "closs", "gloss", "qloss"), s=1.5,  
+                          nfolds=10, foldid, type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, 
                           ...){
     call <- match.call()
+    type <- match.arg(type)
     if(missing(foldid) && nfolds < 3)
         stop("smallest nfolds should be 3\n")
-    family <- match.arg(family)
+    rfamily <- match.arg(rfamily)
     nm <- dim(x)
     nobs <- n <- nm[1]
     nvars <- m <- nm[2]
     if(missing(weights)) weights <- rep(1, nobs)
     K <- nfolds
-    glmreg.obj <- glmreg_fit(x, y, weights, lambda=lambda, family=family, ...)
-    lambda <- glmreg.obj$lambda
+    nclreg.obj <- nclreg_fit(x, y, weights, lambda=lambda, rfamily=rfamily, s=s, ...)
+    lambda <- nclreg.obj$lambda
     nlambda <- length(lambda)
     if(missing(foldid)){
-        if(family=="binomial" && balance)  
+        if(rfamily %in% c("closs", "gloss", "qloss") && balance)  
             all.folds <- balanced.folds(y, K)
         else all.folds <- cv.folds(length(y), K)
     }
@@ -90,26 +85,24 @@ cv.glmreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
     i <- 1  ###needed to pass R CMD check with parallel code below
     residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
         omit <- all.folds[[i]]
-        fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], lambda=lambda, family=family, ...)
-	logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit])
+        fitcv <- nclreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], s=s, lambda=lambda, rfamily=rfamily, ...)
+	predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], type=type)
     }
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
-    lambda.which <- which.max(cv)
-    obj<-list(fit=glmreg.obj, residmat=residmat, lambda = lambda, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
-    if(plot.it) plot.cv.glmreg(obj,se=se)
-    class(obj) <- "cv.glmreg"
+    lambda.which <- which.min(cv)
+    obj<-list(fit=nclreg.obj, residmat=residmat, lambda=lambda, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
+    if(plot.it) plot.cv.nclreg(obj,se=se, ylab=type)
+    class(obj) <- "cv.nclreg"
     obj
 }
 
-"plot.cv.glmreg" <-
+"plot.cv.nclreg" <-
     function(x,se=TRUE,ylab=NULL, main=NULL, width=0.02, col="darkgrey", ...){
         lambda <- x$lambda
-        cv <- x$cv
+	cv <- x$cv
         cv.error <- x$cv.error
-        if(is.null(ylab))
-            ylab <- "log-likelihood"
-        plot(log(lambda), cv, type = "b", xlab = expression(log(lambda)), ylab= ylab, ylim = range(cv, cv + cv.error, cv - cv.error), main=main)
+	plot(log(lambda), cv, type = "b", xlab = expression(log(lambda)), ylab= ylab, ylim = range(cv, cv + cv.error, cv - cv.error), main=main)
         if(se)
             error.bars(log(lambda), cv + cv.error, cv - cv.error,
                        width = width, col=col)
@@ -117,6 +110,6 @@ cv.glmreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
         invisible()
     }
 
-coef.cv.glmreg=function(object,which=object$lambda.which,...){
+coef.cv.nclreg=function(object,which=object$lambda.which,...){
     coef(object$fit,which=which,...)
 }

@@ -50,7 +50,6 @@ The method for \code{\link[stats]{coef}} by default
  \item{fit}{a fitted zipath object for the full data.}
  \item{residmat}{matrix for cross-validated log-likelihood at each \code{(count.lambda, zero.lambda)} sequence}
   \item{bic}{matrix of BIC values with row values for \code{lambda} and column values for \code{k}th cross-validation}
- \item{fraction}{a sequence from 1:\code{nlambda}. \code{nlambda} is the same as the argument if any one of \code{(count.lambda, zero.lambda)} is missing; otherwise \code{nlambda=length(count.lambda)}}
   \item{cv}{The mean cross-validated log-likelihood - a vector of length
     \code{length(count.lambda)}.}
   \item{cv.error}{estimate of standard error of \code{cv}.}

@@ -1,4 +1,4 @@
-predict.glmreg <- function(object,newx,which=1:length(object$lambda), type=c("link","response","class", "coefficients","nonzero"), na.action=na.pass, ...){
+predict.glmreg <- function(object,newx,which=1:length(object$lambda), type=c("link","response","class","coefficients","nonzero"), na.action=na.pass, ...){
  type=match.arg(type)
   if(missing(newx)){
     if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")
@@ -38,7 +38,7 @@ if(!is.null(object$terms)){
                   family=as.integer(famtype),
 				  eta = as.double(matrix(0,n,nlambda)),
 				  mu = as.double(matrix(0,n,nlambda)),
-				  package="mpath")
+				  PACKAGE="mpath")
   eta <- matrix(res$eta, ncol=nlambda)
   mu <- matrix(res$mu, ncol=nlambda)
   colnames(eta) <- colnames(mu) <- colnames(object$beta[,which])

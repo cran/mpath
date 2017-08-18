@@ -1,0 +1,67 @@
+
+citHeader("To cite package 'mpath' in publications use:")
+
+year <- sub(".*(2[[:digit:]]{3})-.*", "\\1", meta$Date)
+vers <- meta$Version
+
+citEntry(entry="Manual",
+         title = "mpath: Regularized Linear Models",
+         author = personList(as.person("Zhu Wang")),
+         year = year,
+         note = paste("{R} package version", vers),
+         url = "https://CRAN.R-project.org/package=mpath",
+         textVersion =
+             paste("Zhu Wang (",
+                   year,
+                   "). mpath: Regularized Linear Models, ",
+                   paste("R package version", vers),
+                   ", https://CRAN.R-project.org/package=mpath", ".",
+                   sep=""))
+
+citEntry(entry="Article",
+         title = "Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery",
+         author = personList(as.person("Zhu Wang"), as.person("Shuangge Ma"), 
+         as.person("Michael Zappitelli"), as.person("Chirag Parikh"), as.person("Ching-Yun Wang"), as.person("Prasad Devarajan")),
+         journal      = "Statistical Methods in Medical Research",
+         year         = "2014",
+         note        = "Apr 17. [{Epub} ahead of print]",
+
+         textVersion =
+         paste("Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014).",
+               "Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery.",
+               "Statistical Methods in Medical Research, Apr 17. [Epub ahead of print]."),
+         )
+         
+citEntry(entry="Article",
+         title = "{EM} for Regularized Zero Inflated Regression Models with Applications to Postoperative Morbidity after Cardiac Surgery in Children",
+         author = personList(as.person("Zhu Wang"), as.person("Shuangge Ma"), as.person("Ching-Yun Wang"),  
+         as.person("Michael Zappitelli"), as.person("Chirag Parikh"), as.person("Prasad Devarajan"), as.person("Chirag R. Parikh")),
+         journal = "Statistics in Medicine",
+         year= "2014",
+         volume = "33",
+         number = "29",
+         pages = "5192--5208",
+
+         textVersion =
+         paste("Zhu Wang, Shuangge Ma, Ching-Yun Wang, Michael Zappitelli, Prasad Devarajan and Chirag R. Parikh (2014).",
+              "EM for Regularized Zero Inflated Regression Models with Applications to Postoperative Morbidity after Cardiac Surgery in Children.",
+              "Statistics in Medicine, 33(29):5192-5208."),
+         )
+
+citEntry(entry="Article",
+         title = "Variable selection for zero-inflated and overdispersed data with application to health care demand in {Germany}",
+         author = personList(as.person("Zhu Wang"), as.person("Shuangge Ma"), as.person("Ching-Yun Wang")),  
+         journal = "Biometrical Journal",
+         year= "2015",
+         volume = "57",
+         number = "5",
+         pages = "867--884",
+
+         textVersion =
+         paste("Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015).",
+              "Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany.",
+              "Biometrical Journal, 57(5):867-884."),
+         )
+
+
+citFooter('Use ', sQuote('toBibtex(citation("mpath"))'), ' to extract BibTeX references.')

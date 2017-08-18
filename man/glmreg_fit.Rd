@@ -28,10 +28,10 @@ convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
   \item{etastart}{starting values for the linear predictor.}
   \item{mustart}{starting values for the vector of means.}
   \item{nlambda}{The number of \code{lambda} values - default is 100. The sequence may be truncated before \code{nlambda} is reached if a close to saturated model is fitted. See also \code{satu}.}
-  \item{lambda}{A user supplied \code{lambda} sequence}
+  \item{lambda}{ by default, the algorithm provides a sequence of regularization values, or a user supplied \code{lambda} sequence }
   \item{lambda.min.ratio}{Smallest value for \code{lambda}, as a fraction of
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest
-  value for which all coefficients are zero except the intercept). Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}. If \code{rescale=TRUE}, \code{lambda.max} is the same for \code{penalty="mnet" or "snet"}. Otherwise, some modifications are required. For instance, for small \code{gamma} value, half of the square root (if \code{lambda.max} is too small) of the computed \code{lambda.max} can be used when \code{penalty="mnet" or "snet"}. The default of \code{lambda.min.ratio} depends on the
+  value for which all coefficients are zero except the intercept). Note, there is no closed formula for \code{lambda.max} in general. If \code{rescale=TRUE}, \code{lambda.max} is the same for \code{penalty="mnet" or "snet"}. Otherwise, some modifications are required. For instance, for small \code{gamma} value, half of the square root (if \code{lambda.max} is too small) of the computed \code{lambda.max} can be used when \code{penalty="mnet" or "snet"}. The default of \code{lambda.min.ratio} depends on the
   sample size \code{nobs} relative to the number of variables
   \code{nvars}. If \code{nobs > nvars}, the default is \code{0.001},
   close to zero.  If \code{nobs < nvars}, the default is \code{0.05}.}
