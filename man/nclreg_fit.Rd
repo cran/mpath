@@ -10,8 +10,9 @@
 nclreg_fit(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), 
 s=NULL, fk=NULL, iter=10, del=1e-10, nlambda=100, lambda=NULL, lambda.min.ratio=
 ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, penalty.factor = NULL, 
-maxit=1000, type.init="bst", mstop.init=10, nu.init=0.1, direction="bwd", 
-eps=.Machine$double.eps, trace=FALSE, penalty=c("enet","mnet","snet"), type.path="naive")
+maxit=1000, type.init="bst", mstop.init=10, nu.init=0.1, direction=c("bwd", "fwd"), 
+eps=.Machine$double.eps, trace=FALSE, penalty=c("enet","mnet","snet"), 
+type.path=c("active", "naive", "onestep"))
 }
 
 \arguments{
@@ -50,7 +51,7 @@ eps=.Machine$double.eps, trace=FALSE, penalty=c("enet","mnet","snet"), type.path
  \item{del}{convergency critera} 
  \item{eps}{If a coefficient is less than \code{eps} in magnitude, then it is reported to be 0}
  \item{penalty}{Type of regularization}
- \item{type.path}{solution path. If \code{type.path="naive"}, for each element of the lambda sequence, iterate until convergency. If \code{type.path="onestep"}, update for one element of lambda depending on direction="fwd" (last element of lambda) or "bwd" (then first element of lambda) in each MM iteration, and iterate until convergency of prediction. Then fit a solution path based on the sequence of lambda.}
+ \item{type.path}{solution path. If \code{type.path="active"}, then \code{direction="bwd"} by the program. Cycle through only the active set in the next increasing \code{lambda} sequence. If \code{type.path="naive"}, no active set for each element of the lambda sequence, iterate until convergency. If \code{type.path="onestep"}, update for one element of lambda depending on direction="fwd" (last element of lambda) or "bwd" (then first element of lambda) in each MM iteration, and iterate until convergency of prediction. Then fit a solution path based on the sequence of lambda.}
  \item{trace}{If \code{TRUE}, fitting progress is reported}
 }
 \details{

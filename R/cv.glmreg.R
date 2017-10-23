@@ -93,6 +93,7 @@ cv.glmreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
         fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], lambda=lambda, family=family, ...)
 	logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit])
     }
+    stopImplicitCluster()
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.max(cv)

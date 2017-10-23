@@ -88,6 +88,7 @@ cv.nclreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
         fitcv <- nclreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], s=s, lambda=lambda, rfamily=rfamily, ...)
 	predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], type=type)
     }
+    stopImplicitCluster()
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.min(cv)

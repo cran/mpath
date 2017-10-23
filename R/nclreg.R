@@ -80,7 +80,7 @@ compute.2d <- function(y, f, s, family=c("clossR", "closs", "gloss", "qloss")){
         sqrt(2/pi)*u/s^3*exp(-u^2/(2*s^2))
 }
 
-nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, del=1e-10, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, penalty.factor = NULL, maxit=1000, type.init="bst", mstop.init=10, nu.init=0.1, direction="bwd", eps=.Machine$double.eps, trace=FALSE, penalty=c("enet","mnet","snet"), type.path="naive"){ 
+nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, del=1e-10, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, penalty.factor = NULL, maxit=1000, type.init="bst", mstop.init=10, nu.init=0.1, direction=c("bwd", "fwd"), eps=.Machine$double.eps, trace=FALSE, penalty=c("enet","mnet","snet"), type.path=c("active", "naive", "onestep")){ 
 ### compute h value
     compute.h <- function(rfamily, y, fk_old, s, B){
         if(rfamily=="clossR")
@@ -92,6 +92,13 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
     call <- match.call()
     rfamily <- match.arg(rfamily)
     penalty <- match.arg(penalty)
+    direction <- match.arg(direction)
+    type.path <- match.arg(type.path)
+    if(type.path=="active") direction <- "bwd"
+    if(!is.null(lambda) && type.path == "active"){
+        if (length(lambda) > 1 && any(diff(lambda) < 0))
+	    stop("for type.path='active', the provided lambda sequence must be increasing\n")
+    }
     if(rfamily %in% c("closs", "gloss", "qloss"))
         if(!all(names(table(y)) %in% c(1, -1)))
             stop("response variable must be 1/-1 for family ", rfamily, "\n")
@@ -237,8 +244,8 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
     }
     else
         nlambda <- length(lambda)
-    beta <- matrix(NA, ncol=nlambda, nrow=m)
-    b0 <- rep(NA, nlambda)
+    beta <- matrix(0, ncol=nlambda, nrow=m)
+    b0 <- rep(0, nlambda)
     stopit <- FALSE
 ### for each element of the lambda sequence, iterate until convergency
     typeA <- function(beta, b0){
@@ -281,12 +288,6 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
                 d1 <- sum((fk_old - fk)^2)
                                         #d1 <- sum((fk_old - fk)^2)/sum(fk_old^2) ### this can cause a problem if fk_old is zero
                 if(trace) cat("\n  iteration", k, ": relative change of fk", d1, ", robust loss value", los[k, i], ", penalized loss value", pll[k, i], "\n")
-###this is incorrect since we optimize penalized loss, not loss, changed 7/15/2017
-                                        #if(k > 1){
-                                        #    if(los[k] > los[k-1]){
-                                        #k <- iter
-                                        #}
-                                        #}
                 if(trace) cat("  d1=", d1, ", k=", k, ", d1 > del && k <= iter: ", (d1 > del && k <= iter), "\n")
                 k <- k + 1
             }
@@ -299,7 +300,72 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
         }
         list(beta=beta, b0=b0, RET=RET, risk=los, pll=pll)
     }
-
+### only for direction="bwd", cycle through only on active set. for each element of the lambda sequence, iterate until convergency
+    typeB <- function(beta, b0){
+        i <- 1
+	x.act <- x ### current active set
+	start.act <- start
+	m.act <- dim(x.act)[2]
+	penalty.factor.act <- penalty.factor
+        los <- pll <- matrix(NA, nrow=iter, ncol=nlambda)
+        while(i <= nlambda){
+            if(trace) message("loop in lambda:", i, "\n")
+            if(trace) {
+                cat("Quadratic majorization iterations ...\n")
+            }
+            k <- 1
+            d1 <- 10
+            while(d1 > del && k <= iter){
+                fk_old <- RET$fitted.values
+                h <- compute.h(rfamily, y, fk_old, s, B)
+                if(any(is.nan(h))){ # exit loop 
+                    stopit <- TRUE
+                    break
+                }
+		RET <- glmreg_fit(x=x.act*sqrt(B), y=h*sqrt(B), weights=weights, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor.act, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start.act)
+		RET$b0 <- RET$b0/sqrt(B)
+### for LASSO, the above two lines are equivalent to the next line
+                                        #RET <- glmreg_fit(x=x, y=h, weights=weights, lambda=lambda[i]/B,alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty)
+                fk <- RET$fitted.values <- predict(RET, newx=x.act)
+                start.act <- coef(RET)
+                los[k, i] <- mean(loss(y, f=fk, cost, family = rfamily, s=s, fk=NULL))
+###penalized loss value for beta
+                penval <- .Fortran("penGLM",
+                                   start=as.double(RET$beta),
+                                   m=as.integer(m.act),
+                                   lambda=as.double(lambda[i]*penalty.factor.act),
+                                   alpha=as.double(alpha),
+                                   gam=as.double(gamma),
+                                   penalty=as.integer(pentype),
+                                   pen=as.double(0.0),
+                                   PACKAGE="mpath")$pen
+                if(standardize)  ### lambda value, hence penval, depends on whether standardize is TRUE/FALSE
+                    pll[k, i] <- los[k, i] + n*penval
+                else pll[k, i] <- los[k, i] + penval
+                d1 <- sum((fk_old - fk)^2)
+                                        #d1 <- sum((fk_old - fk)^2)/sum(fk_old^2) ### this can cause a problem if fk_old is zero
+                if(trace) cat("\n  iteration", k, ": relative change of fk", d1, ", robust loss value", los[k, i], ", penalized loss value", pll[k, i], "\n")
+                if(trace) cat("  d1=", d1, ", k=", k, ", d1 > del && k <= iter: ", (d1 > del && k <= iter), "\n")
+                k <- k + 1
+            }
+            if(!stopit){
+                tmp <- as.vector(RET$beta)
+                activeset <- which(abs(tmp) > 0)
+                beta[activeset,i] <- tmp[activeset]
+		start.act <- start.act[which(abs(start.act) > 0)]
+		x.act <- x[, activeset] #update active set
+		if(length(activeset)==1)
+		x.act <- matrix(x.act, ncol=1)
+		m.act <- length(activeset) #update active set
+	        penalty.factor.act <- penalty.factor[activeset]
+                                        # beta[,i] <- as.vector(RET$beta)
+                b0[i] <- RET$b0
+      		i <- i + 1
+            }
+            else i <- nlambda + 1
+        }
+        list(beta=beta, b0=b0, RET=RET, risk=los, pll=pll)
+    }
 ### update for one element of lambda depending on direction="fwd" (last element of lambda) or "bwd" (then first element of lambda) in each MM iteration, and iterate until convergency of prediction. Then fit a solution path based on the sequence of lambda.
     typeC <- function(beta, b0){
         if(trace) {
@@ -345,7 +411,8 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
         b0 <- RET$b0
         list(beta=beta, b0=b0, RET=RET, risk=los, pll=pll)
     }
-    if(type.path=="naive") tmp <- typeA(beta, b0)
+    if(type.path=="active") tmp <- typeB(beta, b0)
+    else if(type.path=="naive") tmp <- typeA(beta, b0)
     else if(type.path=="onestep") tmp <- typeC(beta, b0)
     beta <- tmp$beta
     b0 <- tmp$b0

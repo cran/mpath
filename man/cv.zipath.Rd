@@ -74,8 +74,8 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 \dontrun{
 data("bioChemists", package = "pscl")
 fm_zip <- cv.zipath(art ~ . | ., data = bioChemists, family = "poisson", nlambda=10)
-coef(fm_zip)
 ### prediction from the best model
+coef(fm_zip)
 fm_zip_predict <- predict(object=fm_zip$fit, which=fm_zip$lambda.which, type="response", 
 model=c("full"))
 fm_znb <- cv.zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)

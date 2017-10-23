@@ -60,12 +60,9 @@
 
 \seealso{\code{\link{glmreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.glmreg"} object.}
 \examples{
-\dontrun{
 data("bioChemists", package = "pscl")
 fm_pois <- cv.glmreg(art ~ ., data = bioChemists, family = "poisson")
-plot(fm_pois)
 title("Poisson Family",line=2.5)
-}
 }
 \keyword{models}
 \keyword{regression}

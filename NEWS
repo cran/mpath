@@ -115,4 +115,13 @@
                CHANGES in `mpath' VERSION 0.3-3 (08-17-2017)
   
   o  cycle through active set 
-  o  add midloopGLM.f for GLM to separate from midloop.f for gaussian family
+               
+               CHANGES in `mpath' VERSION 0.3-4 (08-22-2017)
+  
+  o  add type="active" in R/nclreg_fit function
+  o  fix a bug with cv.zipath when plot.it=TRUE
+  o  add stopImplicitCluster() after registerDoParallel
+               
+               CHANGES in `mpath' VERSION 0.3-5 (10-17-2017)
+  o  add vignette to illustrate classification of cancer patients with penalized robust nonconvex loss functions
+  

@@ -4,7 +4,7 @@
 %% need no \usepackage{Sweave.sty}
 %\usepackage{natbib}
 %\usepackage{/usr/lib/R/share/texmf/Sweave}
-%\VignetteIndexEntry{Variable Selection for Health Care Demand in Germany (Short)}
+%\VignetteIndexEntry{Variable Selection for Health Care Demand in Germany (without Results)}
 %\VignetteDepends{zic}
 \SweaveOpts{keep.source=FALSE}
 \author{Zhu Wang \\ 

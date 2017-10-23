@@ -39,14 +39,32 @@ cv.zipath <- function(formula, data, weights, nlambda=100, lambda.count=NULL, la
         fitcv <- do.call("zipath", list(formula, data[-omit,], weights[-omit], lambda.count=lambda.count, lambda.zero=lambda.zero, nlambda=nlambda, ...))
         logLik(fitcv, newdata=data[omit,, drop=FALSE], Y[omit], weights=weights[omit])
     }
+    stopImplicitCluster()
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.max(cv)
-    obj<-list(fit=zipath.obj, residmat=residmat, bic=bic, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = list(count=lambda.count[lambda.which], zero=lambda.zero[lambda.which]))
-    class(obj) <- c("cv.zipath", "cv.glmreg")
+    obj<-list(fit=zipath.obj, residmat=residmat, bic=bic, cv = cv, cv.error = cv.error, foldid=all.folds, nlambda=nlambda, lambda.which= lambda.which, lambda.optim = list(count=lambda.count[lambda.which], zero=lambda.zero[lambda.which]))
+    class(obj) <- c("cv.zipath")
+                                        #class(obj) <- c("cv.zipath", "cv.glmreg")
     if(plot.it) plot(obj,se=se)
     obj
 }
+
+"plot.cv.zipath" <-
+    function(x,se=TRUE,ylab=NULL, main=NULL, width=0.02, col="darkgrey", ...){
+        nlambda <- x$nlambda
+        cv <- x$cv
+        cv.error <- x$cv.error
+        if(is.null(ylab))
+            ylab <- "log-likelihood"
+        plot(1:nlambda, cv, type = "b", xlab = "Index of lambda pair", ylab= ylab, ylim = range(cv, cv + cv.error, cv - cv.error), main=main)
+if(se)
+    error.bars(1:nlambda, cv + cv.error, cv - cv.error,
+               width = width, col=col)
+
+invisible()
+}
+
 
 coef.cv.zipath <- function(object, which=object$lambda.which, model = c("full", "count", "zero"), ...) {
     model <- match.arg(model)
