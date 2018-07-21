@@ -17,12 +17,12 @@ zwang@connecticutchildrens.org}
 \maketitle
 
 
-This document reproduces the data analysis presented in
-\cite{wang2014zinb}. For a description of the theory behind
+This document reproduces the data analysis presented in \cite{wang2014zinb}. In an effort to optimizing the computing algorithms, the penalized regression can be slightly different. For a description of the theory behind
 application illustrated here we refer to the original manuscript.
  
 <<echo=false,results=hide>>=
 options(prompt = "R> ", continue = " ", width = 70, digits =4, useFancyQuotes = FALSE)
+ptm <- proc.time()
 @
 \citet{riphahn2003incentive} utilized a part of the German Socioeconomic Panel (GSOEP) data set to analyze the number of doctor visits. The original data have twelve annual waves from 1984 to 1995 for a representative sample of German households, which provide broad information on the health care utilization, current employment status, and the insurance arrangements under which subjects are protected. 
 The data set contains number of doctor office visits for 1,812 West German men aged 25 to 65 years in the last three months of 1994. 
@@ -148,6 +148,14 @@ lambda.count=tmp$lambda.count[1:30], lambda.zero= tmp$lambda.zero[1:30],
 maxit.em=300, maxit.theta=1, theta.fixed=FALSE, penalty="snet", rescale=FALSE, foldid=foldid, n.cores=2)
 cat("cross-validated loglik", max(fitcv$cv))
 @
+Running time for the entire analysis.
+<<echo=TRUE, eval=FALSE>>=
+print(proc.time()-ptm)
+@
+<<sessionInfo>>=
+sessionInfo();
+@
+
 \bibliographystyle{plainnat}
 \bibliography{mpath}
 \end{document}

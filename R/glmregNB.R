@@ -100,14 +100,15 @@ glmregNB <- function(formula, data, weights, nlambda=100, lambda=NULL, lambda.mi
         }
         if(!theta.est) th <- theta0[k]
         iter <- 0
-        d1 <- sqrt(2 * max(1, fit$df.residual))
+	#d1 <- sqrt(2 * max(1, fit$df.residual))
         d2 <- del <- 1
         Lm <- loglik(n, th, mu, Y, w)
         converged <- FALSE                                    
         while((iter <- iter + 1) <= maxit.theta && !converged){
             eta <- log(mu)
-            fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, lambda=lambda[k],alpha=alpha,gamma=gamma,rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace, penalty=penalty)
-                                        #fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, start = start, etastart=eta, mustart = mu, lambda=lambda[k],alpha=alpha,gamma=gamma,rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace, penalty=penalty)
+	    #            fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, lambda=lambda[k],alpha=alpha,gamma=gamma,rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace, penalty=penalty)
+	    #if(maxit.theta!=2) browser()
+	    fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, start = start, etastart=eta, mustart = mu, lambda=lambda[k],alpha=alpha,gamma=gamma,rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace, penalty=penalty)
             t0 <- th
             mu <- fit$fitted.values
             if(theta.est){

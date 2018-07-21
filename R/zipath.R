@@ -505,7 +505,8 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                 }
                 else{
                     capture.output(model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize = FALSE, penalty.factor=penalty.factor.count, lambda=lambda.count[k], alpha=alpha.count,gamma=gamma.count, rescale=rescale, maxit=maxit,
-                                        #                                         start=start$count, mustart=mui, etastart=g(mui, family="poisson"),  
+					   ### the line start= ... included 7/20/2018
+                                                                               start=start$count, mustart=mui, etastart=g(mui, family="poisson"),  
                                                              family = "poisson", penalty=penalty, trace=trace))
                     countcoef = c(model_count$b0, model_count$beta)
                     if(trace && penalty=="enet"){
@@ -525,14 +526,19 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                 }
                 else{
                     capture.output(model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=standardize, penalty.factor=penalty.factor.zero, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit, 
-                                        #                                        start=start$zero, mustart=model_zero$fitted.value, etastart=g(model_zero$fitted.value, family="binomial", eps.bino=eps.bino),
+					   ### the line start= ... included 7/20/2018
+                                                                     start=start$zero, mustart=model_zero$fitted.value, etastart=g(model_zero$fitted.value, family="binomial", eps.bino=eps.bino),
                                                             family = "binomial", penalty=penalty, trace=trace, eps.bino=eps.bino))
                     zerocoef = c(model_zero$b0, model_zero$beta)
                     if(trace && penalty=="enet"){
-                        eta <- model_zero$b0 + as.vector(Znew %*% model_zero$beta)
+                        if(dim(Z)[2]==1)
+			    eta <- zerocoef
+			else eta <- model_zero$b0 + as.vector(Znew %*% model_zero$beta)
                         mu = 1.0/(1+exp(-eta))
                         w <- weights/sum(weights)
-                        ll2 <- sum(w*(probi*eta - log(1+exp(eta)))) - lambda.zero[k]*sum(abs(model_zero$beta))
+                        if(dim(Z)[2]==1)
+                        ll2 <- sum(w*(probi*eta - log(1+exp(eta))))
+			else ll2 <- sum(w*(probi*eta - log(1+exp(eta)))) - lambda.zero[k]*sum(abs(model_zero$beta))
                         cat("penalized binomial loglik by updated parameter ll2", ll2, "\n")
                         cat("model_zero$pll", model_zero$pll, "\n")
                         cat("model_zero$pllres", model_zero$pllres, "\n")
@@ -588,7 +594,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                     countcoef = model_count$coefficients
                 }
                 else{
-                    model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize=FALSE, penalty.factor=penalty.factor.count, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count,rescale=rescale, maxit=maxit, #start=start$count, mustart=mui, etastart=g(mui,family="negbin"),
+                    model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize=FALSE, penalty.factor=penalty.factor.count, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count,rescale=rescale, maxit=maxit, start=start$count, mustart=mui, etastart=g(mui,family="negbin"),
                                               family = "negbin", theta=1, penalty=penalty)
                     countcoef = c(model_count$b0, model_count$beta)
                 }
@@ -599,7 +605,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                 }
                 else{
                     model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=standardize, penalty.factor=penalty.factor.zero, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit,
-                                        #start=start$zero, mustart=model_zero$fitted.value, etastart=g(model_zero$fitted.value, family="binomial", eps.bino=eps.bino),
+                                        start=start$zero, mustart=model_zero$fitted.value, etastart=g(model_zero$fitted.value, family="binomial", eps.bino=eps.bino),
                                              family = "binomial", penalty=penalty, eps.bino=eps.bino)
                     zerocoef = c(model_zero$b0, model_zero$beta)
                 }
@@ -656,14 +662,14 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                     else model_count <- suppressWarnings(glm.nb(Y ~ 0 + X + offset(offset), weights = weights * (1-probi),
                                                                 start = start$count, init.theta = start$theta))
                     countcoef = model_count$coefficients
-                }        else{ 
-                    if(theta.fixed)
+                }        else{
+		    	if(theta.fixed)
                         capture.output(model_count <- glmreg_fit(Xnew, Y, weights = weights * (1-probi)/n, standardize=FALSE, penalty.factor=penalty.factor.count, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count,rescale=rescale, maxit=maxit,
-                                        #                      start=start$count, mustart=mui, etastart=g(mui,family="negbin"),
+                                        start=start$count, mustart=mui, etastart=g(mui,family="negbin"),
                                                                  family = "negbin", theta=init.theta, penalty=penalty, trace=trace, ...))
                     else capture.output(model_count <- glmregNB(Y ~ X[,-1], standardize=FALSE, weights = weights * (1-probi)/n, penalty.factor=penalty.factor.count, lambda=lambda.count[k], alpha=alpha.count, gamma=gamma.count, rescale=rescale, maxit.theta = maxit.theta, maxit=maxit,
-### not inclued line otherwise not accurate###
-                                        #   start=start$count, mustart=mui, etastart=g(mui,family="negbin"),
+					   ### the line start= ... included 7/20/2018
+					   start=start$count, mustart=mui, etastart=g(mui,family="negbin"), 
                                                                 init.theta=start$theta, penalty=penalty, trace=trace, ...))
                     countcoef = c(model_count$b0, model_count$beta)
                 }
@@ -674,8 +680,8 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                 }
                 else{
                     capture.output(model_zero <- glmreg_fit(Znew, probi, weights = weights, standardize=TRUE, penalty.factor=penalty.factor.zero, lambda=lambda.zero[k], alpha=alpha.zero, gamma=gamma.zero, rescale=rescale, maxit=maxit,
-### not inclued line otherwise not accurate###
-                                        #start=start$zero, mustart=model_zero$fitted.value, etastart=g(model_zero$fitted.value, family="binomial", eps.bino=eps.bino),
+					   ### the line start= ... included 7/20/2018
+					        start=start$zero, mustart=model_zero$fitted.value, etastart=g(model_zero$fitted.value, family="binomial", eps.bino=eps.bino), 
                                               family = "binomial", penalty=penalty, trace=trace, eps.bino=eps.bino, ...))
                                         #if(nlambda < 100){
                                         #       	cat("k=",k, "model_zero$satu=", model_zero$satu, "\n")
@@ -693,9 +699,13 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
 	            zerocoef = c(model_zero$b0, model_zero$beta)
                 }
                 if(trace && penalty=="enet"){
+                    if(dim(Z)[2]==1) eta <- zerocoef
+		    else
                     eta <- model_zero$b0 + as.vector(Znew %*% model_zero$beta)
                     w <- weights
-                    ll2 <- sum(w*(probi*eta - log(1+exp(eta)))) - length(Y)*lambda.zero[k]*sum(abs(model_zero$beta))
+                    if(dim(Z)[2]==1)
+                    ll2 <- sum(w*(probi*eta - log(1+exp(eta))))
+		    else ll2 <- sum(w*(probi*eta - log(1+exp(eta)))) - length(Y)*lambda.zero[k]*sum(abs(model_zero$beta))
                 }
                 start <- list(count=countcoef, zero=zerocoef, theta=model_count$theta)
                 ll_raw <- loglikfun(c(start$count, start$zero, log(start$theta)))

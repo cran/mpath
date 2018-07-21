@@ -1,10 +1,10 @@
 \name{tuning.zipath}
 \alias{tuning.zipath}
 
-\title{find optimal penalized zero-inflated model}
+\title{find optimal path for penalized zero-inflated model}
 
 \description{
-Fit penalized zero-inflated models, generate multiple paths with varying penalty parameters, therefore determine optimal penalty parameters
+Fit penalized zero-inflated models, generate multiple paths with varying penalty parameters, therefore determine optimal path with respect to a particular penalty parameter
   }
 \usage{
 tuning.zipath(formula, data, weights, subset, na.action, offset, standardize=TRUE,
@@ -35,6 +35,7 @@ maxit.theta=1, gamma.count=3, gamma.zero=3, ...)
   \item{...}{Other arguments passing to \code{zipath}}
 }
 \details{
+From the default \code{lambdaZeroRatio = c(.1, .01, .001)} values, 
 find optimal lambdaZeroRatio for penalized zero-inflated Poisson, negative binomial and geometric model 
   }
 \value{

@@ -72,8 +72,8 @@ glmreg.matrix <- function(x, y, weights, offset=NULL, ...){
 }
 
 glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars),thresh=1e-6, eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, family=c("gaussian", "binomial", "poisson", "negbin"), penalty=c("enet","mnet","snet"), convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE){
-    if(!is.null(start) && !is.null(etastart) && !is.null(mustart))
-        stop("start, etastart and mustart is for testing only\n")
+	#if(!is.null(start) && !is.null(etastart) && !is.null(mustart))
+	#stop("start, etastart and mustart is for testing only\n")
     family <- match.arg(family)
     penalty <- match.arg(penalty)
     if(!family %in% c("gaussian", "binomial", "poisson", "negbin")){

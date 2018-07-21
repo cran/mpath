@@ -1,9 +1,10 @@
 ### R code from vignette source 'german.Rnw'
 
 ###################################################
-### code chunk number 1: german.Rnw:24-25
+### code chunk number 1: german.Rnw:23-25
 ###################################################
 options(prompt = "R> ", continue = " ", width = 70, digits =4, useFancyQuotes = FALSE)
+ptm <- proc.time()
 
 
 ###################################################
@@ -163,5 +164,17 @@ dat <- cbind(dt, tmp)
 ## lambda.count=tmp$lambda.count[1:30], lambda.zero= tmp$lambda.zero[1:30],
 ## maxit.em=300, maxit.theta=1, theta.fixed=FALSE, penalty="snet", rescale=FALSE, foldid=foldid, n.cores=2)
 ## cat("cross-validated loglik", max(fitcv$cv))
+
+
+###################################################
+### code chunk number 22: german.Rnw:152-153 (eval = FALSE)
+###################################################
+## print(proc.time()-ptm)
+
+
+###################################################
+### code chunk number 23: sessionInfo
+###################################################
+sessionInfo();
 
 

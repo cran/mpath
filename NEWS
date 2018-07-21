@@ -124,4 +124,5 @@
                
                CHANGES in `mpath' VERSION 0.3-5 (10-17-2017)
   o  add vignette to illustrate classification of cancer patients with penalized robust nonconvex loss functions
-  
+  o  change zipath function to cycle through warm start. The results can be different from the previous versions.
+  o  fix bugs with zipath when trace=TRUE and the zero component is an intercept-only model
