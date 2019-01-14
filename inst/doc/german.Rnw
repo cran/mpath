@@ -1,23 +1,36 @@
 \documentclass[a4paper]{article}
 \usepackage[round]{natbib}
 \usepackage{Sweave}
+\usepackage{hyperref}
 %% need no \usepackage{Sweave.sty}
 %\usepackage{natbib}
 %\usepackage{/usr/lib/R/share/texmf/Sweave}
 %\VignetteIndexEntry{Variable Selection for Health Care Demand in Germany (without Results)}
 %\VignetteDepends{zic}
 \SweaveOpts{keep.source=FALSE}
+\hypersetup{%
+  pdftitle = {Variable Selection for Health Care Demand in Germany},
+  pdfsubject = {package vignette},
+  pdfauthor = {Zhu Wang},
+  %% change colorlinks to false for pretty printing
+  colorlinks = {true},
+  linkcolor = {blue},
+  citecolor = {blue},
+  urlcolor = {red},
+  hyperindex = {true},
+  linktocpage = {true},
+}
+
 \author{Zhu Wang \\ 
-Connecticut Children's Medical Center\\
-University of Connecticut School of Medicine\\
-zwang@connecticutchildrens.org}
+UT Health San Antonio\\
+wangz1@uthscsa.edu}
 \title{Variable Selection for Health Care Demand in Germany}
 \begin{document}
 
 \maketitle
 
 
-This document reproduces the data analysis presented in \cite{wang2014zinb}. In an effort to optimizing the computing algorithms, the penalized regression can be slightly different. For a description of the theory behind
+This document reproduces the data analysis presented in \cite{wang2014zinb}. In an effort to optimize the computing algorithms, the penalized regression can be slightly different. For a description of the theory behind
 application illustrated here we refer to the original manuscript.
  
 <<echo=false,results=hide>>=

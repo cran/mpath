@@ -381,7 +381,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
         if(!valid) start <- NULL
     }
     if(!is.null(lambda.count) && !is.null(lambda.zero)){
-        if(length(lambda.count) != length(lambda.zero))
+    	    if(length(lambda.count) != length(lambda.zero))
             stop("length of lambda.count must be the same as lambda.zero\n")
         else nlambda <- length(lambda.count)
     } 
@@ -420,9 +420,18 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
         kz <- NCOL(Z)
     }
     if(is.null(penalty.factor.count)) penalty.factor.count <- rep(1, dim(Xnew)[2])
+    if(all(penalty.factor.count==0)){
+	    penalty.factor.count <- rep(1, dim(Xnew)[2])
+	    lambda.count <- rep(0, nlambda)
+    }
     if(is.null(penalty.factor.zero)) penalty.factor.zero <- rep(1, dim(Znew)[2])
+    if(all(penalty.factor.zero==0)){
+	    penalty.factor.zero <- rep(1, dim(Znew)[2])
+	    lambda.zero <- rep(0, nlambda)
+    }
 ### get lambda -begin
-    if(is.null(lambda.count) && is.null(lambda.zero)){
+    if(is.null(lambda.count) || is.null(lambda.zero)){
+	    #if(is.null(lambda.count) && is.null(lambda.zero)){
         mui <- predict(fit0, type="count")
         probi <- predict(fit0, type="zero")
         probi <- switch(family,
@@ -431,7 +440,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                         "negbin"= probi/(probi + (1-probi) * dnbinom(0, size = fit0$theta, mu = mui))
                         )
         probi[Y1] <- 0
-        if(dim(Xnew)[2] > 1){
+        if(dim(Xnew)[2] > 1 && is.null(lambda.count)){
             if(family=="poisson"){
                 lambda.count <- glmreg_fit(Xnew, Y, weights=weights*(1-probi)/n, family="poisson", penalty.factor=penalty.factor.count, nlambda=nlambda, lambda.min.ratio = lambda.min.ratio, alpha=alpha.count, maxit=1, standardize=FALSE, ...)$lambda
             }
@@ -448,9 +457,9 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
             }
         }
         else lambda.count <- rep(0, nlambda)
-        if(dim(Znew)[2] > 1){
-            lambda.zero <- glmreg_fit(Znew, probi, weights=weights, family="binomial", penalty=penalty, penalty.factor=penalty.factor.zero, rescale=rescale, nlambda=nlambda, lambda.min.ratio=lambda.zero.min.ratio, alpha=alpha.zero, maxit=1, eps.bino=eps.bino, ...)$lambda
-       # if(penalty %in% c("mnet", "snet") && !rescale) 
+        if(dim(Znew)[2] > 1 && is.null(lambda.zero)){
+    		lambda.zero <- glmreg_fit(Znew, probi, weights=weights, family="binomial", penalty=penalty, penalty.factor=penalty.factor.zero, rescale=rescale, nlambda=nlambda, lambda.min.ratio=lambda.zero.min.ratio, alpha=alpha.zero, maxit=1, eps.bino=eps.bino, ...)$lambda
+	 	# if(penalty %in% c("mnet", "snet") && !rescale) 
        #   {###it seems lambda.zero[1] too small, thus ...
        #    lmax <- 0.632 * sqrt(lambda.zero[1])
        #    lambda.zero <- seq(log(lmax), log(lambda.zero.min.ratio * lmax), length.out=nlambda)
@@ -520,6 +529,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
                     }
                 }
                 if(dim(Z)[2]==1){
+			#if(dim(Z)[2]==1){
                     model_zero <- suppressWarnings(glm.fit(Z, probi, weights = weights, offset = offsetz,
                                                            family = binomial(link = linkstr), start = start$zero))
                     zerocoef = model_zero$coefficients
@@ -749,7 +759,7 @@ zipath <- function(formula, data, weights, subset, na.action, offset, standardiz
 	ll[k] <- ll_raw
         convout[k] <- converged
         coefc[,k] <- start$count
-        coefz[,k] <- start$zero
+	coefz[,k] <- start$zero
         if(family == "negbin") 
             theta[k] <- model_count$theta
 ### standard errors, experiment code, compare to sandwichreg function 

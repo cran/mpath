@@ -122,6 +122,10 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
 
     if(is.null(penalty.factor))
         penalty.factor <- rep(1, nvars)
+    if(all(penalty.factor==0)){	
+        lambda <- rep(0, nvars) 
+        penalty.factor <- rep(1, nvars)
+    }
     xold <- x
 
     if(standardize){
@@ -309,7 +313,7 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
 	penalty.factor.act <- penalty.factor
         los <- pll <- matrix(NA, nrow=iter, ncol=nlambda)
         while(i <= nlambda){
-            if(trace) message("loop in lambda:", i, "\n")
+            if(trace) message("loop in lambda:", i, ", lambda=", lambda[i], "\n")
             if(trace) {
                 cat("Quadratic majorization iterations ...\n")
             }
@@ -322,6 +326,7 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
                     stopit <- TRUE
                     break
                 }
+                                        #if(i==70 && k==iter) browser()
 		RET <- glmreg_fit(x=x.act*sqrt(B), y=h*sqrt(B), weights=weights, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor.act, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start.act)
 		RET$b0 <- RET$b0/sqrt(B)
 ### for LASSO, the above two lines are equivalent to the next line
@@ -351,11 +356,12 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
             if(!stopit){
                 tmp <- as.vector(RET$beta)
                 activeset <- which(abs(tmp) > 0)
+                if(length(activeset)==0)    break
                 beta[activeset,i] <- tmp[activeset]
 		start.act <- start.act[which(abs(start.act) > 0)]
 		x.act <- x[, activeset] #update active set
 		if(length(activeset)==1)
-		x.act <- matrix(x.act, ncol=1)
+                    x.act <- matrix(x.act, ncol=1)
 		m.act <- length(activeset) #update active set
 	        penalty.factor.act <- penalty.factor[activeset]
                                         # beta[,i] <- as.vector(RET$beta)

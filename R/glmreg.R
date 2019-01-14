@@ -141,6 +141,10 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
     stantype <- as.numeric(standardize)
                                         #  warning("alp = 1/theta in glm negative.binomial function\n")
     if(length(penalty.factor) != nvars) stop("number of penalty.factor should be the same as nvars")
+    if(all(penalty.factor==0)){ 
+    lambda <- rep(0, nvars)
+    penalty.factor <- rep(1, nvars)
+}
     im <- inactive <- seq(m)
 ### compute the pathwise coordinate descent, cf: section 2.5 in Friedman et al., JSS 2010, 33(1)
     if(is.null(weights)) weights <- rep(1, n)
@@ -175,7 +179,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
                       family=as.integer(famtype),
                       z=as.double(rep(0,n)),
                       PACKAGE="mpath")$z
-        lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, mu=mu, w=w, z=z, alpha=alpha, penalty.factor=penalty.factor, standardize=standardize) 
+	       	      lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, mu=mu, w=w, z=z, alpha=alpha, penalty.factor=penalty.factor, standardize=standardize) 
                                         #    if(penalty %in% c("mnet", "snet") && !rescale) lmax <- 0.5 * sqrt(lmax)
 	lpath <- seq(log(lmax), log(lambda.min.ratio * lmax), length.out=nlambda)
         lambda <- exp(lpath)
@@ -273,6 +277,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
 ### Names
     if(is.null(colnames(x))) varnames <- paste("V", 1:ncol(x), sep="")
     else varnames <- colnames(x)
+    #if(lambda > 0.0757) browser()
     beta <- matrix(tmp$b, ncol=nlambda)[,good]
     beta <- as.matrix(beta)
     b0 <- tmp$bz[good]
@@ -381,7 +386,8 @@ init <- function(wt, y, family){
 }
 
 findlam <- function(x, y, weights, family, theta=NULL,mu, w, z, alpha, penalty.factor, eps.bino=1e-5, standardize=TRUE){ 
-    if (alpha <= 0 || alpha > 1){
+    if(all(penalty.factor==0)) return(0)
+    	if (alpha <= 0 || alpha > 1){
         stop("alpha must be greater than 0 and less than or equal to 1, but alpha=", alpha)
     }
     if(family=="gaussian" || standardize)  #changed 8/12/2016

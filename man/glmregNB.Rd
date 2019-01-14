@@ -21,7 +21,7 @@ x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
   \item{formula}{formula used to describe a model.}
  \item{data}{argument controlling formula processing
     via \code{\link[stats]{model.frame}}.} 
-  \item{weights}{observation weights. Default is 1 for each observation}
+  \item{weights}{an optional vector of `prior weights' to be used in the fitting process. Should be \code{NULL} or a numeric vector. Default is a vector of 1s with equal weight for each observation.}
  \item{nlambda}{The number of \code{lambda} values - default is 100.}
  \item{lambda}{A user supplied \code{lambda} sequence}
   \item{lambda.min.ratio}{Smallest value for \code{lambda}, as a fraction of

@@ -2,14 +2,26 @@
 \usepackage[round]{natbib}
 \usepackage{hyperref}
 %\usepackage{natbib}
-%\VignetteIndexEntry{Classification of Cancer Patients with Penalized Robust Nonconvex Loss Functions (without results)}
+%\VignetteIndexEntry{Classification of Cancer Patients with Penalized Robust Nonconvex Loss Functions (without Results)}
 %\VignetteDepends{knitr, gdata}
 %\VignetteEngine{knitr::knitr}
 \newcommand{\R}[1]{\texttt{#1}}
+\hypersetup{%
+  pdftitle = {Classification of Cancer Patients with Penalized Robust Nonconvex Loss Functions},
+  pdfsubject = {package vignette},
+  pdfauthor = {Zhu Wang},
+  %% change colorlinks to false for pretty printing
+  colorlinks = {true},
+  linkcolor = {blue},
+  citecolor = {blue},
+  urlcolor = {red},
+  hyperindex = {true},
+  linktocpage = {true},
+}
+
 \author{Zhu Wang \\
-  Connecticut Children's Medical Center\\
-  University of Connecticut School of Medicine\\
-  zwang@connecticutchildrens.org}
+  UT Health San Antonio\\
+  wangz1@uthscsa.edu}
 \title{Classification of Cancer Patients with Penalized Robust Nonconvex Loss Functions}
 \begin{document}
 \sloppy

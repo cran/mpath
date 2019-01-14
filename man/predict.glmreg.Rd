@@ -37,6 +37,7 @@ outcome <- gl(3,1,9)
 treatment <- gl(3,3)
 print(d.AD <- data.frame(treatment, outcome, counts))
 fit <- glmreg(counts ~ outcome + treatment, data=d.AD, family="poisson")
+predict(fit, newx=d.AD[,1:2])
 summary(fit)
 coef(fit)
 }

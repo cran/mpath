@@ -126,3 +126,8 @@
   o  add vignette to illustrate classification of cancer patients with penalized robust nonconvex loss functions
   o  change zipath function to cycle through warm start. The results can be different from the previous versions.
   o  fix bugs with zipath when trace=TRUE and the zero component is an intercept-only model
+               
+               CHANGES in `mpath' VERSION 0.3-6 (10-04-2018)
+  o  fix bugs when all elements of penalty.factor=0 in glmreg_fit or glmregNB. In this case, we set lambda=0 for each variable, and all penalty.factor=1. 
+  o  fix bugs when all elements of penalty.factor.count=0 or penalty.factor.zero=0 in zipath. In this case, we set corresponding lambda = 0.
+  o  fix bugs when activeset=NULL in nclreg function
