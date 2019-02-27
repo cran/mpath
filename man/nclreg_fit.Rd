@@ -7,12 +7,14 @@
   of values for the regularization parameter lambda.
   }
 \usage{
-nclreg_fit(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), 
-s=NULL, fk=NULL, iter=10, del=1e-10, nlambda=100, lambda=NULL, lambda.min.ratio=
-ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, penalty.factor = NULL, 
-maxit=1000, type.init="bst", mstop.init=10, nu.init=0.1, direction=c("bwd", "fwd"), 
-eps=.Machine$double.eps, trace=FALSE, penalty=c("enet","mnet","snet"), 
-type.path=c("active", "naive", "onestep"))
+nclreg_fit(x, y, weights, offset=NULL, cost=0.5, 
+	   rfamily=c("clossR", "closs", "gloss", "qloss"), 
+	   s=NULL, fk=NULL, iter=10, del=1e-10, nlambda=100, lambda=NULL, 
+	   lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, 
+	   standardize=TRUE, penalty.factor = NULL, maxit=1000, type.init="bst", 
+	   mstop.init=10, nu.init=0.1, direction=c("bwd", "fwd"), 
+	   eps=.Machine$double.eps, trace=FALSE, penalty=c("enet","mnet","snet"), 
+	   type.path=c("active", "naive", "onestep"))
 }
 
 \arguments{
@@ -20,6 +22,7 @@ type.path=c("active", "naive", "onestep"))
   observation vector.} 
   \item{y}{response variable. Quantitative for \code{rfamily="clossR"} and -1/1 for classifications.}
   \item{weights}{observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation}
+  \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting. This should be NULL or a numeric vector of length equal to the number of cases. Currently only one offset term can be included in the formula.}
   \item{cost}{ price to pay for false positive, 0 < \code{cost} < 1; price of false negative is 1-\code{cost}.}
   \item{rfamily}{Response type and relevant loss functions (see above)}
   \item{s}{ nonconvex loss tuning parameter for robust regression and classification. }
@@ -67,7 +70,7 @@ An object with S3 class \code{"nclreg"} for the various types of models.
   \item{lambda}{The actual sequence of \code{lambda} values used}
 }
 
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link{nclreg}}}
 \keyword{models}

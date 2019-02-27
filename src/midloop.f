@@ -24,7 +24,8 @@ C     b0
 C     yhat
 C     dev
 
-      subroutine midloop(n,m,x,y,xold,yold,weights, mu, eta, family,
+      subroutine midloop(n,m,x,y,xold,yold,weights, mu, eta, offset,
+     +     family,
      +     penalty,lamk, 
      +     alpha, gam, theta, rescale, standardize,eps,innermaxit,
      +     maxit, thresh, nulldev, wt, beta, b0,yhat,dev,trace,convmid, 
@@ -37,7 +38,7 @@ C     dev
      +     del,olddev,weights(n),xold(n,m), yold(n),normx(m),xd(m), 
      +     thresh, nulldev, dev, theta, wtw(n),lamk(m),alpha, 
      +     gam, eps, beta(m), betaold(m), b0, b0old, yhat(n),avg, ep, 
-     +     pll(maxit)
+     +     pll(maxit), offset(n)
 
       innermaxit = maxit
       maxit = 1
@@ -51,6 +52,7 @@ C 5    enddo
 
       do 10 i=1, n
          wtw(i)=wt(i) * w(i)
+         z(i)=z(i) - offset(i)
  10   continue
       call preprocess(x, z, n, m, wtw, family, standardize,
      +     normx, xd, avg)
@@ -68,6 +70,9 @@ C 5    enddo
  230     continue
  220  continue
       call DCOPY(n, yhat, 1, eta, 1)
+      do 350 i = 1, n
+         eta(i) = eta(i) + offset(i)
+ 350  continue
       call linkinv(n, eta, family, mu)
       olddev = dev
 C     compute deviance dev

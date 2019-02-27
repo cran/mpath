@@ -48,7 +48,7 @@ An object with S3 class \code{"nclreg"} for the various types of models.
   \item{fitted.values}{predicted values depending on \code{standardize}, internal use only}
 }
 
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 \seealso{\code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and \code{\link{plot}} methods, and the \code{\link{cv.nclreg}} function.}
 \examples{
 #binomial

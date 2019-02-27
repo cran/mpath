@@ -60,12 +60,12 @@ ncl.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL,
     RET
 }
 ncl.matrix <- function(x, y, weights, offset=NULL, ...){
-    RET <- ncl_fit(x, y, weights,...)
+    RET <- ncl_fit(x, y, weights, offset=offset, ...)
     RET$call <- match.call()
     return(RET)
 }
 
-ncl_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, del=1e-10, trace=FALSE){
+ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, del=1e-10, trace=FALSE){
     call <- match.call()
     rfamily <- match.arg(rfamily)
     if(is.null(s)) stop("s must be a number\n")
@@ -126,7 +126,7 @@ ncl_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "gloss"
 	    z <- y*fk_old
 	    h <- -y*(gradient(family=rfamily, u=z, s=s)/B-z)
         }
-	RET <- lm.wfit(x, h, weights)
+	RET <- lm.wfit(x, h, weights, offset)
 	fk <- RET$fitted.values
                                         #if(rfamily=="closs")
                                         #fk <- pmin(1, pmax(-1, fk)) ### truncated at -1 or 1

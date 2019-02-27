@@ -16,5 +16,5 @@
 \item{meanx}{a vector of means for each column in the original \code{x}}
 \item{normx}{a vector of scales for each column in the original \code{x}}
 }
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 

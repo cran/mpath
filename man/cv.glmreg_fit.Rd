@@ -4,7 +4,7 @@
 \description{Internal function to conduct k-fold cross-validation for glmreg, produces a plot,
   and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
-cv.glmreg_fit(x, y, weights, lambda=NULL, balance=TRUE, 
+cv.glmreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE, 
 family=c("gaussian", "binomial", "poisson", "negbin"), 
 nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
 }
@@ -12,6 +12,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
   \item{x}{\code{x} matrix as in \code{glmreg}.}
   \item{y}{response \code{y} as in \code{glmreg}.}
   \item{weights}{Observation weights; defaults to 1 per observation}
+  \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting. This should be NULL or a numeric vector of length equal to the number of cases. Currently only one offset term can be included in the formula.}
   \item{lambda}{Optional user-supplied lambda sequence; default is
     \code{NULL}, and \code{glmreg} chooses its own sequence}
  \item{balance}{for \code{family="binomial"} only}
@@ -52,7 +53,7 @@ Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Pra
 \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
 }
 
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 \seealso{\code{\link{glmreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.glmreg"} object.}
 \keyword{models}
 \keyword{regression}

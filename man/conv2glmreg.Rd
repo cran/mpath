@@ -12,5 +12,5 @@ conv2glmreg(object, family=c("poisson", "negbin"))
   \item{family}{one of families in glm class}
 }
 \value{an object of class glmreg}
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 

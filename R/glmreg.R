@@ -55,7 +55,7 @@ glmreg.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL,
     }
 ### End of addition 08/07/2012 
 
-    RET <- glmreg_fit(X[,-1], Y, weights,...)
+    RET <- glmreg_fit(X[,-1], Y, weights=weights, offset=offset,...)
     RET$call <- match.call()
     RET <- c(RET, list(formula=formula, terms = mt, data=data,
                        contrasts = attr(X, "contrasts"),
@@ -66,12 +66,12 @@ glmreg.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL,
     RET
 }
 glmreg.matrix <- function(x, y, weights, offset=NULL, ...){
-    RET <- glmreg_fit(x, y, weights,...)
+    RET <- glmreg_fit(x, y, weights=weights, offset=offset,...)
     RET$call <- match.call()
     return(RET)
 }
 
-glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars),thresh=1e-6, eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, family=c("gaussian", "binomial", "poisson", "negbin"), penalty=c("enet","mnet","snet"), convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE){
+glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, offset=rep(0, nobs), nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars),thresh=1e-6, eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, family=c("gaussian", "binomial", "poisson", "negbin"), penalty=c("enet","mnet","snet"), convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE){
 	#if(!is.null(start) && !is.null(etastart) && !is.null(mustart))
 	#stop("start, etastart and mustart is for testing only\n")
     family <- match.arg(family)
@@ -109,6 +109,8 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
     if( !is.null(weights) && any(weights < 0) ){
         stop("negative weights not allowed")
     }
+    if (is.null(offset))
+                    offset <- rep.int(0, nobs)
     if(family=="binomial"){
         if(is.factor(y))
             y <- as.integer(y) - 1
@@ -150,7 +152,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
     if(is.null(weights)) weights <- rep(1, n)
     wt <- weights/sum(weights)
     if(is.null(mustart) || is.null(etastart)){
-        tmp <- init(wt, y, family=family)
+        tmp <- init(wt, y, offset, family=family)
         mu <- tmp$mu
         eta <- rep(tmp$eta,n)
     }
@@ -159,7 +161,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
         eta <- etastart
     }
     if(is.null(lambda)){
-        tmp <- init(wt, y, family=family)
+        tmp <- init(wt, y, offset, family=family)
         mu <- tmp$mu
         eta <- rep(tmp$eta,n)
         w <- .Fortran("glmlink",
@@ -179,6 +181,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
                       family=as.integer(famtype),
                       z=as.double(rep(0,n)),
                       PACKAGE="mpath")$z
+	z <- z - offset
 	       	      lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, mu=mu, w=w, z=z, alpha=alpha, penalty.factor=penalty.factor, standardize=standardize) 
                                         #    if(penalty %in% c("mnet", "snet") && !rescale) lmax <- 0.5 * sqrt(lmax)
 	lpath <- seq(log(lmax), log(lambda.min.ratio * lmax), length.out=nlambda)
@@ -250,6 +253,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
                     rescale=as.integer(rescale),
                     mu=as.double(mu),
                     eta=as.double(eta),
+		    offset=as.double(offset),
                     family=as.integer(famtype),
                     standardize=as.integer(stantype),
                     nulldev=as.double(nulldev),
@@ -277,11 +281,10 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
 ### Names
     if(is.null(colnames(x))) varnames <- paste("V", 1:ncol(x), sep="")
     else varnames <- colnames(x)
-    #if(lambda > 0.0757) browser()
     beta <- matrix(tmp$b, ncol=nlambda)[,good]
     beta <- as.matrix(beta)
     b0 <- tmp$bz[good]
-### note: pll was from standardized beta values if standardize=TRUE
+    ### note: pll was from standardized beta values if standardize=TRUE
     if(trace)
         pll <- matrix(tmp$outpll, ncol=nlambda)
     else pll <- NULL
@@ -291,8 +294,10 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
                                         #if (family != "gaussian" && standardize){ 
         beta <- as.matrix(beta/as.vector(normx))
         b0 <- b0 - crossprod(meanx,beta)
-        if (family == "gaussian")
+        if (family == "gaussian"){
             b0 <- mean(y) + b0    ### changed 4/22/2015
+            b0 <- b0 - mean(offset)
+	}
     }
     else normx <- NULL
     resdev <- tmp$resdev[good]
@@ -302,8 +307,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
         names(beta) <- colnames(x)
     else{
         rownames(beta) <- colnames(x)
-                                        # colnames(beta) <- lambda
-        colnames(beta) <- round(lambda,digits=4)
+        colnames(beta) <- round(lambda,digits=4)[good]
     }
     RET <- list(family=family,standardize=standardize, satu=tmp$satu, lambda=lambda[good], nlambda=length(lambda[good]), beta=beta, b0=matrix(b0, ncol=nlambda), meanx=meanx, normx=normx, theta=theta[good], nulldev=nulldev, resdev=resdev, pll = pll, fitted.values=yhat, converged=tmp$convout[good], convex.min=convex.min, penalty.factor=penalty.factor, gamma=gamma, alpha=alpha)
     if(x.keep) RET$x <- x
@@ -311,8 +315,8 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, n
     class(RET) <- "glmreg"
     RET$twologlik <- try(2*logLik(RET, newx=x, y=y, weights=weights))
 ###penalized log-likelihood function value for rescaled beta
-    penval <- rep(NA, nlambda)
-    for(j in 1:nlambda){
+    penval <- rep(NA, nlambda)[good]
+    for(j in (1:nlambda)[good]){
         penval[j] <- .Fortran("penGLM", 
                               start=as.double(beta[,j]),
                               m=as.integer(m),
@@ -366,8 +370,8 @@ g <- function(mu, family, eps.bino=1e-5){
 }
 
 ### eta is the estimated beta_0 in the intercept-only model
-init <- function(wt, y, family){
-    mu <- wt %*% y
+init <- function(wt, y, offset, family){
+    mu <- as.vector(wt %*% y) + offset
     switch(family,
            "gaussian"={
                eta <- mu

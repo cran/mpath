@@ -26,8 +26,7 @@ maxit.theta = 1, reltol = 1e-5, eps.bino=1e-5, shortlist=FALSE, trace = FALSE, .
   \item{data, subset, na.action}{arguments controlling formula processing
     via \code{\link[stats]{model.frame}}.}
   \item{offset}{optional numeric vector with an a priori known component to be
-    included in the linear predictor of the count model. See below for more
-    information on offsets.}
+    included in the linear predictor of the count model or zero model. See below for an example.}
 \item{standardize}{Logical flag for x variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
     the original scale. Default is \code{standardize=TRUE}.}
@@ -138,7 +137,7 @@ Zhu Wang, Shuangge Ma, Ching-Yun Wang, Michael Zappitelli, Prasad Devarajan and 
 Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, \emph{Biometrical Journal}. 57(5):867-84.
 }
 
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link[stats]{glm}},
   \code{\link{glmreg}}, \code{\link{glmregNB}}
@@ -172,6 +171,13 @@ lambda.count=0, lambda.zero=0, reltol=1e-12)
 summary(fm_zinb3)
 fm_zinb4 <- zerofinfl(art ~ . | ., data = bioChemists, dist = "negbin")
 summary(fm_zinb4)
+### offset
+exposure <- rep(0.5, dim(bioChemists)[1])
+fm_zinb <- zipath(art ~ . +offset(log(exposure))| ., data = bioChemists, 
+		  family = "poisson", nlambda=10)
+print(coef(fm_zinb))
+print(predict(fm_zinb))
+
 }
 }
 

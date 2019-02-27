@@ -50,7 +50,7 @@ type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, ...)
   \item{lambda.optim}{value of \code{lambda} that gives minimum \code{cv} value.}
 }
 
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 \seealso{\code{\link{nclreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.nclreg"} object.}
 \keyword{models}
 \keyword{regression}

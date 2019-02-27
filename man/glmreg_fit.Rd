@@ -8,7 +8,7 @@
   linear, logistic, Poisson and negative binomial (fixed scale parameter) regression models.
   }
 \usage{
-glmreg_fit(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, 
+glmreg_fit(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, offset = rep(0, nobs), 
 nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, 
 gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars),thresh=1e-6, 
 eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, 
@@ -27,6 +27,7 @@ convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
   \item{start}{starting values for the parameters in the linear predictor.}
   \item{etastart}{starting values for the linear predictor.}
   \item{mustart}{starting values for the vector of means.}
+  \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting. This should be NULL or a numeric vector of length equal to the number of cases. Currently only one offset term can be included in the formula.}
   \item{nlambda}{The number of \code{lambda} values - default is 100. The sequence may be truncated before \code{nlambda} is reached if a close to saturated model is fitted. See also \code{satu}.}
   \item{lambda}{ by default, the algorithm provides a sequence of regularization values, or a user supplied \code{lambda} sequence }
   \item{lambda.min.ratio}{Smallest value for \code{lambda}, as a fraction of
@@ -100,7 +101,7 @@ Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Pra
 \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
 }
 
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link{glmreg}}}
 \keyword{models}

@@ -1,5 +1,5 @@
-cv.glmregNB <- function(formula, data, weights, lambda=NULL, 
-nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
+cv.glmregNB <- function(formula, data, weights, offset=NULL, 
+lambda=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
 ...){
     call <- match.call()
  mf <- Call <- match.call()
@@ -20,7 +20,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2,
   if(any(weights < 0)) stop("negative weights not allowed")
 
   K <- nfolds
-      glmregNB.obj <- do.call("glmregNB", list(formula, data, weights, lambda=lambda, ...))
+      glmregNB.obj <- do.call("glmregNB", list(formula, data, weights, offset=offset, lambda=lambda, ...))
     lambda <- glmregNB.obj$lambda
     nlambda <- length(lambda)
     if(missing(foldid))
@@ -31,7 +31,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2,
     residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
       omit <- all.folds[[i]]
 ### changed 5/20/2013 fixed theta
-      fitcv <- do.call("glmregNB", list(formula, data[-omit,], weights[-omit], nlambda=nlambda, lambda=lambda, theta.est=FALSE, theta0=glmregNB.obj$theta, ...))
+      fitcv <- do.call("glmregNB", list(formula, data[-omit,], weights[-omit], offset=offset[-omit], nlambda=nlambda, lambda=lambda, theta.est=FALSE, theta0=glmregNB.obj$theta, ...))
 ### remove the first column, which is for intercept
       fitcv$terms <- NULL ### logLik requires data frame if terms is not NULL
       logLik(fitcv, newx=X[omit,-1, drop=FALSE], Y[omit], weights=weights[omit])

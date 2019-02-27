@@ -21,7 +21,7 @@ fitted \code{"glmreg"} object.
 \details{
 A coefficient profile plot is produced. 
 }
-\author{Zhu Wang zwang@connecticutchildrens.org}
+\author{Zhu Wang wangz1@uthscsa.edu}
 \seealso{\code{glmreg}, and \code{print}, \code{predict} and \code{coef} methods.}
 \examples{
 x=matrix(rnorm(100*20),100,20)

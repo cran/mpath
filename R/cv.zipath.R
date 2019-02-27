@@ -1,5 +1,5 @@
-cv.zipath <- function(formula, data, weights, nlambda=100, lambda.count=NULL, lambda.zero=NULL, 
-                      nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
+cv.zipath <- function(formula, data, weights, nlambda=100, lambda.count=NULL, 
+		      lambda.zero=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
                       ...){
     call <- match.call()
     if(missing(foldid) && nfolds < 3)
@@ -36,7 +36,7 @@ cv.zipath <- function(formula, data, weights, nlambda=100, lambda.count=NULL, la
     i <- 1  ###needed to pass R CMD check with parallel code below
     residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
         omit <- all.folds[[i]]
-        fitcv <- do.call("zipath", list(formula, data[-omit,], weights[-omit], lambda.count=lambda.count, lambda.zero=lambda.zero, nlambda=nlambda, ...))
+    	fitcv <- do.call("zipath", list(formula, data[-omit,], weights[-omit], lambda.count=lambda.count, lambda.zero=lambda.zero, nlambda=nlambda, ...))
         logLik(fitcv, newdata=data[omit,, drop=FALSE], Y[omit], weights=weights[omit])
     }
     stopImplicitCluster()
@@ -65,6 +65,8 @@ if(se)
 invisible()
 }
 
+predict.cv.zipath <- function(object, newdata, ...)
+predict(object$fit, newdata, which=object$lambda.which, ...)
 
 coef.cv.zipath <- function(object, which=object$lambda.which, model = c("full", "count", "zero"), ...) {
     model <- match.arg(model)

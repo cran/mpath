@@ -126,8 +126,12 @@ C     check if beta(j) strictly increases penalized loglikehood function
          endif
 C     70: cycle through in the active set (end with endif statement) 
  40   continue
-      call checkConvergence(m, beta, beta_old, eps, thresh, converged,
+      call checkConvergence(1, b0, b0_old, eps, thresh, converged,
+     +     1, 1)      
+      if(converged.EQ.1) then
+        call checkConvergence(m, beta, beta_old, eps, thresh, converged,
      +     activeset, jk)
+      endif    
 
       return
       end

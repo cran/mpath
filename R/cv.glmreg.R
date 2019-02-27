@@ -54,17 +54,17 @@ cv.glmreg.formula <- function(formula, data, weights, offset=NULL, ...){
     }
 ### End of addition 08/07/2012 
 
-    RET <- cv.glmreg_fit(X[,-1], Y, weights,...)
+    RET <- cv.glmreg_fit(X[,-1], Y, weights, offset=offset, ...)
     RET$call <- match.call()
     return(RET)
 }
 cv.glmreg.matrix <- function(x, y, weights, offset=NULL, ...){
-    RET <- cv.glmreg_fit(x, y, weights,...)
+    RET <- cv.glmreg_fit(x, y, weights, offset=offset, ...)
     RET$call <- match.call()
     return(RET)
 }
 
-cv.glmreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE, 
+cv.glmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE, 
                           family=c("gaussian", "binomial", "poisson", "negbin"), 
                           nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
                           ...){
@@ -77,7 +77,7 @@ cv.glmreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
     nvars <- m <- nm[2]
     if(missing(weights)) weights <- rep(1, nobs)
     K <- nfolds
-    glmreg.obj <- glmreg_fit(x, y, weights, lambda=lambda, family=family, ...)
+    glmreg.obj <- glmreg_fit(x, y, weights, offset=offset, lambda=lambda, family=family, ...)
     lambda <- glmreg.obj$lambda
     nlambda <- length(lambda)
     if(missing(foldid)){
@@ -90,7 +90,7 @@ cv.glmreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
     i <- 1  ###needed to pass R CMD check with parallel code below
     residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
         omit <- all.folds[[i]]
-        fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], lambda=lambda, family=family, ...)
+        fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offset[- omit], lambda=lambda, family=family, ...)
 	logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit])
     }
     stopImplicitCluster()
@@ -117,6 +117,10 @@ cv.glmreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
 
         invisible()
     }
+
+predict.cv.glmreg=function(object, newx, ...){
+      	predict(object$fit,newx,which=object$lambda.which,...)
+}
 
 coef.cv.glmreg=function(object,which=object$lambda.which,...){
     coef(object$fit,which=which,...)

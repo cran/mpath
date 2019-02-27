@@ -8,7 +8,8 @@ a fitted \code{"glmreg"} object.
 }
 \usage{
 \method{predict}{glmreg}(object,newx,which=1:length(object$lambda),
-type=c("link","response","class","coefficients","nonzero"), na.action=na.pass, ...)
+type=c("link","response","class","coefficients","nonzero"), newoffset = NULL, 
+na.action=na.pass, ...)
 \method{coef}{glmreg}(object,which=1:length(object$lambda),...)
 }
 \arguments{
@@ -21,6 +22,7 @@ type=c("link","response","class","coefficients","nonzero"), na.action=na.pass, .
     linear predictors; \code{"response"} gives the fitted values;
     \code{"class"} returns the binomial outcome with the highest
     probability; \code{"coefficients"} returns the coefficients.}
+  \item{newoffset}{an offset term used in prediction}
   \item{na.action}{action for missing data value}
   \item{\dots}{ arguments for predict }}
 \value{The returned object depends on \code{type}.}
@@ -28,7 +30,7 @@ type=c("link","response","class","coefficients","nonzero"), na.action=na.pass, .
 Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)
 \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
 }
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 \seealso{\code{\link{glmreg}}}
 \examples{
 ## Dobson (1990) Page 93: Randomized Controlled Trial :

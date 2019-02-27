@@ -8,12 +8,12 @@
   of values for the regularization parameter lambda. 
   }
 \usage{
-glmregNB(formula, data, weights, nlambda = 100, lambda=NULL, lambda.min.ratio = 
-ifelse(nobs<nvars,0.05,0.001), alpha=1, gamma=3, rescale=TRUE, standardize = TRUE, 
-penalty.factor = rep(1, nvars), thresh = 0.001, maxit.theta = 25, maxit=1000, 
-eps=.Machine$double.eps, trace=FALSE, start = NULL, etastart = NULL, mustart = NULL, 
-theta.est=TRUE, theta0=NULL, init.theta=ifelse(theta.est, theta0[1],NULL),link=log, 
-penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, 
+glmregNB(formula, data, weights, offset=NULL, nlambda = 100, lambda=NULL, 
+lambda.min.ratio = ifelse(nobs<nvars,0.05,0.001), alpha=1, gamma=3, rescale=TRUE, 
+standardize = TRUE, penalty.factor = rep(1, nvars), thresh = 0.001, maxit.theta = 25, 
+maxit=1000, eps=.Machine$double.eps, trace=FALSE, start = NULL, etastart = NULL, 
+mustart = NULL, theta.est=TRUE, theta0=NULL, init.theta=ifelse(theta.est, theta0[1],NULL),
+link=log, penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, 
 x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
 }
 
@@ -22,7 +22,9 @@ x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
  \item{data}{argument controlling formula processing
     via \code{\link[stats]{model.frame}}.} 
   \item{weights}{an optional vector of `prior weights' to be used in the fitting process. Should be \code{NULL} or a numeric vector. Default is a vector of 1s with equal weight for each observation.}
- \item{nlambda}{The number of \code{lambda} values - default is 100.}
+   \item{offset}{optional numeric vector with an a priori known component to be
+    included in the linear predictor of the model.}
+  \item{nlambda}{The number of \code{lambda} values - default is 100.}
  \item{lambda}{A user supplied \code{lambda} sequence}
   \item{lambda.min.ratio}{Smallest value for \code{lambda}, as a fraction of
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest
@@ -95,7 +97,7 @@ Breheny, P. and Huang, J. (2011) \emph{Coordinate descent
 Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)      \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
 }
 
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and \code{\link{plot}} methods, and the \code{\link{cv.glmregNB}} function.}
 \examples{

@@ -7,6 +7,7 @@ C     m
 C     x
 C     y
 C     mu
+C     offset
 C     family
 C     nlambda
 C     lamk
@@ -25,7 +26,8 @@ C     b0
 C     yhat
 C     dev
 
-      subroutine midloopGLM(n,m,x,y,xold,yold,weights, mu, eta, family,
+      subroutine midloopGLM(n,m,x,y,xold,yold,weights, mu, eta, offset,
+     +     family,
      +     penalty,lamk, 
      +     alpha, gam, theta, rescale, standardize,eps,innermaxit,
      +     maxit, thresh, nulldev, wt, beta, b0,yhat,dev,trace,convmid, 
@@ -39,7 +41,7 @@ C     dev
      +     del,olddev,weights(n),xold(n,m), yold(n),normx(m),xd(m), 
      +     thresh, nulldev, dev, theta, thetaold, wtw(n),lamk(m),alpha, 
      +     gam, eps, beta(m), betaold(m), b0, b0old, yhat(n),avg, ep, 
-     +     pll(maxit)
+     +     pll(maxit), offset(n)
 
       innermaxit = 1
       
@@ -55,10 +57,12 @@ C     dev
          if(trace.EQ.1)then 
             call intpr("Middle loop: Update the quadratic approximation 
      +likelihood function", -1, 1, 0)
-            call intpr(" middle loop iteration ", -1, jj, 1)
+            call intpr(" middle loop iteration jj=", -1, jj, 1)
             call dblepr("convergency criterion at beginning", -1, del,1)
+            call intpr("convmid", -1, convmid,1)
          endif
          call DCOPY(m, beta, 1, betaold, 1)
+         
          b0old = b0
          thetaold = theta
          call glmlink(n,mu,family,theta,w, ep)
@@ -66,6 +70,7 @@ C     dev
 
          do 10 i=1, n
             wtw(i)=wt(i) * w(i)
+            z(i)=z(i) - offset(i)
  10      continue
          call loop_glm(x, y, z, n, m, w, mu, penalty, thresh, eps, 
      +        standardize, family, beta, b0, lamk, alpha, gam, 
@@ -79,6 +84,9 @@ C     dev
  230        continue
  220     continue
          call DCOPY(n, yhat, 1, eta, 1)
+         do 350 i = 1, n
+            eta(i) = eta(i) + offset(i)
+ 350     continue
          call linkinv(n, eta, family, mu)
          olddev = dev
 C     compute deviance dev

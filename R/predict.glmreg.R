@@ -1,4 +1,4 @@
-predict.glmreg <- function(object,newx,which=1:length(object$lambda), type=c("link","response","class","coefficients","nonzero"), na.action=na.pass, ...){
+predict.glmreg <- function(object,newx,which=1:length(object$lambda), type=c("link","response","class","coefficients","nonzero"), newoffset=NULL, na.action=na.pass, ...){
  type=match.arg(type)
   if(missing(newx)){
     if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")
@@ -28,6 +28,8 @@ if(!is.null(object$terms)){
 					"negbin"=4)
   n <- dim(newx)[1]
   m <- dim(newx)[2]
+  if(is.list(newx))
+	  newx <- as.matrix(as.data.frame(lapply(newx, as.numeric)))
   res <- .Fortran("pred",
 				  n=as.integer(n),
 				  m=as.integer(m),
@@ -41,6 +43,10 @@ if(!is.null(object$terms)){
 				  PACKAGE="mpath")
   eta <- matrix(res$eta, ncol=nlambda)
   mu <- matrix(res$mu, ncol=nlambda)
+  if(!is.null(newoffset)){
+  eta <- eta + newoffset
+  mu <- eta ### only works for gaussian, it should be updated from the above pred Fortran code
+  }
   colnames(eta) <- colnames(mu) <- colnames(object$beta[,which])
   #pihat <- exp(eta)/(1+exp(eta))
     if (object$family=="gaussian" | type=="link") return(eta)

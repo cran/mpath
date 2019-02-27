@@ -47,7 +47,7 @@ nclreg.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL, 
             stop(gettextf("number of offsets is %d should equal %d (number of observations)", length(offset), NROW(Y)), domain = NA)
     }
 
-    RET <- nclreg_fit(X[,-1], Y, weights=weights, ...)
+    RET <- nclreg_fit(X[,-1], Y, weights=weights, offset=offset, ...)
     RET$call <- match.call()
     RET <- c(RET, list(formula=formula, terms = mt, data=data,
                        contrasts = attr(X, "contrasts"),
@@ -56,7 +56,7 @@ nclreg.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL, 
     RET
 }
 nclreg.matrix <- function(x, y, weights, offset=NULL, ...){
-    RET <- nclreg_fit(x, y, weights,...)
+    RET <- nclreg_fit(x, y, weights, offset=offset, ...)
     RET$call <- match.call()
     return(RET)
 }
@@ -80,7 +80,7 @@ compute.2d <- function(y, f, s, family=c("clossR", "closs", "gloss", "qloss")){
         sqrt(2/pi)*u/s^3*exp(-u^2/(2*s^2))
 }
 
-nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, del=1e-10, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, penalty.factor = NULL, maxit=1000, type.init="bst", mstop.init=10, nu.init=0.1, direction=c("bwd", "fwd"), eps=.Machine$double.eps, trace=FALSE, penalty=c("enet","mnet","snet"), type.path=c("active", "naive", "onestep")){ 
+nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, del=1e-10, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, penalty.factor = NULL, maxit=1000, type.init="bst", mstop.init=10, nu.init=0.1, direction=c("bwd", "fwd"), eps=.Machine$double.eps, trace=FALSE, penalty=c("enet","mnet","snet"), type.path=c("active", "naive", "onestep")){ 
 ### compute h value
     compute.h <- function(rfamily, y, fk_old, s, B){
         if(rfamily=="clossR")
@@ -205,7 +205,7 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
         h <- RET$h                               
 ### If standardize=TRUE, x has already been standardized. Therefore, in the sequel, we don't standardize x again
 ### method A, to obtain lambda values from fitting the penalized regression. 
-        lambda <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, lambda.min.ratio=lambda.min.ratio, nlambda=nlambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=1, eps=eps, family="gaussian", penalty=penalty)$lambda
+        lambda <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda.min.ratio=lambda.min.ratio, nlambda=nlambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=1, eps=eps, family="gaussian", penalty=penalty)$lambda
 ### with type.init, add two different lambda sequences and make lambda values flexible to have different solution paths
         if(type.init %in% c("bst", "heu")){
             if(direction=="bwd")#{### solution path backward direction
@@ -269,7 +269,7 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
                     stopit <- TRUE
                     break
                 }
-		RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
+		RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
 		RET$b0 <- RET$b0/sqrt(B)
 ### for LASSO, the above two lines are equivalent to the next line
                                         #RET <- glmreg_fit(x=x, y=h, weights=weights, lambda=lambda[i]/B,alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty)
@@ -327,7 +327,7 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
                     break
                 }
                                         #if(i==70 && k==iter) browser()
-		RET <- glmreg_fit(x=x.act*sqrt(B), y=h*sqrt(B), weights=weights, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor.act, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start.act)
+		RET <- glmreg_fit(x=x.act*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor.act, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start.act)
 		RET$b0 <- RET$b0/sqrt(B)
 ### for LASSO, the above two lines are equivalent to the next line
                                         #RET <- glmreg_fit(x=x, y=h, weights=weights, lambda=lambda[i]/B,alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty)
@@ -385,7 +385,7 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
 	while(d1 > del && k <= iter){
 	    fk_old <- fk
             h <- compute.h(rfamily, y, fk_old, s, B)
-	    RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, lambda=lam, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
+	    RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lam, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
             RET$b0 <- RET$b0/sqrt(B)
 	    fk <- predict(RET, newx=x)
             start <- coef(RET)
@@ -395,7 +395,7 @@ nclreg_fit <- function(x,y, weights, cost=0.5, rfamily=c("clossR", "closs", "glo
             k <- k + 1
         }
 ### fit a solution path    
-        RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, lambda=lambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
+        RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
         RET$b0 <- RET$b0/sqrt(B)
         for(i in 1:nlambda){
             los[i] <- weighted.mean(loss(y, f=RET$fitted.values[,i], cost, family = rfamily, s=s, fk=NULL), w=w)

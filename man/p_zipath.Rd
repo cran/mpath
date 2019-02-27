@@ -41,7 +41,7 @@ gamma.count = 3, gamma.zero = 3, prop=0.5, trace=TRUE, B=10, ...)
 }
 \references{
 Nicolai Meinshausen, Lukas Meier and Peter Buehlmann (2013)
-\emph{p-Values for High-Dimensional Regression}, \emph{Journal of the American Statistical Association}, \bold{104(488)}, 1671--1681
+\emph{p-Values for High-Dimensional Regression}, \emph{Journal of the American Statistical Association}, 104(488), 1671--1681.
 
 Zhu Wang, Shuangge Ma, Ching-Yun Wang, Michael Zappitelli, Prasad Devarajan and Chirag R. Parikh (2014)
 \emph{EM for Regularized Zero Inflated Regression Models with Applications to Postoperative Morbidity after Cardiac Surgery in Children}, \emph{Statistics in Medicine}. 33(29):5192-208.
@@ -49,7 +49,7 @@ Zhu Wang, Shuangge Ma, Ching-Yun Wang, Michael Zappitelli, Prasad Devarajan and 
 Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, \emph{Biometrical Journal}. 57(5):867-84.
 }
 
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \keyword{models}
 \keyword{regression}

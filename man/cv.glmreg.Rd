@@ -4,6 +4,7 @@
 \alias{cv.glmreg.matrix}
 \alias{cv.glmreg.default}
 \alias{plot.cv.glmreg}
+\alias{predict.cv.glmreg}
 \alias{coef.cv.glmreg}
 \title{Cross-validation for glmreg}
 \description{Does k-fold cross-validation for glmreg, produces a plot,
@@ -13,6 +14,7 @@
 \method{cv.glmreg}{matrix}(x, y, weights, offset=NULL, ...)
 \method{cv.glmreg}{default}(x,  ...)
 \method{plot}{cv.glmreg}(x,se=TRUE,ylab=NULL, main=NULL, width=0.02, col="darkgrey", ...)
+\method{predict}{cv.glmreg}(object, newx, ...)
 \method{coef}{cv.glmreg}(object,which=object$lambda.which, ...)
 }
 \arguments{
@@ -24,7 +26,9 @@
   \item{weights}{Observation weights; defaults to 1 per observation}
   \item{offset}{Not implemented yet}
   \item{object}{object of \code{cv.glmreg}}
- \item{which}{Indices of the penalty parameter \code{lambda} at which
+  \item{newx}{Matrix of values at which predictions are to be made.  Not
+    used for \code{type="coefficients"}}
+  \item{which}{Indices of the penalty parameter \code{lambda} at which
     estimates are extracted. By default, the one which generates the optimal cross-validation value.}
   \item{se}{logical value, if \code{TRUE}, standard error curve is also plotted} 
   \item{ylab}{ylab on y-axis}
@@ -56,13 +60,15 @@
 }
 \references{Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)      \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
 }
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link{glmreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.glmreg"} object.}
 \examples{
 data("bioChemists", package = "pscl")
 fm_pois <- cv.glmreg(art ~ ., data = bioChemists, family = "poisson")
 title("Poisson Family",line=2.5)
+predict(fm_pois, newx=bioChemists)
+coef(fm_pois)
 }
 \keyword{models}
 \keyword{regression}

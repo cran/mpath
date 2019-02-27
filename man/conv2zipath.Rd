@@ -12,5 +12,5 @@ conv2zipath(object, family=c("poisson", "negbin", "geometric"))
   \item{family}{one of families in zeroinfl class}
 }
 \value{an object of class zipath}
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 

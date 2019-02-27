@@ -4,7 +4,7 @@
 \description{Does k-fold cross-validation for glmregNB, produces a plot,
   and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
-cv.glmregNB(formula, data, weights, lambda=NULL,
+cv.glmregNB(formula, data, weights, offset=NULL, lambda=NULL,
 nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
 }
 \arguments{
@@ -12,6 +12,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
   \item{data}{arguments controlling formula processing
     via \code{\link[stats]{model.frame}}.}
   \item{weights}{Observation weights; defaults to 1 per observation}
+  \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting. This should be NULL or a numeric vector of length equal to the number of cases. Currently only one offset term can be included in the formula.}
   \item{lambda}{Optional user-supplied lambda sequence; default is
     \code{NULL}, and \code{glmregNB} chooses its own sequence}
   \item{nfolds}{number of folds - default is 10. Although \code{nfolds}
@@ -56,7 +57,7 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
 Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)
 \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print] 
 }
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 \seealso{\code{\link{glmregNB}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.glmregNB"} object.}
 \examples{
 \dontrun{

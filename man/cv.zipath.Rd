@@ -1,20 +1,22 @@
 \name{cv.zipath}
 \alias{cv.zipath}
+\alias{predict.cv.zipath}
 \alias{coef.cv.zipath}
 \title{Cross-validation for zipath}
 \description{Does k-fold cross-validation for zipath, produces a plot,
   and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
-cv.zipath(formula, data, weights, nlambda=100, lambda.count=NULL, lambda.zero=NULL,
-nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
+cv.zipath(formula, data, weights, nlambda=100, lambda.count=NULL, 
+lambda.zero=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
+\method{predict}{cv.zipath}(object, newdata, \dots)
 \method{coef}{cv.zipath}(object, which=object$lambda.which, model = c("full", "count", "zero"), \dots)
 }
 \arguments{
-  \item{formula}{symbolic description of the model}
+  \item{formula}{symbolic description of the model with an optional numeric vector \code{offset} with an a priori known component to be included in the linear predictor of the count model or zero model. Offset must be a variable in \code{data} if used, while this is optional in \code{zipath}. See an example below.}
   \item{data}{arguments controlling formula processing
     via \code{\link[stats]{model.frame}}.}
   \item{weights}{Observation weights; defaults to 1 per observation}
-\item{nlambda}{number of \code{lambda} value, default value is 10.}
+  \item{nlambda}{number of \code{lambda} value, default value is 10.}
   \item{lambda.count}{Optional user-supplied lambda.count sequence; default is
     \code{NULL}}
   \item{lambda.zero}{Optional user-supplied lambda.zero sequence; default is
@@ -29,6 +31,8 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
   will attempt to send different CV folds off to different cores.}
   \item{\dots}{Other arguments that can be passed to \code{zipath}.}
  \item{object}{object of class \code{cv.zipath}.}
+ \item{newdata}{optionally, a data frame in which to look for variables with
+    which to predict. If omitted, the original observations are used.}
  \item{which}{Indices of the pair of penalty parameters \code{lambda.count} and \code{lambda.zero} at which
     estimates are extracted.  By default, the one which generates the optimal cross-validation value.}
  \item{model}{character specifying for which component of the model the
@@ -67,7 +71,7 @@ Zhu Wang, Shuangge Ma, Ching-Yun Wang, Michael Zappitelli, Prasad Devarajan and 
 Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zero-inflated and overdispersed data with application to health care demand in Germany}, \emph{Biometrical Journal}. 57(5):867-84.
 }
 
-\author{Zhu Wang <zwang@connecticutchildrens.org>}
+\author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link{zipath}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.zipath"} object.}
 \examples{
@@ -75,11 +79,15 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 data("bioChemists", package = "pscl")
 fm_zip <- cv.zipath(art ~ . | ., data = bioChemists, family = "poisson", nlambda=10)
 ### prediction from the best model
+predict(fm_zip, newdata=bioChemists)
+fm_zip_predict <- predict(object=fm_zip$fit, which=fm_zip$lambda.which, 
+			  type="response", model=c("full"))
 coef(fm_zip)
-fm_zip_predict <- predict(object=fm_zip$fit, which=fm_zip$lambda.which, type="response", 
-model=c("full"))
 fm_znb <- cv.zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)
 coef(fm_znb)
+fm_zinb2 <- cv.zipath(art ~ . +offset(log(phd))| ., data = bioChemists, 
+		      family = "poisson", nlambda=10)
+coef(fm_zinb2)
 }
 }
 \keyword{models}
