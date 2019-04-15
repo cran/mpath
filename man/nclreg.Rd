@@ -43,8 +43,8 @@ An object with S3 class \code{"nclreg"} for the various types of models.
       length(lambda)} matrix of coefficients.}
   \item{lambda}{The actual sequence of \code{lambda} values used}
   \item{nobs}{number of observations}
-  \item{risk}{if \code{type.path="naive"}, a matrix with number of rows \code{iter} and number of columns \code{nlambda}, loss values along the regularization path. If \code{type.path="fast"}, a vector of length \code{nlambda}, loss values along the regularization path}
-  \item{pll}{if \code{type.path="naive"}, a matrix with number of rows \code{iter} and number of columns \code{nlambda}, penalized loss values along the regularization path. If \code{type.path="fast"}, a vector of length \code{nlambda}, penalized loss values along the regularization path}
+  \item{risk}{if \code{type.path="nonactive"}, a matrix with number of rows \code{iter} and number of columns \code{nlambda}, loss values along the regularization path. If \code{type.path="fast"}, a vector of length \code{nlambda}, loss values along the regularization path}
+  \item{pll}{if \code{type.path="nonactive"}, a matrix with number of rows \code{iter} and number of columns \code{nlambda}, penalized loss values along the regularization path. If \code{type.path="fast"}, a vector of length \code{nlambda}, penalized loss values along the regularization path}
   \item{fitted.values}{predicted values depending on \code{standardize}, internal use only}
 }
 

@@ -22,21 +22,17 @@
 }
 
 \author{Zhu Wang \\ 
-UT Health San Antonio\\
-wangz1@uthscsa.edu}
+  UT Health San Antonio\\
+  wangz1@uthscsa.edu}
 \title{Variable Selection for Health Care Demand in Germany}
 \begin{document}
 
 \maketitle
-
-
-This document reproduces the data analysis presented in \cite{wang2014zinb}. In an effort to optimize the computing algorithms, the penalized regression can be slightly different. For a description of the theory behind
-application illustrated here we refer to the original manuscript.
- 
 <<echo=false,results=hide>>=
 options(prompt = "R> ", continue = " ", width = 70, digits =4, useFancyQuotes = FALSE)
 ptm <- proc.time()
 @
+This document reproduces the data analysis presented in \cite{wang2014zinb}. In an effort to optimize the computing algorithms, the penalized regression can be slightly different. For a description of the theory behind application illustrated here we refer to the original manuscript. 
 \citet{riphahn2003incentive} utilized a part of the German Socioeconomic Panel (GSOEP) data set to analyze the number of doctor visits. The original data have twelve annual waves from 1984 to 1995 for a representative sample of German households, which provide broad information on the health care utilization, current employment status, and the insurance arrangements under which subjects are protected. 
 The data set contains number of doctor office visits for 1,812 West German men aged 25 to 65 years in the last three months of 1994. 
 As shown in the figure, many doctor office visits are zeros, which can be difficult to fit with a Poisson or negative binomial model. Therefore, zero-inflated negative binomial (ZINB) model is considered.
@@ -73,7 +69,7 @@ cat("BIC of zero-inflated model with backward selection", AIC(fitbe, k=log(dim(d
 @
 Compute LASSO estimates.
 <<echo=TRUE, eval=FALSE>>=
-    fit.lasso <- zipath(docvisits~.|.,data = dat, family = "negbin", nlambda=100, lambda.zero.min.ratio=0.001, maxit.em=300, maxit.theta=25, theta.fixed=FALSE, trace=FALSE, penalty="enet", rescale=FALSE)
+fit.lasso <- zipath(docvisits~.|.,data = dat, family = "negbin", nlambda=100, lambda.zero.min.ratio=0.001, maxit.em=300, maxit.theta=25, theta.fixed=FALSE, trace=FALSE, penalty="enet", rescale=FALSE)
 @
 Estimated coefficient parameters with smallest BIC value.
 <<echo=TRUE, eval=FALSE>>=
@@ -81,7 +77,7 @@ minBic <- which.min(BIC(fit.lasso))
 coef(fit.lasso, minBic)
 cat("theta estimate", fit.lasso$theta[minBic])
 @
-Compute standard errors of coefficients and theta (the last one for theta).
+Compute standard errors of coefficients and theta:
 <<echo=TRUE, eval=FALSE>>=
 se(fit.lasso, minBic, log=FALSE)
 @
@@ -106,8 +102,8 @@ cat("cross-validated loglik", max(fitcv$cv))
 Compute MCP estimates. We compute solution paths for the first 30 pairs of shrinkage parameters (the EM algorithm can be slow), and then evaluate results as for the LASSO estimates.
 For cross-validation, set maximum number of iterations in estimating scaling parameter 1 (maxit.theta=1) to reduce computation costs.
 <<echo=TRUE, eval=FALSE>>=
-    tmp <- zipath(docvisits~.|.,data = dat, family = "negbin", gamma.count=2.7, gamma.zero=2.7, lambda.zero.min.ratio= 0.1, maxit=1, maxit.em=1, maxit.theta=2, theta.fixed=FALSE, penalty="mnet")
-    fit.mcp <- zipath(docvisits~.|.,data = dat, family = "negbin", gamma.count=2.7, gamma.zero=2.7, lambda.count=tmp$lambda.count[1:30], lambda.zero= tmp$lambda.zero[1:30], maxit.em=300, maxit.theta=25, theta.fixed=FALSE, penalty="mnet")
+tmp <- zipath(docvisits~.|.,data = dat, family = "negbin", gamma.count=2.7, gamma.zero=2.7, lambda.zero.min.ratio= 0.1, maxit=1, maxit.em=1, maxit.theta=2, theta.fixed=FALSE, penalty="mnet")
+fit.mcp <- zipath(docvisits~.|.,data = dat, family = "negbin", gamma.count=2.7, gamma.zero=2.7, lambda.count=tmp$lambda.count[1:30], lambda.zero= tmp$lambda.zero[1:30], maxit.em=300, maxit.theta=25, theta.fixed=FALSE, penalty="mnet")
 @
 Estimated coefficient parameters with smallest BIC value.
 <<echo=TRUE, eval=FALSE>>=
@@ -115,7 +111,7 @@ minBic <- which.min(BIC(fit.mcp))
 coef(fit.mcp, minBic)
 cat("theta estimate", fit.mcp$theta[minBic])
 @
-Compute standard errors of coefficients and theta (the last one for theta).
+Compute standard errors of coefficients and theta:
 <<echo=TRUE, eval=FALSE>>=
 se(fit.mcp, minBic, log=FALSE)
 @
@@ -135,8 +131,8 @@ cat("cross-validated loglik", max(fitcv$cv))
 
 Compute SCAD estimates.
 <<echo=TRUE, eval=FALSE>>=
-    tmp <- zipath(docvisits~.|.,data = dat, family = "negbin", gamma.count=2.5, gamma.zero=2.5, lambda.zero.min.ratio= 0.01, maxit=1, maxit.em=1, maxit.theta=2, theta.fixed=FALSE, penalty="snet")
-    fit.scad <- zipath(docvisits~.|.,data = dat, family = "negbin", gamma.count=2.5, gamma.zero=2.5, lambda.count=tmp$lambda.count[1:30], lambda.zero= tmp$lambda.zero[1:30], maxit.em=300, maxit.theta=25, theta.fixed=FALSE, penalty="snet")
+tmp <- zipath(docvisits~.|.,data = dat, family = "negbin", gamma.count=2.5, gamma.zero=2.5, lambda.zero.min.ratio= 0.01, maxit=1, maxit.em=1, maxit.theta=2, theta.fixed=FALSE, penalty="snet")
+fit.scad <- zipath(docvisits~.|.,data = dat, family = "negbin", gamma.count=2.5, gamma.zero=2.5, lambda.count=tmp$lambda.count[1:30], lambda.zero= tmp$lambda.zero[1:30], maxit.em=300, maxit.theta=25, theta.fixed=FALSE, penalty="snet")
 @
 Estimated coefficient parameters with smallest BIC value.
 <<echo=TRUE, eval=FALSE>>=
@@ -144,7 +140,7 @@ minBic <- which.min(BIC(fit.scad))
 coef(fit.scad, minBic)
 cat("theta estimate", fit.scad$theta[minBic])
 @
-Compute standard errors of coefficients and theta (the last one for theta).
+Compute standard errors of coefficients and theta:
 <<echo=TRUE, eval=FALSE>>=
 se(fit.scad, minBic, log=FALSE)
 @

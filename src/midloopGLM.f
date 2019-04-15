@@ -26,21 +26,20 @@ C     b0
 C     yhat
 C     dev
 
-      subroutine midloopGLM(n,m,x,y,xold,yold,weights, mu, eta, offset,
-     +     family,
-     +     penalty,lamk, 
+      subroutine midloopGLM(n,m,x,y,yold,weights, mu, eta, offset,
+     +     family, penalty,lamk, 
      +     alpha, gam, theta, rescale, standardize,eps,innermaxit,
      +     maxit, thresh, nulldev, wt, beta, b0,yhat,dev,trace,convmid, 
-     +     satu, ep, pll, normx, xd, avg, activeset, jk)
+     +     satu, ep, pll, activeset, jk)
       
       implicit none
       integer standardize, trace, penalty, maxit, i, j, jj, nmid, n, 
      +     family, innermaxit, m,converged,convmid, satu,
      +     rescale,activeset(m), jk, ii
       double precision x(n,m),y(n), mu(n), z(n), eta(n), wt(n), w(n), 
-     +     del,olddev,weights(n),xold(n,m), yold(n),normx(m),xd(m), 
+     +     del,olddev,weights(n),yold(n), 
      +     thresh, nulldev, dev, theta, thetaold, wtw(n),lamk(m),alpha, 
-     +     gam, eps, beta(m), betaold(m), b0, b0old, yhat(n),avg, ep, 
+     +     gam, eps, beta(m), betaold(m), b0, b0old, yhat(n), ep, 
      +     pll(maxit), offset(n)
 
       innermaxit = 1
@@ -92,17 +91,20 @@ C     dev
 C     compute deviance dev
          call deveval(n, yold, mu, theta, weights, family, dev)
          if(family .EQ. 2)then
-            if(dev/nulldev .LT.0.01 .OR. dev.LT.0.0001)then
-               call dblepr("saturated model, residual deviance = ", -1, 
-     +              dev,1)
-               call dblepr("saturated model, null deviance = ", -1, 
-     +              nulldev, 1)
-               call intpr("family", -1, family, 1)
-               call rwarn("saturated model, exiting ...")
-               satu = 1
-               call DCOPY(m, betaold, 1, beta, 1)
-               b0 = b0old
-               theta = thetaold
+           if(dev/nulldev .LT.0.01 .OR. dev.LT.0.0001)then
+C               call dblepr("saturated model, residual deviance = ", -1, 
+C     +              dev,1)
+C               call dblepr("saturated model, null deviance = ", -1, 
+C     +              nulldev, 1)
+C               call intpr("family", -1, family, 1)
+C                call rwarn("saturated model for family='binomial', exiti
+C     +ng coordinate descent iteration. Consider decreasing lambda.zero.m
+C     +in.ratio if zipath is called. This may be caused by larger maxit.em
+C     in zipath!") 
+                satu = 1
+C               call DCOPY(m, betaold, 1, beta, 1)
+C               b0 = b0old
+C               theta = thetaold
             endif
          endif
          del = dabs(dev - olddev)

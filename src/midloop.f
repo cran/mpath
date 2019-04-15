@@ -29,20 +29,22 @@ C     dev
      +     penalty,lamk, 
      +     alpha, gam, theta, rescale, standardize,eps,innermaxit,
      +     maxit, thresh, nulldev, wt, beta, b0,yhat,dev,trace,convmid, 
-     +     satu, ep, pll, normx, xd, avg)
+     +     ep, normx, xd, avg, activeset, jk, fullset)
       
       implicit none
-      integer standardize, trace, penalty, maxit, i, j, jj, nmid, n, 
-     +     family, innermaxit, m,converged,convmid, satu, rescale
+      integer standardize, trace, penalty, maxit, i, j, nmid, n, 
+     +     family, innermaxit, m,converged,convmid, satu, rescale,
+     +     fullset(m),activeset(m), jk
       double precision x(n,m),y(n), mu(n), z(n), eta(n), wt(n), w(n), 
      +     del,olddev,weights(n),xold(n,m), yold(n),normx(m),xd(m), 
      +     thresh, nulldev, dev, theta, wtw(n),lamk(m),alpha, 
-     +     gam, eps, beta(m), betaold(m), b0, b0old, yhat(n),avg, ep, 
+     +     gam, eps, beta(m), b0, yhat(n),avg, ep, 
      +     pll(maxit), offset(n)
 
-      innermaxit = maxit
+C      innermaxit = maxit
       maxit = 1
-      
+C     innermaxit serves as maxit here
+
 C      do 5 jj=1, maxit
 C         pll(jj)=0
 C 5    enddo
@@ -58,7 +60,8 @@ C 5    enddo
      +     normx, xd, avg)
       call lmnetGaus(x, z, n, m, wtw, lamk, alpha, gam, thresh, 
      +     innermaxit, eps, standardize, penalty, xd, 
-     +     beta, b0, avg, nmid,rescale, converged)
+     +     beta, b0, avg, nmid,rescale, converged, activeset, jk,
+     +     fullset)
       do 220 i = 1, n
          yhat(i) = b0
          do 230 j = 1, m

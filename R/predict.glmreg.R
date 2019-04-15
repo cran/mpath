@@ -43,9 +43,13 @@ if(!is.null(object$terms)){
 				  PACKAGE="mpath")
   eta <- matrix(res$eta, ncol=nlambda)
   mu <- matrix(res$mu, ncol=nlambda)
-  if(!is.null(newoffset)){
-  eta <- eta + newoffset
-  mu <- eta ### only works for gaussian, it should be updated from the above pred Fortran code
+  if(object$is.offset){
+	  if(is.null(newoffset)) stop("newoffset is required\n")
+          else 
+     {
+      eta <- eta + newoffset
+      mu <- eta
+     }
   }
   colnames(eta) <- colnames(mu) <- colnames(object$beta[,which])
   #pihat <- exp(eta)/(1+exp(eta))

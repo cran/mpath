@@ -19,3 +19,20 @@ C vector A(N)
          A(I)=U
    10 CONTINUE
       END
+
+C copy a matrix
+C input: x is an n x m matrix
+C      y is the output and y=x
+      subroutine copymatrix(n, m, x, y)
+              implicit none
+              integer i, j, n, m
+              double precision x(n, m), y(n, m)
+
+      do 100 j=1, m
+       do 110 i=1, n
+              y(i, j)=x(i, j)
+ 110   continue
+ 100  continue
+
+              return
+              end

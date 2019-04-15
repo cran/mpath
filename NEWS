@@ -12,7 +12,7 @@
                 
                 CHANGES in `gzipath' VERSION 0.1_14   (2014-5-8)
 
-  o for rescale=TRUE and penalty="mnet" or "snet" in zipath, data driven lambda.zero[1] (i.e., the maximum value of lambda in zero component) is too small, now changed to 0.5*sqrt(lambda.zero[1]). This may    be modified if the maximum value of lambda in glmreg was changed in the similar situations. 
+  o for rescale=TRUE and penalty="mnet" or "snet" in zipath, data driven lambda.zero[1] (i.e., the maximum value of lambda in zero component) is too small, now changed to 0.5*sqrt(lambda.zero[1]). This may be modified if the maximum value of lambda in glmreg was changed in the similar situations. 
 
                 CHANGES in `gzipath' VERSION 0.1_14   (2014-6-9)
 
@@ -114,7 +114,7 @@
                
                CHANGES in `mpath' VERSION 0.3-3 (08-17-2017)
   
-  o  cycle through active set 
+  o  cycle through active set with modified codes in Fortran files in src directory 
                
                CHANGES in `mpath' VERSION 0.3-4 (08-22-2017)
   
@@ -137,3 +137,18 @@
   o  Changes were made in midloopGLM.f so that iterations run and check for convergency for b0 as well as beta  
   o  Changes were made in zipath to make offset work
   o  offset is now working in glmregNB, zipath, cv.glmreg, cv.glmregNB and cv.zipath
+               
+               CHANGES in `mpath' VERSION 0.3-8 (03-03-2019)
+  o  changes were made on how active set works. Now, we cycle through the active set until convergence, then cycle through all the variables ONCE, this is an reverse to the previous procedure. This includes changes in outloop.f, midloop.f, midloopGLM.f, lmnetGLM, add src/find_activeset.f to simplify the codes.
+  o  R/nclreg seems to be incorrect when update beta[activeset, i], since activeset is relative to the current x.act, not x. The new Fortran subroutine using dynamic allocation to deal with this. The Fortran subroutine nclreg_fortran.f conducts the three layers of iteration loops, lambda, MM and internal penalty estimation loop.
+  o  Not a good idea to convert theta.ml R function to Fortran subroutine since the speed actually is slower in Fortran. This is probably because digamma and trigamma functions in a Fortran subroutine used C functions. In contrast, the R function theta.ml directly used these C functions. Maybe there are other reasons. But we leave a glmregNB.R with the Fortran subroutine glmregnb_fortran.
+
+               CHANGES in `mpath' VERSION 0.3-9 (04-06-2019)
+  o  Major improvement on zipath.R. Replace the R codes with Fortran codes to compute lmax. Compute the solution path with zipath_fortran subroutine to replace the R codes.
+
+               CHANGES in `mpath' VERSION 0.3-10 (04-12-2019)
+  o  update zipath_fortran subroutine with an active set approach. Is this faster than nonactive approach?
+  
+               CHANGES in `mpath' VERSION 0.3-11 (04-12-2019)
+  o  implement both active and nonactive path in R zipath function
+

@@ -1,9 +1,9 @@
 ###Adapted from file MASS/R/negbin.R
-glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars), thresh=1e-3, maxit.theta=25, maxit=1000, eps=.Machine$double.eps, trace=FALSE, start = NULL, etastart = NULL, mustart = NULL, theta.est=TRUE, theta0=NULL, init.theta=ifelse(theta.est, theta0[1],NULL), link=log, penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
+glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars), thresh=1e-3, maxit.theta=10, maxit=1000, eps=.Machine$double.eps, trace=FALSE, start = NULL, etastart = NULL, mustart = NULL, theta.fixed=FALSE, theta0=NULL, init.theta=ifelse(!theta.fixed, theta0[1],NULL), link=log, penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
 {
-    if(!theta.est)
+    if(theta.fixed)
         if(length(theta0)!=nlambda)
-            stop("length of theta0 must be the same as nlambda if theta.est=FALSE\n")
+            stop("length of theta0 must be the same as nlambda if theta.fixed=TRUE\n")
         else if(any(theta0 <= 0))
             stop("theta0 must be positive\n") 
     penalty <- match.arg(penalty)
@@ -68,7 +68,6 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
     fitted <- matrix(NA, ncol=nlambda, nrow=n)
     pll <- matrix(NA, ncol=nlambda, nrow=maxit)
     b0 <- tht <- nulldev <- resdev <- rep(NA, nlambda)                           
-                                        #    dots <- list(...)
     k <- 1
     convout <- twologlik <- rep(NA, nlambda)
     while(k <= nlambda){  
@@ -98,7 +97,7 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
             if(trace)
                 message("Initial value for theta:", signif(th))
         }
-        if(!theta.est) th <- theta0[k]
+        if(theta.fixed) th <- theta0[k]
         iter <- 0
 	#d1 <- sqrt(2 * max(1, fit$df.residual))
         d2 <- del <- 1
@@ -106,13 +105,11 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
         converged <- FALSE                                    
         while((iter <- iter + 1) <= maxit.theta && !converged){
             eta <- log(mu)
-	    #            fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, lambda=lambda[k],alpha=alpha,gamma=gamma,rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace, penalty=penalty)
-	    #if(maxit.theta!=2) browser()
 	    fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, start = start, etastart=eta, mustart = mu, offset=offset, lambda=lambda[k],alpha=alpha,gamma=gamma,rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace, penalty=penalty)
             t0 <- th
             mu <- fit$fitted.values
-            if(theta.est){
-                                        #      th <- theta.ml(Y, mu, sum(w), w, limit=maxit.theta,
+            if(!theta.fixed){
+                #      th <- theta.ml(Y, mu, sum(w), w, limit=maxit.theta,
                 th <- theta.ml(Y, mu, sum(w), w,
                                trace = trace)
             }

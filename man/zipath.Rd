@@ -13,12 +13,13 @@ standardize = TRUE, family = c("poisson", "negbin","geometric"),
 link = c("logit", "probit", "cloglog", "cauchit", "log"), 
 penalty = c("enet", "mnet", "snet"), start = NULL, model = TRUE, 
 y = TRUE, x = FALSE, nlambda = 100, lambda.count = NULL,lambda.zero = NULL, 
- penalty.factor.count=NULL, penalty.factor.zero=NULL,
-lambda.count.min.ratio = .0001, lambda.zero.min.ratio = .1, 
-alpha.count = 1, alpha.zero = alpha.count, gamma.count = 3, 
-gamma.zero = gamma.count, rescale=FALSE, init.theta, theta.fixed=FALSE,
-EM = TRUE, maxit.em=200, convtype=c("count", "both"), maxit = 1000, 
-maxit.theta = 1, reltol = 1e-5, eps.bino=1e-5, shortlist=FALSE, trace = FALSE, ...)
+type.path=c("nonactive", "active"), penalty.factor.count=NULL, 
+penalty.factor.zero=NULL,lambda.count.min.ratio = 0.0001,
+lambda.zero.min.ratio = .1, alpha.count = 1, 
+alpha.zero = alpha.count, gamma.count = 3, gamma.zero = gamma.count, rescale=FALSE,
+init.theta=1, theta.fixed=FALSE, EM = TRUE, maxit.em=200, convtype=c("count", "both"), 
+maxit = 1000, maxit.theta = 10, reltol = 1e-5, thresh=1e-6, eps.bino=1e-5, 
+shortlist=FALSE, trace = FALSE, ...)
 }
 \arguments{
   \item{formula}{symbolic description of the model, see details.}
@@ -39,12 +40,11 @@ maxit.theta = 1, reltol = 1e-5, eps.bino=1e-5, shortlist=FALSE, trace = FALSE, .
   \item{penalty}{penalty considered as one of \code{enet, mnet, snet}.}
   \item{start}{starting values for the parameters in the linear predictor.}
   \item{nlambda}{number of \code{lambda} value, default value is 100. The sequence may be truncated before \code{nlambda} is reached if a close to saturated model for the zero component is fitted.}
-  \item{lambda.count}{A user supplied \code{lambda.count} sequence. Typical usage
-    is to have the
-    program compute its own \code{lambda.count} and \code{lambda.zero} sequence based on
+  \item{lambda.count}{A user supplied \code{lambda.count} sequence. Typical usage is to have the program compute its own \code{lambda.count} and \code{lambda.zero} sequence based on
     \code{nlambda} and \code{lambda.min.ratio}.} 
   \item{lambda.zero}{A user supplied \code{lambda.zero} sequence.}
- \item{penalty.factor.count, penalty.factor.zero}{These are numeric vectors with the same length as predictor variables. that multiply \code{lambda.count, lambda.zero}, respectively, to allow differential shrinkage of coefficients. Can be 0 for some variables, which implies
+\item{type.path}{solution path. If \code{type.path="nonactive"}, no active set for each element of the lambda sequence and cycle through all the predictor variables. If \code{type.path="active"}, then cycle through only the active set, then cycle through all the variables for the same penalty parameter. See details below.} 
+  \item{penalty.factor.count, penalty.factor.zero}{These are numeric vectors with the same length as predictor variables. that multiply \code{lambda.count, lambda.zero}, respectively, to allow differential shrinkage of coefficients. Can be 0 for some variables, which implies
     no shrinkage, and that variable is always included in the
     model. Default is same shrinkage for all variables.}
  \item{lambda.count.min.ratio, lambda.zero.min.ratio}{Smallest value for \code{lambda.count} 
@@ -67,6 +67,7 @@ Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}.
  \item{maxit.theta}{Maximum number of iterations for estimating \code{theta} scaling parameter if family="negbin". Default value \code{maxit.theta} may be increased, yet may slow the algorithm}
  \item{eps.bino}{a lower bound of probabilities to be claimed as zero, for computing weights and related values when \code{family="binomial"}.}
 \item{reltol}{Convergence criteria, default value 1e-5 may be reduced to make more accurate yet slow}
+\item{thresh}{Convergence threshold for coordinate descent. Defaults value is \code{1e-6}.}
 \item{shortlist}{logical value, if TRUE, limited results return}
 \item{trace}{If \code{TRUE}, progress of algorithm is reported}
 \item{...}{Other arguments which can be passed to from \code{glmreg}}
@@ -76,8 +77,14 @@ Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}.
   The algorithm fits penalized zero-inflated count data regression models using the coordinate descent algorithm within the EM algorithm.
   The returned fitted model object is of class \code{"zipath"} and is similar
   to fitted \code{"glm"} and \code{"zeroinfl"} objects. For elements such as \code{"coefficients"} a list is returned with elements for the zero and count component,
-  respectively. For details see below.
-  
+  respectively. 
+ 
+  If \code{type.path="active"}, the algorithm iterates for a pair (lambda_count, lambda_zero) in a loop:\cr
+  Step 1: For initial coefficients start_count of the count model and start_zero of the zero model, the EM algorithm is iterated until convergence for the active set with non-zero coefficients determined from start_count and start_zero, respectively.\cr
+  Step 2: EM is iterated for all the predict variables once.\cr
+  Step 3: If active set obtained from Step 2 is the same as in Step 1, stop; othwerise, repeat Step 1 and Step 2.\cr
+  If \code{type.path="nonactive"}, the EM algorithm iterates for a pair (lambda_count, lambda_zero) with all the predict variables until convergence. 
+
   A set of standard extractor functions for fitted model objects is available for
   objects of class \code{"zipath"}, including methods to the generic functions
   \code{\link[base]{print}}, \code{\link[stats]{coef}}, 
@@ -176,6 +183,7 @@ exposure <- rep(0.5, dim(bioChemists)[1])
 fm_zinb <- zipath(art ~ . +offset(log(exposure))| ., data = bioChemists, 
 		  family = "poisson", nlambda=10)
 print(coef(fm_zinb))
+### offset can't be specified in predict function as it has been contained
 print(predict(fm_zinb))
 
 }

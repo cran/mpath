@@ -68,7 +68,7 @@ An object with S3 class \code{"glmreg"} for the various types of models.
   \item{nobs}{number of observations}
   \item{pll}{penalized log-likelihood values for standardized coefficients in the IRLS iterations. For \code{family="gaussian"}, not implemented yet.}
   \item{pllres}{penalized log-likelihood value for the estimated model on the original scale of coefficients}
-  \item{fitted.values}{predicted values depending on \code{standardize}, internal use only}
+  \item{fitted.values}{the fitted mean values, obtained by transforming the linear predictors by the inverse of the link function. }
 }
 \references{
 Breheny, P. and Huang, J. (2011) \emph{Coordinate descent

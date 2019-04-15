@@ -40,21 +40,21 @@ convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
     \eqn{0<\le alpha\le 1}. \code{alpha=1} is lasso (mcp, scad) penalty; and \code{alpha=0} the ridge penalty. However, if \code{alpha=0}, one must provide \code{lambda} values.}
  \item{gamma}{The tuning parameter of the \code{snet} or \code{mnet} penalty.}
  \item{rescale}{logical value, if TRUE, adaptive rescaling of the penalty parameter for \code{penalty="mnet"} or \code{penalty="snet"} with \code{family} other than "gaussian". See reference}
-  \item{standardize}{logical value for x variable standardization, prior to
+ \item{standardize}{logical value for x variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
     the original scale. Default is \code{standardize=TRUE}.}
-  \item{penalty.factor}{This is a number that multiplies \code{lambda} to allow
+ \item{penalty.factor}{This is a number that multiplies \code{lambda} to allow
     differential shrinkage of coefficients. Can be 0 for some variables, which implies
     no shrinkage, and that variable is always included in the
     model. Default is same shrinkage for all variables.}
-  \item{thresh}{Convergence threshold for coordinate descent. Defaults value is \code{1e-6}.}
-  \item{eps.bino}{a lower bound of probabilities to be claimed as zero, for computing weights and related values when \code{family="binomial"}.}
-    \item{maxit}{Maximum number of coordinate descent iterations for each \code{lambda} value; default is 1000.}
-    \item{eps}{If a coefficient is less than \code{eps} in magnitude, then it is reported to be 0}
+ \item{thresh}{Convergence threshold for coordinate descent. Defaults value is \code{1e-6}.}
+ \item{eps.bino}{a lower bound of probabilities to be truncated, for computing weights and related values when \code{family="binomial"}. It is also used when \code{family="negbin"}.}
+ \item{maxit}{Maximum number of coordinate descent iterations for each \code{lambda} value; default is 1000.}
+ \item{eps}{If a coefficient is less than \code{eps} in magnitude, then it is reported to be 0}
  \item{convex}{Calculate index for which objective function ceases to
     be locally convex? Default is FALSE and only useful if \code{penalty="mnet" or "snet"}.}
  \item{theta}{ an overdispersion scaling parameter for \code{family="negbin"}}
-  \item{family}{Response type (see above)}
+ \item{family}{Response type (see above)}
  \item{penalty}{Type of regularization}
  \item{x.keep, y.keep}{ For glmreg: logical values indicating whether the response
           vector and model matrix used in the fitting process should be

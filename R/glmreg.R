@@ -102,7 +102,6 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     nvars <- m <- nm[2]
     if(missing(weights)) weights=rep(1,nobs)
     weights <- as.vector(weights)
-    penalty <- match.arg(penalty)
     if(!is.null(weights) && !is.numeric(weights))
         stop("'weights' must be a numeric vector")
     ## check weights and offset
@@ -110,7 +109,10 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
         stop("negative weights not allowed")
     }
     if (is.null(offset))
-                    offset <- rep.int(0, nobs)
+	    offset <- rep.int(0, nobs)
+    if (all(offset==0))
+	    is.offset <- FALSE
+    else is.offset <- TRUE
     if(family=="binomial"){
         if(is.factor(y))
             y <- as.integer(y) - 1
@@ -147,14 +149,14 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     lambda <- rep(0, nvars)
     penalty.factor <- rep(1, nvars)
 }
-    im <- inactive <- seq(m)
+#    im <- inactive <- seq(m)
 ### compute the pathwise coordinate descent, cf: section 2.5 in Friedman et al., JSS 2010, 33(1)
     if(is.null(weights)) weights <- rep(1, n)
     wt <- weights/sum(weights)
     if(is.null(mustart) || is.null(etastart)){
         tmp <- init(wt, y, offset, family=family)
         mu <- tmp$mu
-        eta <- rep(tmp$eta,n)
+        eta <- tmp$eta
     }
     else{
         mu <- mustart
@@ -163,7 +165,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     if(is.null(lambda)){
         tmp <- init(wt, y, offset, family=family)
         mu <- tmp$mu
-        eta <- rep(tmp$eta,n)
+        eta <- tmp$eta
         w <- .Fortran("glmlink",
                       n=as.integer(1),
                       mu=as.double(mu),
@@ -182,7 +184,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
                       z=as.double(rep(0,n)),
                       PACKAGE="mpath")$z
 	z <- z - offset
-	       	      lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, mu=mu, w=w, z=z, alpha=alpha, penalty.factor=penalty.factor, standardize=standardize) 
+    lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, mu=mu, w=w, z=z, alpha=alpha, penalty.factor=penalty.factor, standardize=standardize) 
                                         #    if(penalty %in% c("mnet", "snet") && !rescale) lmax <- 0.5 * sqrt(lmax)
 	lpath <- seq(log(lmax), log(lambda.min.ratio * lmax), length.out=nlambda)
         lambda <- exp(lpath)
@@ -201,6 +203,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
                         dev=as.double(0),
                         PACKAGE="mpath")$dev
     beta <- matrix(0, ncol=nlambda, nrow=m)
+    b0 <- rep(0, nlambda)
     if(is.null(start))
         startv <- 0
     if(!is.null(start)){
@@ -208,11 +211,11 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
             stop("length of start doesn't match x dimension\n")
         else{
             startv <- 1
-            if(length(start) > 1){
-                for(j in 1: nlambda)
-                    beta[,j] <- start[-1]
-            }
-            b0 <- rep(start[1], nlambda)
+            #if(length(start) > 1){
+            #    for(j in 1: nlambda)
+            #        beta[,j] <- start[-1]
+            #}
+            #b0 <- rep(start[1], nlambda)
         }
     }
     else{
@@ -253,7 +256,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
                     rescale=as.integer(rescale),
                     mu=as.double(mu),
                     eta=as.double(eta),
-		    offset=as.double(offset),
+	          	    offset=as.double(offset),
                     family=as.integer(famtype),
                     standardize=as.integer(stantype),
                     nulldev=as.double(nulldev),
@@ -309,7 +312,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
         rownames(beta) <- colnames(x)
         colnames(beta) <- round(lambda,digits=4)[good]
     }
-    RET <- list(family=family,standardize=standardize, satu=tmp$satu, lambda=lambda[good], nlambda=length(lambda[good]), beta=beta, b0=matrix(b0, ncol=nlambda), meanx=meanx, normx=normx, theta=theta[good], nulldev=nulldev, resdev=resdev, pll = pll, fitted.values=yhat, converged=tmp$convout[good], convex.min=convex.min, penalty.factor=penalty.factor, gamma=gamma, alpha=alpha)
+    RET <- list(family=family,standardize=standardize, satu=tmp$satu, lambda=lambda[good], nlambda=length(lambda[good]), beta=beta, b0=matrix(b0, ncol=nlambda), meanx=meanx, normx=normx, theta=theta[good], nulldev=nulldev, resdev=resdev, pll = pll, fitted.values=yhat, converged=tmp$convout[good], convex.min=convex.min, penalty.factor=penalty.factor, gamma=gamma, alpha=alpha, is.offset=is.offset)
     if(x.keep) RET$x <- x
     if(y.keep) RET$y <- y
     class(RET) <- "glmreg"

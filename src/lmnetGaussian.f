@@ -87,7 +87,7 @@ C     jj
 C     input: others except the above mentioned output
       subroutine lmnetGaus(x, y, n, m, weights, lambda, alpha, 
      +     gam,thresh, maxit, eps, standardize, penalty, xd,beta, b0, 
-     +     avg, jj, rescale, converged)
+     +     avg, jj, rescale, converged, activeset, jk, fullset)
 
       implicit none
       integer maxit, standardize, penalty, n,m,i,j, jj,converged,
@@ -116,62 +116,43 @@ C     compute weighted means sum(weights_i*y_i)
  30   continue
 C     compute weighted column averages meanx = x^(transpose) * wtnew
       call DGEMV('T',n, m, 1.0D0, x, n, wtnew, 1, 0.0D0, meanx, 1)
-      do 40 j=1, m
-C     activeset(j)=1
-C     fullset(j)=1
-         activeset(j)=j
-         fullset(j)=j
- 40   continue
       convact=0
 C     some loop, if no change to the active set, stop
       k = 1
       do 2000 while (k .LT. 100 .AND. convact .EQ. 0)
-         do 50 j=1, m
+C     update the active set with only non-zero coefficients 
+            call loop_gaussian(x,y,n,m,penalty,thresh,eps,maxit,
+     +        standardize,
+     +        beta,b0,resid,xd,lambda,alpha,gam,weights,avg,meanx, 
+     +        jj,rescale, converged, activeset, jk)
+            call find_activeset(m, beta, eps, activeset, jk)
+         do 60 j=1, m
             activesetold(j)=activeset(j)
- 50      continue
+ 60      continue
 C     set maxit=1, and have a complete cycle through all the variables
-         call loop_gaussian(x,y, n,m,penalty,thresh,eps,1,standardize,
+            call loop_gaussian(x,y,n,m,penalty,thresh,eps,1,
+     +        standardize,
      +        beta,b0,resid,xd,lambda,alpha,gam,weights,avg,meanx, 
      +        jj,rescale, converged, fullset, m)
-C     determine the active set with only non-zero coefficients 
-C     jk: number of variables in active set
-         jk = 0
-C     it is possible, jk=0 if beta=0, like intercept-only model
-         do 60 j=1, m
-            if(dabs(beta(j)) .GT. eps)then
-               jk=jk+1
-               activeset(jk)=j
-C     activeset(j)=1
-C     else 
-C     activeset(j)=0
-            endif
- 60      continue
+            call find_activeset(m, beta, eps, activeset, jk)
 C     it is possible, jk=0 if beta=0, like intercept-only model
          if(jk .EQ. 0)then
             convact=1
             exit
          endif
 C     check if the active set was changed--begin
-         if (k .GT. 1)then
-            do 90 j=1, m
+         do 90 j=1, m
                if(activesetold(j) .NE. activeset(j))then
                   convact=0
                   exit
                else 
                   if(j .EQ. m)then
                      convact = 1
+                     exit
                   endif
                endif 
- 90         continue
-            if(convact .EQ. 1)then
-               exit
-            endif
-         endif
+ 90      continue
 C     check if the active set was changed--end
-C     now cycle through only the active set
-         call loop_gaussian(x,y, n,m,penalty,thresh,eps,maxit,
-     +        standardize,beta,b0,resid,xd,lambda,alpha,gam,weights,
-     +        avg,meanx, jj,rescale, converged, activeset, jk)
          k = k + 1
  2000 continue
 C     used to match outside loop in subroutine midloop
@@ -354,6 +335,8 @@ C     endif
  80         continue
             b0 = avg - b0
          endif
+C         call dblepr("                    beta=", -1, beta, m)
+C         call dblepr("                    beta_old=", -1, beta_old, m)
          call checkConvergence(m, beta, beta_old, eps, thresh, 
      +        converged, activeset, jk)
          jj = jj + 1

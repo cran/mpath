@@ -27,7 +27,7 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 
 \examples{
 data("bioChemists", package = "pscl")
-fm_zinb <- zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)
+fm_zinb <- zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10, maxit.em=1)
 res <- estfunReg(fm_zinb, which=which.min(fm_zinb$bic))
 }
 
