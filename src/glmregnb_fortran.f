@@ -8,7 +8,7 @@ C  vector of length nlambda
      +    beta, b0, tht, yhat)
       implicit none
       integer k, i, j, n, m, trace, nlambda, penalty, maxit_theta, 
-     +  maxit, rescale, standardize, iter, theta_fixed
+     +  maxit, rescale, standardize, iter, theta_fixed, satu
       double precision x(n, m), y(n), lambda(nlambda), weights(n),
      +  offset(n), start(m+1), etastart(n), mustart(n), thetastart, 
      +  del, epsbino, theta0(nlambda), d, tht(nlambda), eps, thresh, 
@@ -32,7 +32,7 @@ C      convout <- twologlik <- rep(NA, nlambda)
      +       etastart, mustart, offset, 1, lambda(k), alpha, gam, 
      +       rescale, standardize, penaltyfactor, thresh, epsbino,
      +       maxit,eps, thetastart, 4, penalty, trace, beta_1, 
-     +       b0_1, yhat)
+     +       b0_1, yhat, satu)
             call dcopy(n, yhat, 1, mustart, 1)
             do i=1, n
             etastart(i) = dlog(mustart(i))

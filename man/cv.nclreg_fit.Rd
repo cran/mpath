@@ -6,7 +6,8 @@
 \usage{
 cv.nclreg_fit(x, y, weights, lambda=NULL, balance=TRUE, 
 rfamily=c("clossR", "closs", "gloss", "qloss"), s=1.5, nfolds=10, foldid, 
-type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, ...)
+type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, 
+parallel=FALSE, ...)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{nclreg}.}
@@ -26,6 +27,8 @@ type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, ...)
   \item{se}{ a logical value, to plot with standard errors. }
   \item{n.cores}{The number of CPU cores to use. The cross-validation loop
     will attempt to send different CV folds off to different cores.}
+  \item{trace}{ a logical value, print progress of cross validation or not}
+  \item{parallel}{ a logical value, parallel computing or not}
   \item{\dots}{Other arguments that can be passed to \code{nclreg}.}
 }
 \details{The function runs \code{nclreg} \code{nfolds}+1 times; the

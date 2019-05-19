@@ -65,7 +65,7 @@ ncl.matrix <- function(x, y, weights, offset=NULL, ...){
     return(RET)
 }
 
-ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, del=1e-10, trace=FALSE){
+ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, reltol=1e-5, trace=FALSE){
     call <- match.call()
     rfamily <- match.arg(rfamily)
     if(is.null(s)) stop("s must be a number\n")
@@ -115,7 +115,7 @@ ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "cl
     }
     los <- rep(NA, iter)
     B <- bfunc(family=rfamily, s=s)
-    while(d1 > del && k <= iter){
+    while(d1 > reltol && k <= iter){
         fk_old <- RET$fitted.values
                                         #if(rfamily=="closs")
                                         #fk_old<- pmin(1, pmax(-1, fk_old)) ### truncated at -1 or 1
@@ -133,15 +133,16 @@ ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "cl
 	los[k] <- mean(loss(y, f=fk, cost, family = rfamily, s=s, fk=NULL))
 	if(trace){
         }
-	d1 <- sum((fk_old - fk)^2)/max(1, sum(fk_old^2))
+#	d1 <- sum((fk_old - fk)^2)/max(1, sum(fk_old^2))
 	if(trace) cat("\niteration", k, ": relative change of fk", d1, ", robust loss value", los[k], "\n") 
 	if(k > 1){
+            d <- abs(los[k]-los[k-1]/los[k-1])
             if(los[k] > los[k-1]){
 		      k <- iter
             }
         }
         k <- k + 1
-	if(trace) cat("d1=", d1, ", k=", k, ", d1 > del && k <= iter: ", (d1 > del && k <= iter), "\n")
+	if(trace) cat("d1=", d1, ", k=", k, ", d1 > reltol && k <= iter: ", (d1 > reltol && k <= iter), "\n")
     }
     RET$h <- h
     RET$x <- x

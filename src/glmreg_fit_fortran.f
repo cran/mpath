@@ -5,7 +5,7 @@ c output: yhat is the updated mustart as output
       subroutine glmreg_fit_fortran(x, y, weights, n,m,start, etastart,
      +         mustart, offset, nlambda, lambda, alpha, gam, rescale, 
      +         standardize, penaltyfactor, thresh, epsbino, maxit, 
-     +         eps, theta, family, penalty, trace, beta, b0, yhat)
+     +         eps, theta, family, penalty, trace, beta, b0, yhat, satu)
       implicit none
       integer n,m, i,j, penalty, nlambda, family, standardize, maxit,
      +     innermaxit, trace, rescale, good,
@@ -50,12 +50,11 @@ Cstart(m+1),etastart(n), mustart(n),
               call intpr("trace", -1, trace, 1)
               call dblepr("beta", -1, beta, m)
               call dblepr("b0", -1, b0, 1)
-              call dblepr("sum(yhat)", -1, sum(yhat), 1)
       endif
 
-      if(family.EQ.1) then
-            rescale = 0
-      endif
+C      if(family.EQ.1)then
+C            rescale = 0
+C      endif
       call  deveval(n, y, mustart, theta, weights, family, nulldev)
       startv = 1
       sumpen = sum(penaltyfactor)
@@ -99,7 +98,7 @@ C    need to check if satu is input or output
      +            theta,rescale,mustart,etastart,offset,family,
      +            standardize,nulldev,thresh,maxit,innermaxit,eps,trace,
      +            start,startv,beta,b0,resdev,yhat,
-     +              convout, satu, good, epsbino,outpll) 
+     +              convout, satu, good, epsbino,outpll)
       if (standardize .EQ. 1)then
          do 200 j=1, nlambda
          do 250 i=1, m

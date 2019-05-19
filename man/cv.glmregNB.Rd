@@ -4,8 +4,8 @@
 \description{Does k-fold cross-validation for glmregNB, produces a plot,
   and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
-cv.glmregNB(formula, data, weights, offset=NULL, lambda=NULL,
-nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
+cv.glmregNB(formula, data, weights, offset=NULL, lambda=NULL, nfolds=10, 
+foldid, plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, ...)
 }
 \arguments{
   \item{formula}{symbolic description of the model}
@@ -25,7 +25,9 @@ nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, ...)
   \item{se}{ a logical value, to plot with standard errors. }
  \item{n.cores}{The number of CPU cores to use. The cross-validation loop
   will attempt to send different CV folds off to different cores.}
-  \item{\dots}{Other arguments that can be passed to \code{glmregNB}.}
+ \item{trace}{a logical value, print progress of cross-validation or not}
+ \item{parallel}{a logical value, parallel computing or not}
+\item{\dots}{Other arguments that can be passed to \code{glmregNB}.}
 }
 \details{The function runs \code{glmregNB} \code{nfolds}+1 times; the
   first to get the \code{lambda} sequence, and then the remainder to

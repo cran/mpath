@@ -139,7 +139,8 @@
   o  offset is now working in glmregNB, zipath, cv.glmreg, cv.glmregNB and cv.zipath
                
                CHANGES in `mpath' VERSION 0.3-8 (03-03-2019)
-  o  changes were made on how active set works. Now, we cycle through the active set until convergence, then cycle through all the variables ONCE, this is an reverse to the previous procedure. This includes changes in outloop.f, midloop.f, midloopGLM.f, lmnetGLM, add src/find_activeset.f to simplify the codes.
+  o  R zipath function has both Fortran and R computations, can be useful to compare the results.
+  o  changes were made on how active set works in src/outloop.f file. Now, we cycle through the active set until convergence, then cycle through all the variables ONCE, this is an reverse to the previous procedure. This includes changes in outloop.f, midloop.f, midloopGLM.f, lmnetGLM, add src/find_activeset.f to simplify the codes.
   o  R/nclreg seems to be incorrect when update beta[activeset, i], since activeset is relative to the current x.act, not x. The new Fortran subroutine using dynamic allocation to deal with this. The Fortran subroutine nclreg_fortran.f conducts the three layers of iteration loops, lambda, MM and internal penalty estimation loop.
   o  Not a good idea to convert theta.ml R function to Fortran subroutine since the speed actually is slower in Fortran. This is probably because digamma and trigamma functions in a Fortran subroutine used C functions. In contrast, the R function theta.ml directly used these C functions. Maybe there are other reasons. But we leave a glmregNB.R with the Fortran subroutine glmregnb_fortran.
 
@@ -151,4 +152,8 @@
   
                CHANGES in `mpath' VERSION 0.3-11 (04-12-2019)
   o  implement both active and nonactive path in R zipath function
-
+  
+               CHANGES in `mpath' VERSION 0.3-13 (05-18-2019)
+  o  fix bugs in Fortran subroutines, mostly related to uninitialized values after dynamic allocate of vectors.
+  o  in vignettes/brcancer.Rnw, compare type.path="nonative" and "active"
+  o  in man/nclreg.Rd, provide examples of different solution paths

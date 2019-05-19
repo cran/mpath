@@ -66,7 +66,7 @@ cv.glmreg.matrix <- function(x, y, weights, offset=NULL, ...){
 
 cv.glmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE, 
                           family=c("gaussian", "binomial", "poisson", "negbin"), 
-                          nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
+                          nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE,  
                           ...){
     call <- match.call()
     if(missing(foldid) && nfolds < 3)
@@ -86,18 +86,37 @@ cv.glmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
         else all.folds <- cv.folds(length(y), K)
     }
     else all.folds <- foldid
+    if(parallel){
     registerDoParallel(cores=n.cores)
     i <- 1  ###needed to pass R CMD check with parallel code below
-    residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
+    #residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
+    #residmat should be a list since it is possible to generate different length of loss values, thus, cbind may fail
+    residmat <- foreach(i=seq(K), .packages=c("mpath")) %dopar% {
         omit <- all.folds[[i]]
         fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offset[- omit], lambda=lambda, family=family, ...)
 	logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit])
     }
     stopImplicitCluster()
+    residmat <- sapply(residmat, '[', seq(max(sapply(residmat, length))))
+    }
+    else{
+     residmat <- matrix(NA, nlambda, K)
+     for(i in seq(K)) {
+       if(trace)
+         cat("\n CV Fold", i, "\n\n")
+       omit <- all.folds[[i]]
+       fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], lambda=lambda, family=family, ...)
+       residmat[1:fitcv$nlambda, i] <- logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit])
+     }
+    }
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.max(cv)
-    obj<-list(fit=glmreg.obj, residmat=residmat, lambda = lambda, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
+    if(family=="binomial")
+    good <- which(!is.na(cv))
+    else
+    good <- 1:nlambda
+    obj<-list(fit=glmreg.obj, residmat=residmat[good,], lambda = lambda[good], cv = cv[good], cv.error = cv.error[good], foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
     if(plot.it) plot.cv.glmreg(obj,se=se)
     class(obj) <- "cv.glmreg"
     obj

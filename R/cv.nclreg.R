@@ -60,7 +60,7 @@ cv.nclreg.matrix <- function(x, y, weights, offset=NULL, ...){
 
 cv.nclreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE, 
                           rfamily=c("clossR", "closs", "gloss", "qloss"), s=1.5,  
-                          nfolds=10, foldid, type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, 
+                          nfolds=10, foldid, type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE,  
                           ...){
     call <- match.call()
     type <- match.arg(type)
@@ -81,6 +81,7 @@ cv.nclreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
         else all.folds <- cv.folds(length(y), K)
     }
     else all.folds <- foldid
+    if(parallel){
     registerDoParallel(cores=n.cores)
     i <- 1  ###needed to pass R CMD check with parallel code below
     residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
@@ -89,6 +90,17 @@ cv.nclreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
 	predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], type=type)
     }
     stopImplicitCluster()
+    }
+    else{
+        residmat <- matrix(NA, nlambda, K)
+        for(i in seq(K)){
+        if(trace)
+          cat("\n CV Fold", i, "\n\n")
+        omit <- all.folds[[i]]
+        fitcv <- nclreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], s=s, lambda=lambda, rfamily=rfamily, ...)
+	    residmat[,i] <- predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], type=type)
+        }
+    }
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.min(cv)

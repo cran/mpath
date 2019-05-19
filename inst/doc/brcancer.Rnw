@@ -54,7 +54,7 @@ table(y)
 res <- rep(NA, dim(bc)[2])
 for(i in 1:dim(bc)[2])
 res[i] <- abs(t.test(bc[,i]~y)$statistic)
-### find 300 largest absolute value of t-statistic
+### find 3000 largest absolute value of t-statistic
 tmp <- order(res, decreasing=TRUE)[1:3000]
 dat <- bc[, tmp]
 ### standardize variables
@@ -74,8 +74,6 @@ nlam <- ifelse(type.path!="onestep", 30, 100)
 per <- c(0, 0.05, 0.10, 0.15)
 ### what quantity is minimized for tuning parameter selection
 tuning <- "error"
-### In cross-validation, we set the number of cores for parallel computing by
-n.cores <- 5
 ### robust nonconvex loss function, rfamily type and logistic
 type <- c("closs", "gloss", "qloss", "binomial")
 ### and corresponding labels
@@ -85,106 +83,106 @@ s <- c(0.9, 1.01, 0.5)
 mstop <- 50
 plot.it <- TRUE
 @
-The training data contains randomly selected 50 samples with positive estrogen receptor status and 50 samples with negative estrogen receptor status, and the rest were designated as the test data. The training data is contaminated by randomly switching response variable labels at varying pre-specified proportions \R{per}=\Sexpr{per}. This process is repeated \R{nrun}=\Sexpr{nrun} times. Robust non-convex loss functions include C-loss, G-loss and Q-loss, each with penalty LASSO, SCAD and MCP. The
-initial values are derived using the boosting package \R{bst} with \R{mstop}=\Sexpr{mstop} and \R{nu} provided below depending on loss function \R{type}. For SCAD and MCP penalty, a penalty tuning parameter \R{gam} is provided below. By default, the solution path is computed backward as \R{decreasing=FALSE} in \R{nclreg} function. To select optimal penalization tuning parameters, we run five-fold cross-validation averaging classification errors. In cross-validation, we set the number of cores for parallel computing by \R{n.cores}=\Sexpr{n.cores}.
-  The classification errors and number of selected variables are summarized and these results can be plotted if \R{plot.it=TRUE}. This script also contains results with penalized logistic regression using \R{glmreg}. The script took 3 hours 20 minutes to execute on Intel\textsuperscript{\tiny{\textregistered}} CPU @ 2.10GHz $\times$ with 5 cores on a single processor. 
+The training data contains randomly selected 50 samples with positive estrogen receptor status and 50 samples with negative estrogen receptor status, and the rest were designated as the test data. The training data is contaminated by randomly switching response variable labels at varying pre-specified proportions \R{per}=\Sexpr{per}. This process is repeated \R{nrun}=\Sexpr{nrun} times. Robust non-convex loss functions include C-loss, G-loss and Q-loss, each with penalty LASSO, SCAD and MCP. The initial values are derived using the boosting package \R{bst} with \R{mstop}=\Sexpr{mstop} and \R{nu} provided below depending on loss function \R{type}. For SCAD and MCP penalty, a penalty tuning parameter \R{gam} is provided below. To select optimal penalization tuning parameters, we run five-fold cross-validation averaging classification errors. 
+The classification errors and number of selected variables are tabularized and plotted with \R{plot.it=TRUE}. The script uses \R{type.path="nonactive"}. Alternatively, setting \R{type.path="active"}, computing time can be reduced by more than 50 percent with slightly inferior results in some cases. The test errors based on cross-validation tuning parameters between \R{type.path="nonactive"} and \R{type.path="active"} have ranges (0, 0.0002), (-0.0007, 0.0002), (-0.0021, 0.0002) and (-0.0035, -0.0003) for
+\R{per}=\Sexpr{per}, respectively. Finally, this script also contains results with penalized logistic regression using \R{glmreg}. 
 <<brcancer, fig.show='hold', eval=FALSE>>=
-  summary7 <- function(x) c(summary(x), sd=sd(x))
-  ptm <- proc.time()
-  for(k in (1:4)){   ### k controls family argument rfamily type (see above)
-    if(type[k]=="gloss")
-    nu <- 0.1
-    else 
-    nu <- 0.01
-    for(j in (1:3)){    ### j controls argument penalty type (see above)
-      gam <- ifelse(penalty[j]=="snet", 3.7, 12)
-      err.m1 <- nvar.m1 <- errbest.m1 <- lambest.m1 <- matrix(NA, ncol=4, nrow=nrun)
-      nvarbest.m1 <- mstopcv.m1 <- matrix(NA, ncol=4, nrow=nrun)
-      colnames(err.m1) <- c("cont-0%", "cont-5%", "cont-10%", "cont-15%")
-      colnames(mstopcv.m1) <- colnames(nvarbest.m1) <- colnames(err.m1)
-      colnames(nvar.m1) <- colnames(err.m1)
-      colnames(errbest.m1) <- colnames(err.m1)
-      colnames(lambest.m1) <- colnames(err.m1)
-      for (ii in 1:nrun){
-        set.seed(1000+ii)
-        trid <- c(sample(which(y==1))[1:50], sample(which(y==-1))[1:50])
-        dtr <- dat[trid, ]
-        dte <- dat[-trid, ]
-        ytrold <- y[trid]
-        yte <- y[-trid]
-        ### number of patients/no. variables in training and test data
-        dim(dtr)
-        dim(dte) 
-        ### randomly contaminate data
-        ntr <- length(trid)
-        set.seed(1000+ii)
-        con <- sample(ntr)
-        for(i in (1:4)){    ### i controls how many percentage of data contaminated, see argument per above 
-          ytr <- ytrold
-          percon <- per[i]
-          ### randomly flip labels of the samples in training set according to pre-defined contamination level
-          if(percon > 0){
-            ji <- con[1:(percon*ntr)]
-            ytr[ji] <- -ytrold[ji]
-          }
-          ### fit a model with nclreg for nonconvex loss or glmreg for logistic loss, and use cross-validation to select best penalization parameter
-	  if(type[k] %in% c("closs", "gloss", "qloss")){
-          dat.m1 <- nclreg(x=dtr, y=ytr, s=s[k], iter=100, rfamily = type[k], penalty=penalty[j], lambda.min.ratio=ratio, gamma=gam, mstop.init=mstop, nu.init=nu, type.path=type.path, decreasing=TRUE)
-          set.seed(1000+ii)
-	  cvm1 <- cv.nclreg(x=dtr, y=ytr, nfolds=5, n.cores=n.cores, s=s[k], lambda=dat.m1$lambda[1:nlam], 
-          rfamily = type[k], penalty=penalty[j], gamma=gam, type=tuning, plot.it=FALSE, type.init=dat.m1$type.init, mstop.init=dat.m1$mstop.init, nu.init=dat.m1$nu.init, type.path=type.path, decreasing=TRUE)
-          err1 <- predict(dat.m1, newdata=dte, newy=yte, type="error")
+summary7 <- function(x) c(summary(x), sd=sd(x))
+ptm <- proc.time()
+for(k in (1:4)){   ### k controls family argument rfamily type (see above)
+  if(type[k]=="gloss")
+  nu <- 0.1
+  else 
+  nu <- 0.01
+  for(j in (1:3)){    ### j controls argument penalty type (see above)
+    gam <- ifelse(penalty[j]=="snet", 3.7, 12)
+    err.m1 <- nvar.m1 <- errbest.m1 <- lambest.m1 <- matrix(NA, ncol=4, nrow=nrun)
+    nvarbest.m1 <- mstopcv.m1 <- matrix(NA, ncol=4, nrow=nrun)
+    colnames(err.m1) <- c("cont-0%", "cont-5%", "cont-10%", "cont-15%")
+    colnames(mstopcv.m1) <- colnames(nvarbest.m1) <- colnames(err.m1)
+    colnames(nvar.m1) <- colnames(err.m1)
+    colnames(errbest.m1) <- colnames(err.m1)
+    colnames(lambest.m1) <- colnames(err.m1)
+    for (ii in 1:nrun){
+      set.seed(1000+ii)
+      trid <- c(sample(which(y==1))[1:50], sample(which(y==-1))[1:50])
+      dtr <- dat[trid, ]
+      dte <- dat[-trid, ]
+      ytrold <- y[trid]
+      yte <- y[-trid]
+      ### number of patients/no. variables in training and test data
+      dim(dtr)
+      dim(dte) 
+      ### randomly contaminate data
+      ntr <- length(trid)
+      set.seed(1000+ii)
+      con <- sample(ntr)
+      for(i in (1:4)){    ### i controls how many percentage of data contaminated, see argument per above 
+        ytr <- ytrold
+        percon <- per[i]
+        ### randomly flip labels of the samples in training set according to pre-defined contamination level
+        if(percon > 0){
+          ji <- con[1:(percon*ntr)]
+          ytr[ji] <- -ytrold[ji]
         }
-	else{
-          dat.m1 <- glmreg(x=dtr, y=(ytr+1)/2, family = type[k], penalty=penalty[j], lambda.min.ratio=ratio, gamma=gam)
-          set.seed(1000+ii)
-	  cvm1 <- cv.glmreg(x=dtr, y=(ytr+1)/2, nfolds=5, n.cores=n.cores, lambda=dat.m1$lambda, 
-          family = type[k], penalty=penalty[j], gamma=gam, plot.it=FALSE)
-          err1 <- apply((yte > -1)!=predict(dat.m1, newx=dte, type="class"), 2, mean)          
-        }
-	optmstop <- cvm1$lambda.which
-	err.m1[ii, i] <- err1[optmstop]
-	nvar.m1[ii, i] <- length(predict(dat.m1, which=optmstop, type="nonzero"))
-        errbest.m1[ii, i] <- min(err1, na.rm=TRUE)     
-        lambest.m1[ii, i] <- which.min(err1)
-        nvarbest.m1[ii, i] <- length(predict(dat.m1, which=which.min(err1), type="nonzero"))
+        ### fit a model with nclreg for nonconvex loss or glmreg for logistic loss, and use cross-validation to select best penalization parameter
+	if(type[k] %in% c("closs", "gloss", "qloss")){
+        dat.m1 <- nclreg(x=dtr, y=ytr, s=s[k], iter=100, rfamily = type[k], penalty=penalty[j], lambda.min.ratio=ratio, gamma=gam, mstop.init=mstop, nu.init=nu, type.path=type.path, decreasing=FALSE, type.init="bst")
+        lambda <- dat.m1$lambda[1:nlam]
+        set.seed(1000+ii)
+	cvm1 <- cv.nclreg(x=dtr, y=ytr, nfolds=5, n.cores=n.cores, s=s[k], lambda=lambda, rfamily = type[k], penalty=penalty[j], gamma=gam, type=tuning, plot.it=FALSE, type.init=dat.m1$type.init, mstop.init=dat.m1$mstop.init, nu.init=dat.m1$nu.init, type.path=type.path, decreasing=dat.m1$decreasing)
+        err1 <- predict(dat.m1, newdata=dte, newy=yte, type="error")
       }
-      if(ii %% nrun ==0){
-      if(type[k]%in% c("closs", "gloss", "qloss"))
-      cat(paste("\nfamily ", type1[k], ", s=", s[k], sep=""), "\n")
-      else cat(paste("\nfamily ", type1[k], sep=""), "\n")
-      pentype <- switch(penalty[j],
-      "enet"="LASSO",
-      "mnet"="MCP",
-      "snet"="SCAD")
-      cat("penalty=", pentype, "\n")
-      if(penalty[j] %in% c("snet", "mnet")) cat("gamma=", gam, "\n")
-      cat("best misclassification error\n")
-      print(round(apply(errbest.m1, 2, summary7),4))
-      cat("which lambda has best error\n")
-      print(round(apply(lambest.m1, 2, summary7),1))
-      cat("number of variables selected with best error\n")
-      print(round(apply(nvarbest.m1, 2, summary7),1))
-      cat("CV based misclassification error\n")
-      print(round(apply(err.m1, 2, summary7),4))
-      cat("number of variables selected by CV\n")
-      print(round(apply(nvar.m1, 2, summary7),1))
-      if(plot.it){
-        par(mfrow=c(2, 1))        
-        boxplot(err.m1, main="Misclassification error", subset="", sub=paste(type1[k], "-", pentype, sep=""))
-        boxplot(nvar.m1, main="No. variables", subset="", sub=paste(type1[k], "-", pentype, sep=""))
+      else{
+        dat.m1 <- glmreg(x=dtr, y=(ytr+1)/2, family = type[k], penalty=penalty[j], lambda.min.ratio=ratio, gamma=gam)
+        set.seed(1000+ii)
+	cvm1 <- cv.glmreg(x=dtr, y=(ytr+1)/2, nfolds=5, n.cores=n.cores, lambda=dat.m1$lambda, 
+        family = type[k], penalty=penalty[j], gamma=gam, plot.it=FALSE)
+        err1 <- apply((yte > -1)!=predict(dat.m1, newx=dte, type="class"), 2, mean)          
       }
+      optmstop <- cvm1$lambda.which
+      err.m1[ii, i] <- err1[optmstop]
+      nvar.m1[ii, i] <- length(predict(dat.m1, which=optmstop, type="nonzero"))
+      errbest.m1[ii, i] <- min(err1, na.rm=TRUE)     
+      lambest.m1[ii, i] <- which.min(err1)
+      nvarbest.m1[ii, i] <- length(predict(dat.m1, which=which.min(err1), type="nonzero"))
+    }
+    if(ii %% nrun ==0){
+    if(type[k]%in% c("closs", "gloss", "qloss"))
+    cat(paste("\nfamily ", type1[k], ", s=", s[k], sep=""), "\n")
+    else cat(paste("\nfamily ", type1[k], sep=""), "\n")
+    pentype <- switch(penalty[j],
+    "enet"="LASSO",
+    "mnet"="MCP",
+    "snet"="SCAD")
+    cat("penalty=", pentype, "\n")
+    if(penalty[j] %in% c("snet", "mnet")) cat("gamma=", gam, "\n")
+    cat("best misclassification error\n")
+    print(round(apply(errbest.m1, 2, summary7),4))
+    cat("which lambda has best error\n")
+    print(round(apply(lambest.m1, 2, summary7),1))
+    cat("number of variables selected with best error\n")
+    print(round(apply(nvarbest.m1, 2, summary7),1))
+    cat("CV based misclassification error\n")
+    print(round(apply(err.m1, 2, summary7),4))
+    cat("number of variables selected by CV\n")
+    print(round(apply(nvar.m1, 2, summary7),1))
+    if(plot.it){
+      par(mfrow=c(2, 1))        
+      boxplot(err.m1, main="Misclassification error", subset="", sub=paste(type1[k], "-", pentype, sep=""))
+      boxplot(nvar.m1, main="No. variables", subset="", sub=paste(type1[k], "-", pentype, sep=""))
     }
   }
 }
 }
-  print(proc.time()-ptm)
-  @
-  
-<<sessionInfo>>=
-sessionInfo();
-@
-  \bibliographystyle{plainnat}
-  \bibliography{mpath}
+  }
+    print(proc.time()-ptm)
+    @
+    
+    <<sessionInfo>>=
+    sessionInfo();
+    @
+    \bibliographystyle{plainnat}
+    \bibliography{mpath}
 
 \end{document}

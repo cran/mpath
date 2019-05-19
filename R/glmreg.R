@@ -116,7 +116,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     if(family=="binomial"){
         if(is.factor(y))
             y <- as.integer(y) - 1
-        if(any(y > 1))
+        if(any(y > 1) || any(y<0))
             stop("response should be between 0 and 1 for family=binomial")
     }
     if(family=="negbin"){
@@ -312,14 +312,17 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
         rownames(beta) <- colnames(x)
         colnames(beta) <- round(lambda,digits=4)[good]
     }
-    RET <- list(family=family,standardize=standardize, satu=tmp$satu, lambda=lambda[good], nlambda=length(lambda[good]), beta=beta, b0=matrix(b0, ncol=nlambda), meanx=meanx, normx=normx, theta=theta[good], nulldev=nulldev, resdev=resdev, pll = pll, fitted.values=yhat, converged=tmp$convout[good], convex.min=convex.min, penalty.factor=penalty.factor, gamma=gamma, alpha=alpha, is.offset=is.offset)
+    lambda <- lambda[good]
+    nlambda <- length(lambda[good])
+    b0 <- matrix(b0, ncol=nlambda)
+    RET <- list(family=family,standardize=standardize, satu=tmp$satu, lambda=lambda, nlambda=nlambda, beta=beta, b0=b0, meanx=meanx, normx=normx, theta=theta[good], nulldev=nulldev, resdev=resdev, pll = pll, fitted.values=yhat, converged=tmp$convout[good], convex.min=convex.min, penalty.factor=penalty.factor, gamma=gamma, alpha=alpha, is.offset=is.offset)
     if(x.keep) RET$x <- x
     if(y.keep) RET$y <- y
     class(RET) <- "glmreg"
     RET$twologlik <- try(2*logLik(RET, newx=x, y=y, weights=weights))
 ###penalized log-likelihood function value for rescaled beta
-    penval <- rep(NA, nlambda)[good]
-    for(j in (1:nlambda)[good]){
+    penval <- rep(NA, nlambda)
+    for(j in (1:nlambda)){
         penval[j] <- .Fortran("penGLM", 
                               start=as.double(beta[,j]),
                               m=as.integer(m),

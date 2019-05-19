@@ -1,13 +1,23 @@
 C compute density function of Poisson distribution with parameter lambda
-      function dpois(x, lambda)
-      integer :: x, Factorial
-      double precision :: lambda, dpois
+C if log_true=1, log density value is computed
+      function dpois(x, lambda, log_true)
+      integer :: x, j, log_true, Factorial
+      double precision :: lambda, dpois, res
       external :: Factorial
 
       if(lambda .LT. 0)then
               call intpr("lambda should be nonnegative")
       endif
-      dpois = dexp(-lambda)*lambda**x/Factorial(x)
-
+      if(log_true==1)then
+              res=0
+          if(x > 0)then 
+              do j=1, x
+               res=res+dlog(j*1.0D0)
+              enddo
+          endif
+        dpois = -lambda+x*1.0D0*dlog(lambda)- res
+      else 
+              dpois = dexp(-lambda)*lambda**x/Factorial(x)
+      endif
       return
       end function

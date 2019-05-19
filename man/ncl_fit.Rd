@@ -7,7 +7,7 @@
 \usage{
 ncl_fit(x,y, weights, offset=NULL, cost=0.5, 
 	rfamily=c("clossR", "closs", "gloss", "qloss"), 
-	s=NULL, fk=NULL, iter=10, del=1e-10, trace=FALSE)
+	s=NULL, fk=NULL, iter=10, reltol=1e-5, trace=FALSE)
 }
 
 \arguments{
@@ -21,7 +21,7 @@ ncl_fit(x,y, weights, offset=NULL, cost=0.5,
   \item{s}{ nonconvex loss tuning parameter for robust regression and classification. }
   \item{fk}{ predicted values at an iteration in the MM algorithm }
  \item{iter}{number of iteration in the MM algorithm}
- \item{del}{convergency critera} 
+ \item{reltol}{convergency critera} 
  \item{trace}{If \code{TRUE}, fitting progress is reported}
 }
 \details{

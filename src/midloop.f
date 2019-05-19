@@ -33,21 +33,17 @@ C     dev
       
       implicit none
       integer standardize, trace, penalty, maxit, i, j, nmid, n, 
-     +     family, innermaxit, m,converged,convmid, satu, rescale,
+     +     family, innermaxit, m,converged,convmid, rescale,
      +     fullset(m),activeset(m), jk
       double precision x(n,m),y(n), mu(n), z(n), eta(n), wt(n), w(n), 
      +     del,olddev,weights(n),xold(n,m), yold(n),normx(m),xd(m), 
      +     thresh, nulldev, dev, theta, wtw(n),lamk(m),alpha, 
-     +     gam, eps, beta(m), b0, yhat(n),avg, ep, 
-     +     pll(maxit), offset(n)
+     +     gam, eps, beta(m), b0, yhat(n),avg, ep, offset(n)
 
 C      innermaxit = maxit
       maxit = 1
 C     innermaxit serves as maxit here
 
-C      do 5 jj=1, maxit
-C         pll(jj)=0
-C 5    enddo
       dev = nulldev
       call glmlink(n,mu,family,theta,w, ep)
       call zeval(n, y, eta, mu, w, family, z)

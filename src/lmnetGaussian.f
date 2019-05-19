@@ -335,8 +335,6 @@ C     endif
  80         continue
             b0 = avg - b0
          endif
-C         call dblepr("                    beta=", -1, beta, m)
-C         call dblepr("                    beta_old=", -1, beta_old, m)
          call checkConvergence(m, beta, beta_old, eps, thresh, 
      +        converged, activeset, jk)
          jj = jj + 1

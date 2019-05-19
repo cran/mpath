@@ -9,6 +9,7 @@ C output: los is the average loss
        implicit none
        integer family, i, n
        double precision x, y(n),f(n),u, cost, s, los, ly(n)
+       external nonconvexloss
 
       if(family .EQ. 2)then
            do 10 i=1, n
@@ -49,7 +50,8 @@ C   clossR: 11, closs: 12, gloss: 13, qloss: 14
        implicit none
        integer family
        double precision cval, u, s, los
-     
+       external pnorm_fortran
+
        if(family .EQ. 11)then
         los=1-1/dexp(u**2/(2*s**2))
          else if(family .EQ. 12)then

@@ -91,7 +91,11 @@ C     dev
 C     compute deviance dev
          call deveval(n, yold, mu, theta, weights, family, dev)
          if(family .EQ. 2)then
-           if(dev/nulldev .LT.0.01 .OR. dev.LT.0.0001)then
+           if(dev/nulldev .LT.0.01)then
+C          because dev in deveval depends on weights, if we scale
+C          weights/n, then dev can be very small, but maybe not that
+C          important      
+C           if(dev/nulldev .LT.0.01 .OR. dev.LT.0.0001)then
 C               call dblepr("saturated model, residual deviance = ", -1, 
 C     +              dev,1)
 C               call dblepr("saturated model, null deviance = ", -1, 

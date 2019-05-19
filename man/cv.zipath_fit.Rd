@@ -1,43 +1,35 @@
-\name{cv.zipath}
-\alias{cv.zipath}
-\alias{cv.zipath.matrix}
-\alias{cv.zipath.formula}
-\alias{cv.zipath.default}
-\alias{predict.cv.zipath}
-\alias{coef.cv.zipath}
+\name{cv.zipath_fit}
+\alias{cv.zipath_fit}
 \title{Cross-validation for zipath}
-\description{Does k-fold cross-validation for zipath, produces a plot,
-  and returns cross-validated log-likelihood values for \code{lambda}}
+\description{Internal function k-fold cross-validation for zipath, produces a plot, and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
-\method{cv.zipath}{formula}(formula, data, weights, offset=NULL, contrasts=NULL, ...)
-\method{cv.zipath}{matrix}(X, Z, Y, weights, offsetx=NULL, offsetz=NULL, ...)
-\method{cv.zipath}{default}(X, ...)
-\method{predict}{cv.zipath}(object, newdata, \dots)
-\method{coef}{cv.zipath}(object, which=object$lambda.which, model = c("full", "count", "zero"), \dots)
+cv.zipath_fit(X, Z, Y, weights, offsetx, offsetz, nlambda=100, lambda.count=NULL, 
+	      lambda.zero=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
+	      trace=FALSE, parallel=FALSE, ...)
 }
 \arguments{
-  \item{formula}{symbolic description of the model with an optional numeric vector \code{offset} with an a priori known component to be included in the linear predictor of the count model or zero model. Offset must be a variable in \code{data} if used, while this is optional in \code{zipath}. See an example below.}
-  \item{data}{arguments controlling formula processing
-    via \code{\link[stats]{model.frame}}.}
-  \item{weights}{Observation weights; defaults to 1 per observation}
-   \item{offset}{optional numeric vector with an a priori known component to be
-     included in the linear predictor of the count model or zero model. See below   for an example.}
    \item{X}{predictor matrix of the count model}
-    \item{Z}{predictor matrix of the zero model}
-    \item{Y}{response variable}
-   \item{offsetx, offsetz}{optional numeric vector with an a priori known component to be
-     included in the linear predictor of the count model (offsetx)or zero model (offsetz).}
-  \item{contrasts}{a list with elements \code{"count"} and \code{"zero"}
-      containing the contrasts corresponding to \code{levels} from the
-      respective models} 
- \item{object}{object of class \code{cv.zipath}.}
- \item{newdata}{optionally, a data frame in which to look for variables with
-    which to predict. If omitted, the original observations are used.}
- \item{which}{Indices of the pair of penalty parameters \code{lambda.count} and \code{lambda.zero} at which
-    estimates are extracted.  By default, the one which generates the optimal cross-validation value.}
- \item{model}{character specifying for which component of the model the
-    estimated coefficients should be extracted.}
-\item{\dots}{Other arguments that can be passed to \code{zipath}.}
+   \item{Z}{predictor matrix of the zero model}
+   \item{Y}{response variable}
+   \item{weights}{optional numeric vector of weights.}
+   \item{offsetx}{optional numeric vector with an a priori known component to be included in the linear predictor of the count model.}
+   \item{offsetz}{optional numeric vector with an a priori known component to be included in the linear predictor of the zero model.}
+  \item{nlambda}{number of \code{lambda} value, default value is 10.}
+  \item{lambda.count}{Optional user-supplied lambda.count sequence; default is
+    \code{NULL}}
+  \item{lambda.zero}{Optional user-supplied lambda.zero sequence; default is
+    \code{NULL}}
+  \item{nfolds}{number of folds >=3, default is 10}
+  \item{foldid}{an optional vector of values between 1 and \code{nfold}
+    identifying what fold each observation is in. If supplied,
+    \code{nfold} can be missing and will be ignored.}
+ \item{plot.it}{ a logical value, to plot the estimated log-likelihood values if \code{TRUE}. }
+  \item{se}{ a logical value, to plot with standard errors. }
+ \item{n.cores}{The number of CPU cores to use. The cross-validation loop
+  will attempt to send different CV folds off to different cores.}
+\item{trace}{ a logical value, print progress of cross-validation or not }
+ \item{parallel}{ a logical value, parallel computing or not}
+  \item{\dots}{Other arguments that can be passed to \code{zipath}.}
 }
 \details{The function runs \code{zipath} \code{nfolds}+1 times; the
   first to compute the \code{(lambda.count, lambda.zero)} sequence, and then to
