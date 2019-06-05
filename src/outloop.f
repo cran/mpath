@@ -17,14 +17,14 @@ C     ypre: yhat
       implicit none
       integer n,m,i,j,k,kk,penalty, nlambda, family, standardize, maxit,
      +     innermaxit, trace,convmid,convout(nlambda), startv, rescale, 
-     +     satu,good,convact,fullset(m),activeset(m),activesetold(m),jk
+     +     satu,good,convact,fullset(m),activeset(m),activesetold(m),
+     +     jk,jkold
       double precision x(n,m), y(n), wt(n), lam(m, nlambda),alpha,
      +     gam, theta,mu(n),eta(n), nulldev,thresh, eps, b(m,nlambda),
      +     bz(nlambda),xold(n,m), yold(n), start(m+1), resdev(nlambda), 
      +     ypre(n,nlambda), lamk(m), beta(m), b0,dev,
      +     weights(n),yhat(n),ep, pll(maxit), outpll(maxit, nlambda),
      +     normx(m),xd(m),avg, offset(n) 
-
       if(family .NE. 1)then
          call preprocess(x, y, n, m, weights, family, standardize,
      +        normx, xd, avg)
@@ -50,15 +50,14 @@ C     keep a copy of x and y in case x and y will be changed in subroutine lmnet
 
       k = 1
       satu = 0
-C      good = nlambda
+C     good = nlambda
       do 401 j=1, m
          activeset(j)=j
          fullset(j)=j
- 401     continue
+ 401  continue
       jk = m
  1000 if(k .LE. nlambda .AND. satu .EQ. 0)then
          if(trace.EQ.1)then
-            call dblepr("", -1, 1,0)
             call dblepr("Outer loop: sequence of lambda", -1, 1,0)
             call intpr("  lambda iteration", -1, k, 1)
             call dblepr("  lambda value", -1, lam(1,k), 1)
@@ -66,14 +65,14 @@ C      good = nlambda
          do 10 j=1,m
             lamk(j) = lam(j,k)
  10      continue
-C       if jk=0, it means an intercept-only model, thus, we update
-C       activeset
-         if(jk .EQ. 0)then
-            do 18 j=1, m
-            activeset(j)=j
- 18        continue
-            jk = m
-         endif
+C     if jk=0, it means an intercept-only model, thus, we update
+C     activeset
+C     if(jk .EQ. 0)then
+C     do 18 j=1, m
+C     activeset(j)=j
+C     18         continue
+C     jk = m
+C     endif
 C     Active set: begin with the 1st element of the sequence of lambda
 C     values, i.e., k=1 in this subroutine. Now, the active set
 C     contains all variables, cycle through all coefficients in the
@@ -85,11 +84,11 @@ C     Otherwise, we repeat the above process until the updated active
 C     set remains the same, or the number of iteration (convact) is met. 
 C     Next, move to the 2nd element of the sequence of lambda values. We 
 C     repeat the above process with the current active set.   
-C   
+C     
 C     70: if block --begin
          if(family .EQ. 1)then
 C     For family=1, active set is implemented in midloop -> lmnetGaus 
-C                                                    -> loop_gaussian
+C     -> loop_gaussian
             call midloop(n,m,x,y, xold,yold,weights,mu, eta, offset,
      +           family, penalty,lamk,alpha,gam,theta,rescale,
      +           standardize, eps,innermaxit, maxit, thresh, nulldev, 
@@ -100,43 +99,55 @@ C     active set applies for family!=1.
             convact=0
 C     some loop, if no change to the active set, stop
             kk = 1
-            do 2000 while (kk .LT. 100 .AND. convact .EQ. 0)
-C     now cycle through only the active set
-               call midloopGLM(n,m,x,y,yold,weights,mu,eta,offset,
-     +              family, 
-     +              penalty,lamk,alpha,gam,theta,rescale,standardize,
-     +              eps,innermaxit,maxit,thresh,nulldev,wt,beta,b0,yhat,
-     +              dev,trace,convmid,satu,ep,pll,
-     +              activeset, jk)
-C     update the active set with only non-zero coefficients 
-              call find_activeset(m, beta, eps, activeset, jk)
-            do 501 j=1, m
-                  activesetold(j)=activeset(j)
- 501           continue
+C     max.cycle: in case of nonconvergence the program looks for a cycle
+C     that repeats itself, default is 2 (kk <= 2)
+            do 2000 while (kk <= 2 .AND. convact == 0)
 C     set maxit=1, and have a complete cycle through all the variables
                call midloopGLM(n,m,x,y,yold,weights,mu,eta,offset,
      +              family, 
      +              penalty,lamk,alpha,gam,theta,rescale,standardize,
-     +              eps,innermaxit,1,thresh,nulldev,wt,beta,b0,yhat, 
-     +              dev,trace,convmid,satu,ep,pll,fullset,
-     +              m)
-C     update the active set with only non-zero coefficients 
-              call find_activeset(m, beta, eps, activeset, jk)
+     +              eps,1,thresh,nulldev,wt,beta,b0,yhat, 
+     +              dev,trace,convmid,satu,ep,pll,fullset,m)
+               call find_activeset(m, beta, eps, activesetold, jkold)
 C     it is possible, jk=0 if beta=0, like intercept-only model
-              if(jk .EQ. 0)then
-                 convact=1
-                 exit
-              endif
+               if(jkold .EQ. 0)then
+                  convact=1
+                  exit
+               endif
+C     now cycle through only the active set
+               call midloopGLM(n,m,x,y,yold,weights,mu,eta,offset,
+     +              family, 
+     +              penalty,lamk,alpha,gam,theta,rescale,standardize,
+     +              eps,maxit,thresh,nulldev,wt,beta,b0,yhat,
+     +              dev,trace,convmid,satu,ep,pll,
+     +              activesetold, jkold)
+C     set maxit=1, and have a complete cycle through all the variables
+               call midloopGLM(n,m,x,y,yold,weights,mu,eta,offset,
+     +              family, 
+     +              penalty,lamk,alpha,gam,theta,rescale,standardize,
+     +              eps,1,thresh,nulldev,wt,beta,b0,yhat, 
+     +              dev,trace,convmid,satu,ep,pll,fullset,m)
+C     update the active set with only non-zero coefficients 
+               call find_activeset(m, beta, eps, activeset, jk)
 C     check if the active set was changed--begin
-             do 901 j=1, m
+C     it is possible, jk=0 if beta=0, like intercept-only model
+               if(jk .EQ. 0)then
+                  convact=1
+                  exit
+               endif
+               if(jkold .NE. jk)then
+                  convact=0
+               else
+                  do 901 j=1, jk
                      if(activesetold(j) .NE. activeset(j))then
                         exit
                      endif
-                       if(j .EQ. m)then
-                               convact = 1
-                               exit
-                       endif
+                     if(j .EQ. jk)then
+                        convact = 1
+                        exit
+                     endif
  901              continue
+               endif
 C     check if the active set was changed--end
                kk=kk+1
  2000       continue
@@ -157,10 +168,10 @@ C     70: if block --end
          bz(k) = b0
          resdev(k) = dev
          call linkinv(n, yhat, family, ypre(1:n,k))
-C         call linkinv(n, yhat, family, v)
-C         do 30 i=1, n
-C            ypre(i,k) = v(i)
-C 30      continue
+C     call linkinv(n, yhat, family, v)
+C     do 30 i=1, n
+C     ypre(i,k) = v(i)
+C     30      continue
          k = k + 1
          if(k .LE. nlambda .AND. satu .EQ. 0)then
             do 40 j=1,m

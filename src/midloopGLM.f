@@ -18,7 +18,6 @@ C     del
 C     thresh
 C     wt              used only for family=1
 C     trace
-C     innermaxit: not used except for family=1      
 C     maxit: not used (and maxit=1) for family=1      
 C     output:
 C     beta
@@ -28,13 +27,13 @@ C     dev
 
       subroutine midloopGLM(n,m,x,y,yold,weights, mu, eta, offset,
      +     family, penalty,lamk, 
-     +     alpha, gam, theta, rescale, standardize,eps,innermaxit,
+     +     alpha, gam, theta, rescale, standardize,eps,
      +     maxit, thresh, nulldev, wt, beta, b0,yhat,dev,trace,convmid, 
      +     satu, ep, pll, activeset, jk)
       
       implicit none
       integer standardize, trace, penalty, maxit, i, j, jj, nmid, n, 
-     +     family, innermaxit, m,converged,convmid, satu,
+     +     family, m,converged,convmid, satu,
      +     rescale,activeset(m), jk, ii
       double precision x(n,m),y(n), mu(n), z(n), eta(n), wt(n), w(n), 
      +     del,olddev,weights(n),yold(n), 
@@ -42,8 +41,6 @@ C     dev
      +     gam, eps, beta(m), betaold(m), b0, b0old, yhat(n), ep, 
      +     pll(maxit), offset(n)
 
-      innermaxit = 1
-      
       do 5 jj=1, maxit
          pll(jj)=0
  5    enddo
@@ -54,6 +51,7 @@ C     dev
       satu = 0
  1000 if (jj .LE. maxit .AND. convmid .EQ. 0 .AND. satu .EQ. 0) then
          if(trace.EQ.1)then 
+            call intpr("family=", -1, family, 1)
             call intpr("Middle loop: Update the quadratic approximation 
      +likelihood function", -1, 1, 0)
             call intpr(" middle loop iteration jj=", -1, jj, 1)
@@ -87,7 +85,6 @@ C     dev
             eta(i) = eta(i) + offset(i)
  350     continue
          call linkinv(n, eta, family, mu)
-         olddev = dev
 C     compute deviance dev
          call deveval(n, yold, mu, theta, weights, family, dev)
          if(family .EQ. 2)then
@@ -113,6 +110,7 @@ C               theta = thetaold
          endif
          del = dabs(dev - olddev)
          convmid = converged
+         olddev = dev
          jj=jj + 1
          goto 1000
       endif

@@ -7,15 +7,15 @@ C     repeated ones
      +     penalty, trace, del,rfamily, B, s, thresh, cost, 
      +     decreasing, active, beta, b0, yhat, los, pll, nlambdacal)
       implicit none
-      integer n,m,i,ii,k,j,jj,penalty,nlambda, standardize, maxit,
+      integer n,m,i,ii,j,jj,penalty,nlambda, standardize, maxit,
      +     trace, iter, rfamily, jk, active, activeset(m), 
      +     m_act, nlambdacal, uturn, decreasing, cutpoint, 
      +     AllocateStatus, DeAllocateStatus, varsel(m), varsel_old(m)
       double precision x(n, m), y(n), weights(n),start(m+1),etastart(n),
      +     mustart(n), offset(n), lambda(nlambda), alpha, gam, eps, 
      +     penaltyfactor(m), thresh, beta(m, nlambda), epscycle,
-     +     b0(nlambda), b0_1, yhat(n), d, del, lambda_i, fk_old(n), s, 
-     +     B, h(n), fk(n), los(nlambda), pll(nlambda), cost, penval
+     +     b0(nlambda), b0_1, yhat(n), del, lambda_i, s, 
+     +     B, fk(n), los(nlambda), pll(nlambda), cost, penval
       double precision, dimension(:, :), allocatable :: x_act
       double precision, dimension(:), allocatable :: start_act, beta_1,
      +     penaltyfactor_act
@@ -115,8 +115,11 @@ C     update x_act matrix
 C     redo (i-1)-lambda estimates with the current start_act for the
 C     i-th lambda. Note, i=i-2 not i-1 will do this since i=i+1 is
 C     computed before the end of the loop.
-      if(i > 1 .AND. decreasing==1 .AND. uturn==0 .AND. cutpoint==1)then
+      if(i > 1 .AND. uturn==0 .AND. cutpoint==1)then
           if(abs(los(i)-los(i-1))/los(i) > epscycle)then
+            do j=1, m_act
+            start_act(j)=0
+            enddo
             cutpoint = i
             uturn=1
           endif

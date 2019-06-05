@@ -20,15 +20,11 @@ Cstart(m+1),etastart(n), mustart(n),
      +     wt(n), meanx(m), normx(m),xd(m), nulldev,
      +     penfac(m), resdev(nlambda), yhat(n), mu(n), sumwt,
      +     crossprod_beta(nlambda), meany, meanoffset
-    
       if(family.EQ.10)then
-              call dblepr("x=", -1, x(1, 1:m), m)
               call dblepr("y", -1, y, 5)
               call dblepr("sum(y)", -1, sum(y), 1)
               call dblepr("weights", -1, weights(1:5), 5)
               call dblepr("sum(weights)", -1, sum(weights), 1)
-              call intpr("n", -1, n, 1)
-              call intpr("m", -1, m, 1)
               call dblepr("start", -1, start, m+1)
               call dblepr("etastart", -1, etastart, 5)
               call dblepr("sum(etastart)", -1, sum(etastart), 1)
@@ -99,6 +95,7 @@ C    need to check if satu is input or output
      +            standardize,nulldev,thresh,maxit,innermaxit,eps,trace,
      +            start,startv,beta,b0,resdev,yhat,
      +              convout, satu, good, epsbino,outpll)
+
       if (standardize .EQ. 1)then
          do 200 j=1, nlambda
          do 250 i=1, m

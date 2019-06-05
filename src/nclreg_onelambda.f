@@ -7,7 +7,7 @@ C     output: start_act, etastart, mustart, beta_1, b0_1, fk
      +     penaltyfactor_act, maxit, eps, penalty, trace, iter,
      +     del, rfamily, B, s, thresh, beta_1, b0_1, fk)
       implicit none
-      integer n,ii,k,j, penalty,maxit,trace,iter,rfamily,m_act,satu
+      integer n,k,j, penalty,maxit,trace,iter,rfamily,m_act,satu
       double precision y(n), weights(n),etastart(n), mustart(n), 
      +     offset(n),lambda_i,alpha,gam,eps,los,penval,pll,pll_old,
      +     thresh, b0_1, yhat(n), d, del, fk_old(n), s, B, 
@@ -16,7 +16,7 @@ C     output: start_act, etastart, mustart, beta_1, b0_1, fk
 
          k = 1
          d = 10
-         call loss(n, y, yhat, 0.5, rfamily, s, los)
+         call loss(n, y, yhat, 0.5D0, rfamily, s, los)
          call penGLM(beta_1, m_act, lambda_i*penaltyfactor_act,
      +        alpha, gam, penalty, penval)
          pll_old=los + penval
@@ -57,7 +57,7 @@ C                  d=d+(start_act(j+1)-beta_1(j))**2
                   start_act(j+1)=beta_1(j)
  100           continue
             endif
-         call loss(n, y, yhat, 0.5, rfamily, s, los)
+         call loss(n, y, yhat, 0.5D0, rfamily, s, los)
          call penGLM(beta_1, m_act, lambda_i*penaltyfactor_act,
      +        alpha, gam, penalty, penval)
          pll=los + penval

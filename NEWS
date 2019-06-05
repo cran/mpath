@@ -157,3 +157,10 @@
   o  fix bugs in Fortran subroutines, mostly related to uninitialized values after dynamic allocate of vectors.
   o  in vignettes/brcancer.Rnw, compare type.path="nonative" and "active"
   o  in man/nclreg.Rd, provide examples of different solution paths
+ 
+               CHANGES in `mpath' VERSION 0.3-14 (05-24-2019)
+  o  zipath can be slow for some data, and change outloop subroutine from active set to nonactive set can help substantially. The reason is that the active set approach can repeat the cycle without convergence. Will be addressed in version 0.3-15.
+  
+               CHANGES in `mpath' VERSION 0.3-15 (06-03-2019)
+  o  still use active set, as in version 0.3-13, but change the number of maximum iteration from 100 to 2 when determining active set in outloop.f. Similarly in lmnetGaussian.f. This will reduce the computing times in case of nonconvergence. The program looks for a cycle that repeats itself, default is 2
+  o  fix bugs in nclreg_ad.f regarding m_act and jk, and similar bugs in zipath_active.f

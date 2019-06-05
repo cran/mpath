@@ -90,7 +90,7 @@ C     input: others except the above mentioned output
      +     avg, jj, rescale, converged, activeset, jk, fullset)
 
       implicit none
-      integer maxit, standardize, penalty, n,m,i,j, jj,converged,
+      integer maxit, standardize, penalty, n,m,i,j,jj,converged,jkold,
      +     rescale,fullset(m),k,activeset(m),activesetold(m),convact,jk 
       double precision x(n, m), y(n), weights(n), lambda(m),
      +     meanx(m), xd(m), resid(n),
@@ -117,60 +117,63 @@ C     compute weighted means sum(weights_i*y_i)
 C     compute weighted column averages meanx = x^(transpose) * wtnew
       call DGEMV('T',n, m, 1.0D0, x, n, wtnew, 1, 0.0D0, meanx, 1)
       convact=0
+C     Active Set Convergence:After a cycle through all the variables, we can restrict 
+C     further iterations to the active set till convergence + one more cycle through all
+C     the variables to check if active set has changed. If no change, we are done, 
+C     otherwise, the process if repeated.
 C     some loop, if no change to the active set, stop
       k = 1
-      do 2000 while (k .LT. 100 .AND. convact .EQ. 0)
-C     update the active set with only non-zero coefficients 
-            call loop_gaussian(x,y,n,m,penalty,thresh,eps,maxit,
-     +        standardize,
-     +        beta,b0,resid,xd,lambda,alpha,gam,weights,avg,meanx, 
-     +        jj,rescale, converged, activeset, jk)
-            call find_activeset(m, beta, eps, activeset, jk)
-         do 60 j=1, m
-            activesetold(j)=activeset(j)
- 60      continue
+C     max.cycle: in case of nonconvergence the program looks for a cycle
+C     that repeats itself, default is 2 (k <= 2)      
+      do 2000 while (k <= 2 .AND. convact == 0)
 C     set maxit=1, and have a complete cycle through all the variables
-            call loop_gaussian(x,y,n,m,penalty,thresh,eps,1,
+         call loop_gaussian(x,y,n,m,penalty,thresh,eps,1,
      +        standardize,
      +        beta,b0,resid,xd,lambda,alpha,gam,weights,avg,meanx, 
      +        jj,rescale, converged, fullset, m)
-            call find_activeset(m, beta, eps, activeset, jk)
+         call find_activeset(m, beta, eps, activesetold, jkold)
+C     it is possible, jk=0 if beta=0, like intercept-only model
+         if(jkold .EQ. 0)then
+            convact=1
+            exit
+         endif
+C     restrict further iterations to the active set till convergence
+         call loop_gaussian(x,y,n,m,penalty,thresh,eps,maxit,
+     +        standardize,
+     +        beta,b0,resid,xd,lambda,alpha,gam,weights,avg,meanx, 
+     +        jj,rescale, converged, activesetold, jkold)
+C     set maxit=1, and have a complete cycle through all the variables
+         call loop_gaussian(x,y,n,m,penalty,thresh,eps,1,
+     +        standardize,
+     +        beta,b0,resid,xd,lambda,alpha,gam,weights,avg,meanx, 
+     +        jj,rescale, converged, fullset, m)
+         call find_activeset(m, beta, eps, activeset, jk)
+C     check if the active set was changed--begin
 C     it is possible, jk=0 if beta=0, like intercept-only model
          if(jk .EQ. 0)then
             convact=1
             exit
          endif
-C     check if the active set was changed--begin
-         do 90 j=1, m
+         if(jkold .NE. jk)then
+            convact=0
+         else
+            do 90 j=1, jk
                if(activesetold(j) .NE. activeset(j))then
                   convact=0
                   exit
                else 
-                  if(j .EQ. m)then
+                  if(j .EQ. jk)then
                      convact = 1
                      exit
                   endif
                endif 
- 90      continue
+ 90         continue
+         endif
 C     check if the active set was changed--end
          k = k + 1
  2000 continue
 C     used to match outside loop in subroutine midloop
       jj = jj - 1
-C     if(standardize.EQ.1)then
-C     do 200 j=1, m
-C     beta(j) = beta(j)/normx(j)
-C     if(dabs(beta(j)) .LT. 1e-10)then
-C     beta(j) = 0
-C     endif
-C     200 continue
-C     endif
-CCCC  changed 4/22/2015
-C     b0 = 0
-C     do 210 j=1, m
-C     b0 = b0 + meanx(j) * beta(j)
-C     210 continue
-C     b0 = avg - b0
 
       return
       end
@@ -261,6 +264,7 @@ C     endif
 !     lambda
 !     alpha
 !     gam
+!     jk
 !     
 !     output variables
 !     beta

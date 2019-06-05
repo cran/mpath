@@ -34,7 +34,7 @@ nrun <- 100
 penalty <- c("enet", "snet", "mnet")
 ### Smallest value for lambda, as a fraction of lambda.max, the smallest value for which all coefficients are zero except the intercept
 ratio <- 0.25
-type.path <- "nonactive"
+type.path <- "active"
 nlam <- ifelse(type.path!="onestep", 30, 100)
 ### The training data is contaminated by randomly switching response variable labels at varying pre-specified proportions
 per <- c(0, 0.05, 0.10, 0.15)

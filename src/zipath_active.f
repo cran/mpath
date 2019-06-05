@@ -8,18 +8,18 @@ C     outputs: coefc, coefz, theta, thetaout
      +     start_count, start_zero, mustart_count, mustart_zero, 
      +     offsetx, offsetz, nlambda, lambda_count,
      +     lambda_zero, alpha_count, alpha_zero,  
-     +     gam_count, gam_zero, standardize, penaltyfactor_count, 
+     +     gam_count, gam_zero, penaltyfactor_count, 
      +     penaltyfactor_zero, maxit, eps, family,
      +     penalty, trace, coefc, coefz, yhat, iter,
      +     del, rescale, thresh, epsbino, 
      +     theta_fixed, maxit_theta, theta, thetaout)
       implicit none
       integer n,i,ii,j,jj,kx, kz, penalty,nlambda,family, 
-     +     standardize, maxit, y1(n), trace, iter, 
+     +     maxit, y1(n), trace, iter, 
      +     rescale, jk_count, jk_zero, activeset_count(kx), 
      +     activeset_count_old(kx), activeset_zero(kz),
      +     activeset_zero_old(kz), m_count_act, maxit_theta,
-     +     m_zero_act, AllocateStatus, DeAllocateStatus, jc, jz, 
+     +     m_zero_act, AllocateStatus, jc, jz, 
      +     nact, conv, theta_fixed, fakec, fakez, satu
       double precision x(n, kx), z(n, kz), weights(n), 
      +     start_count(kx+1), dpois, dnbinom, b0_xall, b0zall, 
@@ -152,7 +152,7 @@ C     When all coef are zero except intercept, choose a predictor
      +           m_count_act, m_zero_act, start_count_act, 
      +           start_zero_act, mustart_count, mustart_zero, offsetx, 
      +           offsetz, lambda_count(i), lambda_zero(i), alpha_count, 
-     +           alpha_zero, gam_count, gam_zero, standardize, 
+     +           alpha_zero, gam_count, gam_zero, 
      +           penaltyfactor_count_act, penaltyfactor_zero_act,
      +           maxit, eps, family, penalty, trace, yhat, iter, del,
      +           rescale, thresh, epsbino, theta_fixed, maxit_theta, 
@@ -179,7 +179,7 @@ C     start_zero_act
      +              kz, start_count, start_zero, mustart_count, 
      +              mustart_zero, offsetx, offsetz, lambda_count(i), 
      +              lambda_zero(i), alpha_count, alpha_zero, gam_count,
-     +              gam_zero, standardize, penaltyfactor_count, 
+     +              gam_zero, penaltyfactor_count, 
      +              penaltyfactor_zero, maxit, eps, family, penalty, 
      +              trace, yhat, 2, del, rescale, thresh, epsbino,
      +              theta_fixed, maxit_theta, thetaall, betaxall, 
@@ -218,26 +218,32 @@ C     check if converged here!
                call intpr("jk_zero=", -1, jk_zero, 1)
                call intpr("m_zero_act=", -1, m_zero_act, 1)
             endif
-            jc=0
-            do ii=1, max(jk_count, m_count_act)
-               if(activeset_count(ii)==activeset_count_old(ii))then
-                  jc=jc+1
-               endif
-            enddo
-            jz=0
-C     what is activeset_zero==activeset_zero_old after only one iteration as
+            if(jk_count .NE. m_count_act)then
+               conv=0
+            else if(jk_zero .NE. m_zero_act)then
+               conv=0
+            else
+               jc=0
+               do ii=1, max(jk_count, m_count_act)
+                  if(activeset_count(ii)==activeset_count_old(ii))then
+                     jc=jc+1
+                  endif
+               enddo
+               jz=0
+C     what if activeset_zero==activeset_zero_old after only one iteration as
 C     in the above? Say, we only have betaz=0.2 with one element, but
 C     jk_zero=kz now. Then we have a problem here to update the values as
 C     stated below! Because in this case, the iteration stops.
-            do ii=1, max(jk_zero, m_zero_act)
-               if(activeset_zero(ii)==activeset_zero_old(ii))then
-                  jz=jz+1
+               do ii=1, max(jk_zero, m_zero_act)
+                  if(activeset_zero(ii)==activeset_zero_old(ii))then
+                     jz=jz+1
+                  endif
+               enddo
+               if(jk_count==jc .AND. jk_zero==jz)then
+                  conv=1
                endif
-            enddo
-            if(jk_count==jc .AND. jk_zero==jz)then
-               conv=1
             endif
-            if(jk_count .NE. jc)then
+            if(jk_count .NE. m_count_act .OR. jk_count .NE. jc)then
                theta = thetaall
                deallocate(betax, start_count_act, 
      +              penaltyfactor_count_act, x_act)
@@ -267,7 +273,7 @@ C     update x_act matrix
                   start_count_act(2)=betaxall(1)
                endif
             endif
-            if(jk_zero .NE. jz)then
+            if(jk_zero .NE. m_zero_act .OR. jk_zero .NE. jz)then
                deallocate(betaz, start_zero_act, 
      +              penaltyfactor_zero_act, z_act)
                allocate(betaz(jk_zero), stat=AllocateStatus)

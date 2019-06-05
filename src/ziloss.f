@@ -7,7 +7,7 @@ C     output: los is the average loss
      +           family, theta, los)
       implicit none
       integer family, i, n
-      double precision x, y(n), offsetx(n), offsetz(n), weights(n), 
+      double precision y(n), offsetx(n), offsetz(n), weights(n), 
      +fc(n), fz(n), mu, phi, theta, los, dpois, dnbinom
       external dpois, dnbinom
 

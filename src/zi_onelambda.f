@@ -9,14 +9,13 @@ C     outputs: betax, b0_x, betaz, b0z, theta, start_count_act, start_zero_act
      +     m_count_act, m_zero_act, start_count_act, start_zero_act,
      +     mustart_count, mustart_zero, offsetx, offsetz, lambda_count,
      +     lambda_zero, alpha_count, alpha_zero,  
-     +     gam_count, gam_zero, standardize, penaltyfactor_count_act, 
+     +     gam_count, gam_zero, penaltyfactor_count_act, 
      +     penaltyfactor_zero_act, maxit, eps, family,
      +     penalty, trace, yhat, iter, del, rescale, thresh, 
      +     epsbino, theta_fixed, maxit_theta, theta, 
      +     betax, b0_x, betaz, b0z, satu)
       implicit none
-      integer n,ii,k,j,penalty, family, 
-     +     standardize, maxit, y1(n), trace, iter, 
+      integer n,ii,k,j,penalty, family, maxit, y1(n), trace, iter, 
      +     rescale, stopit,m_count_act, maxit_theta,
      +     m_zero_act, theta_fixed, satu
       double precision weights(n), dpois, dnbinom, 
@@ -29,8 +28,7 @@ C     outputs: betax, b0_x, betaz, b0z, theta, start_count_act, start_zero_act
      +     epsbino, theta, b0_x, b0z,yhat(n), d, del, theta0, penval,
      +     x_act(n, m_count_act), z_act(n, m_zero_act), pll_old, pll,
      +     start_count_act(m_count_act+1), start_zero_act(m_zero_act+1),
-     +     betax(m_count_act), betaz(m_zero_act), los_old, los,
-     +     loglik0(n), loglik1(n)
+     +     betax(m_count_act), betaz(m_zero_act), los_old,los
       external :: dpois, dnbinom, gfunc, ziloss
 
       stopit = 0
@@ -47,11 +45,7 @@ C     outputs: betax, b0_x, betaz, b0z, theta, start_count_act, start_zero_act
       call penGLM(betaz, m_zero_act, 
      +     lambda_zero*penaltyfactor_zero_act, 
      +     alpha_zero, gam_zero, penalty, penval)
-C     if(standardize .EQ. 1)then
-C     pll_old=los_old - n*penval
-C     else 
       pll_old=pll_old - penval
-C     endif
  500  if(d .GT. del .AND. k .LE. iter)then
          if(trace .EQ. 1)then
             call intpr("  EM algorithm iteration k=", -1, k, 1)
@@ -127,11 +121,6 @@ C     mean values by the link function.
          call penGLM(betaz, m_zero_act, 
      +        lambda_zero*penaltyfactor_zero_act, 
      +        alpha_zero, gam_zero, penalty, penval)
-C     if(standardize .EQ. 1)then
-C     pll=los - n*penval
-C     else 
-C     pll=los - penval
-C     endif
          pll=pll - penval
          d=abs((pll-pll_old)/pll_old)
          pll_old = pll

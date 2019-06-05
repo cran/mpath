@@ -100,6 +100,9 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     nm <- dim(x)
     nobs <- n <- nm[1]
     nvars <- m <- nm[2]
+    if (is.null(lambda) && is.null(lambda.min.ratio)){
+        stop("lambda or lambda.min.ratio must be provided\n")
+    }
     if(missing(weights)) weights=rep(1,nobs)
     weights <- as.vector(weights)
     if(!is.null(weights) && !is.numeric(weights))

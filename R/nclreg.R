@@ -478,7 +478,6 @@ if(any(is.na(RET$beta))){
 			    thresh=as.double(thresh),
 			    cost=as.double(cost),
 			    decreasing=as.integer(decreasing),
-			    active=as.integer(active),
 			    beta=as.double(beta),
 		        b0=as.double(b0), 
 			    yhat=as.double(RET$fitted.values), 

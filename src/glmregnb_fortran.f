@@ -28,7 +28,7 @@ C      convout <- twologlik <- rep(NA, nlambda)
         iter = 0
         d = 10
 30        if(d .GT. del .AND. iter <= maxit_theta)then
-	        call glmreg_fit_fortran(x, y, weights, n, m,start,
+            call glmreg_fit_fortran(x, y, weights, n, m,start,
      +       etastart, mustart, offset, 1, lambda(k), alpha, gam, 
      +       rescale, standardize, penaltyfactor, thresh, epsbino,
      +       maxit,eps, thetastart, 4, penalty, trace, beta_1, 

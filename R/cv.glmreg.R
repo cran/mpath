@@ -13,7 +13,7 @@ cv.glmreg.default <- function(x, ...) {
          " implemented")
 }
 
-cv.glmreg.formula <- function(formula, data, weights, offset=NULL, ...){
+cv.glmreg.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL, ...){
     ## extract x, y, etc from the model formula and frame
     if(!attr(terms(formula, data=data), "intercept"))
         stop("non-intercept model is not implemented")

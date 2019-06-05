@@ -10,7 +10,7 @@
 \description{Does k-fold cross-validation for glmreg, produces a plot,
   and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
-\method{cv.glmreg}{formula}(formula, data, weights, offset=NULL, ...)
+\method{cv.glmreg}{formula}(formula, data, weights, offset=NULL, contrasts=NULL, ...)
 \method{cv.glmreg}{matrix}(x, y, weights, offset=NULL, ...)
 \method{cv.glmreg}{default}(x,  ...)
 \method{plot}{cv.glmreg}(x,se=TRUE,ylab=NULL, main=NULL, width=0.02, col="darkgrey", ...)
@@ -24,7 +24,9 @@
   \item{x}{\code{x} matrix as in \code{glmreg}. It could be object of \code{cv.glmreg}.}
   \item{y}{response \code{y} as in \code{glmreg}.}
   \item{weights}{Observation weights; defaults to 1 per observation}
-  \item{offset}{Not implemented yet}
+  \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting. This should be NULL or a numeric vector of length equal to the number of cases. Currently only one offset term can be included in the formula.}
+   \item{contrasts}{the contrasts corresponding to \code{levels} from the
+     respective models}
   \item{object}{object of \code{cv.glmreg}}
   \item{newx}{Matrix of values at which predictions are to be made.  Not
     used for \code{type="coefficients"}}

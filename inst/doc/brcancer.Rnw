@@ -68,7 +68,7 @@ nrun <- 100
 penalty <- c("enet", "snet", "mnet")
 ### Smallest value for lambda, as a fraction of lambda.max, the smallest value for which all coefficients are zero except the intercept
 ratio <- 0.25
-type.path <- "nonactive"
+type.path <- "active"
 nlam <- ifelse(type.path!="onestep", 30, 100)
 ### The training data is contaminated by randomly switching response variable labels at varying pre-specified proportions
 per <- c(0, 0.05, 0.10, 0.15)
@@ -83,9 +83,7 @@ s <- c(0.9, 1.01, 0.5)
 mstop <- 50
 plot.it <- TRUE
 @
-The training data contains randomly selected 50 samples with positive estrogen receptor status and 50 samples with negative estrogen receptor status, and the rest were designated as the test data. The training data is contaminated by randomly switching response variable labels at varying pre-specified proportions \R{per}=\Sexpr{per}. This process is repeated \R{nrun}=\Sexpr{nrun} times. Robust non-convex loss functions include C-loss, G-loss and Q-loss, each with penalty LASSO, SCAD and MCP. The initial values are derived using the boosting package \R{bst} with \R{mstop}=\Sexpr{mstop} and \R{nu} provided below depending on loss function \R{type}. For SCAD and MCP penalty, a penalty tuning parameter \R{gam} is provided below. To select optimal penalization tuning parameters, we run five-fold cross-validation averaging classification errors. 
-The classification errors and number of selected variables are tabularized and plotted with \R{plot.it=TRUE}. The script uses \R{type.path="nonactive"}. Alternatively, setting \R{type.path="active"}, computing time can be reduced by more than 50 percent with slightly inferior results in some cases. The test errors based on cross-validation tuning parameters between \R{type.path="nonactive"} and \R{type.path="active"} have ranges (0, 0.0002), (-0.0007, 0.0002), (-0.0021, 0.0002) and (-0.0035, -0.0003) for
-\R{per}=\Sexpr{per}, respectively. Finally, this script also contains results with penalized logistic regression using \R{glmreg}. 
+The training data contains randomly selected 50 samples with positive estrogen receptor status and 50 samples with negative estrogen receptor status, and the rest were designated as the test data. The training data is contaminated by randomly switching response variable labels at varying pre-specified proportions \R{per}=\Sexpr{per}. This process is repeated \R{nrun}=\Sexpr{nrun} times. Robust non-convex loss functions include C-loss, G-loss and Q-loss, each with penalty LASSO, SCAD and MCP. The initial values are derived using the boosting package \R{bst} with \R{mstop}=\Sexpr{mstop} and \R{nu} provided below depending on loss function \R{type}. For SCAD and MCP penalty, a penalty tuning parameter \R{gam} is provided below. To select optimal penalization tuning parameters, we run five-fold cross-validation averaging classification errors. The classification errors and number of selected variables are tabularized and plotted with \R{plot.it=TRUE}. With \R{type.path="nonactive"}, the prediction accuracy can be slightly improved in some scenarios, for instance, with contamination rate 15\%. However, the computing times can be doubled. Finally, this script also contains results with penalized logistic regression using \R{glmreg}. 
 <<brcancer, fig.show='hold', eval=FALSE>>=
 summary7 <- function(x) c(summary(x), sd=sd(x))
 ptm <- proc.time()

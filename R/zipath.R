@@ -73,7 +73,7 @@ zipath.matrix <- function(X, Z, Y, weights, offsetx=NULL, offsetz=NULL, ...){
     RET$call <- match.call()
     return(RET)
 }
-zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, family = c("poisson", "negbin", "geometric"), link = c("logit", "probit", "cloglog", "cauchit", "log"), penalty = c("enet", "mnet", "snet"), start = NULL, y = TRUE, x = FALSE, nlambda=100, lambda.count=NULL, lambda.zero=NULL, type.path=c("nonactive", "active"), penalty.factor.count=NULL, penalty.factor.zero=NULL, lambda.count.min.ratio=.0001, lambda.zero.min.ratio=.1, alpha.count=1, alpha.zero=alpha.count, gamma.count=3, gamma.zero=gamma.count, rescale=FALSE, init.theta=1, theta.fixed=FALSE, EM=TRUE, maxit.em=200, convtype=c("count", "both"), maxit= 1000, maxit.theta =10, reltol = 1e-5, thresh=1e-6, eps.bino=1e-5, shortlist=FALSE, trace=FALSE, ...)
+zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, family = c("poisson", "negbin", "geometric"), link = c("logit", "probit", "cloglog", "cauchit", "log"), penalty = c("enet", "mnet", "snet"), start = NULL, y = TRUE, x = FALSE, nlambda=100, lambda.count=NULL, lambda.zero=NULL, type.path=c("active", "nonactive"), penalty.factor.count=NULL, penalty.factor.zero=NULL, lambda.count.min.ratio=.0001, lambda.zero.min.ratio=.1, alpha.count=1, alpha.zero=alpha.count, gamma.count=3, gamma.zero=gamma.count, rescale=FALSE, init.theta=1, theta.fixed=FALSE, EM=TRUE, maxit.em=200, convtype=c("count", "both"), maxit= 1000, maxit.theta =10, reltol = 1e-5, thresh=1e-6, eps.bino=1e-5, shortlist=FALSE, trace=FALSE, ...)
 {
     if(is.null(init.theta) && family=="negbin" && theta.fixed)
         stop("missing argument init.theta while family=='negbin' and theta.fixed is TRUE\n")
@@ -568,7 +568,6 @@ zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, fam
                          alpha_zero=as.double(alpha.zero),
                          gam_count=as.double(gamma.count),
                          gam_zero=as.double(gamma.zero),
-                         standardize=as.integer(standardize), 
                          penaltyfactor_count=as.double(penalty.factor.count),
                          penaltyfactor_zero=as.double(penalty.factor.zero),
                          maxit=as.integer(maxit), 
@@ -611,7 +610,6 @@ zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, fam
                           alpha_zero=as.double(alpha.zero),
                           gam_count=as.double(gamma.count),
                           gam_zero=as.double(gamma.zero),
-                          standardize=as.integer(standardize), 
                           penaltyfactor_count=as.double(penalty.factor.count),
                           penaltyfactor_zero=as.double(penalty.factor.zero),
                           maxit=as.integer(maxit), 

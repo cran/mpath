@@ -6,18 +6,17 @@ C
      +     mustart, offset, iter, nlambda, lambda, alpha, gam, 
      +     standardize, penaltyfactor, maxit, eps, epscycle, 
      +     penalty, trace, del,rfamily, B, s, thresh, cost, 
-     +     decreasing, active, beta, b0, yhat, los, pll, nlambdacal)
+     +     decreasing, beta, b0, yhat, los, pll, nlambdacal)
       implicit none
-      integer n,m,i,ii,k,j,jj,penalty,nlambda, standardize, maxit,
-     +     trace, iter, rfamily, jk, active, activeset(m), 
+      integer n,m,i,ii,j,jj,penalty,nlambda, standardize, maxit,
+     +     trace, iter, rfamily, jk, activeset(m), 
      +     activeset_old(m), m_act, nlambdacal, uturn, decreasing, 
-     +     cutpoint, nact, conv, jc, fakejk,
-     +     AllocateStatus, DeAllocateStatus, varsel(m), varsel_old(m)
+     +     cutpoint, nact, conv, jc, fakejk, AllocateStatus, varsel(m) 
       double precision x(n, m), y(n), weights(n),start(m+1),etastart(n),
      +     mustart(n), offset(n), lambda(nlambda), alpha, gam, eps, 
      +     penaltyfactor(m), thresh, beta(m, nlambda), epscycle,
-     +     betaall(m), b0all, b0(nlambda), b0_1, yhat(n), d, del, 
-     +     lambda_i, fk_old(n), s, B, h(n), fk(n), los(nlambda), 
+     +     betaall(m), b0all, b0(nlambda), b0_1, yhat(n), del, 
+     +     lambda_i, s, B, fk(n), los(nlambda), 
      +     pll(nlambda), cost, penval
       double precision, dimension(:, :), allocatable :: x_act
       double precision, dimension(:), allocatable :: start_act, beta_1,
@@ -107,6 +106,9 @@ C
                   fakejk=1
                endif
             endif
+         if(jk .NE. m_act)then
+             conv=0
+         else
             jc=0
             do ii=1, max(jk, m_act)
                if(activeset(ii)==activeset_old(ii))then
@@ -116,7 +118,8 @@ C
             if(jk==jc)then
                conv=1
             endif
-            if(jk .NE. jc)then
+        endif
+            if(jk .NE. m_act .OR. jk .NE. jc)then
                deallocate(beta_1, start_act, penaltyfactor_act, x_act)
                allocate(beta_1(jk), stat=AllocateStatus)
                allocate(start_act(jk+1), stat=AllocateStatus)
@@ -146,8 +149,8 @@ C
          endif
          nlambdacal=nlambdacal+1
          b0(i)=b0_1
-         if(m_act .GT. 0)then
-            do ii=1, m_act
+         if(jk .GT. 0)then
+            do ii=1, jk
                beta(activeset(ii), i)=beta_1(ii)
             enddo
          endif
