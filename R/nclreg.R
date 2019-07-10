@@ -179,7 +179,7 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
     start <- NULL
     if(is.null(fk) || is.null(lambda)){
         if(type.init %in% c("ncl", "heu")){ ### use ncl function to generate intercept-only model
-            RET <- ncl(y~1, data=data.frame(y, 1), iter=10000, reltol=1e-20, weights=weights, s=s, rfamily=rfamily, trace=FALSE)
+            RET <- ncl_fit(x=matrix(1, ncol=1, nrow=length(y)), y=y, iter=10000, reltol=1e-20, weights=weights, s=s, rfamily=rfamily, trace=FALSE)
             if(type.init=="ncl") start <- c(coef(RET), rep(0, nvars))
 ### it is similar to the following optimization results
                                         #fn <- function(b) sum(loss(y, f=b, cost, family = rfamily, s=s))

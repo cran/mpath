@@ -58,7 +58,7 @@ C     good = nlambda
       jk = m
  1000 if(k .LE. nlambda .AND. satu .EQ. 0)then
          if(trace.EQ.1)then
-            call dblepr("Outer loop: sequence of lambda", -1, 1,0)
+            call intpr("Outer loop: sequence of lambda", -1, 1, 1)
             call intpr("  lambda iteration", -1, k, 1)
             call dblepr("  lambda value", -1, lam(1,k), 1)
          endif

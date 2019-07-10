@@ -47,7 +47,6 @@ C     innermaxit serves as maxit here
       dev = nulldev
       call glmlink(n,mu,family,theta,w, ep)
       call zeval(n, y, eta, mu, w, family, z)
-
       do 10 i=1, n
          wtw(i)=wt(i) * w(i)
          z(i)=z(i) - offset(i)

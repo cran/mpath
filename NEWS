@@ -164,3 +164,8 @@
                CHANGES in `mpath' VERSION 0.3-15 (06-03-2019)
   o  still use active set, as in version 0.3-13, but change the number of maximum iteration from 100 to 2 when determining active set in outloop.f. Similarly in lmnetGaussian.f. This will reduce the computing times in case of nonconvergence. The program looks for a cycle that repeats itself, default is 2
   o  fix bugs in nclreg_ad.f regarding m_act and jk, and similar bugs in zipath_active.f
+
+               CHANGES in `mpath' VERSION 0.3-16 (07-09-2019)
+  o to avoid mismatch between predictor variables and the estimated coefficients - this can happen if the input data contains response variable but not appropriately handled, add the following line in R/predict.glmreg.R
+    if(dim(object$beta)[1] != m) stop("number of columns in newx should be the same as number of rows  in beta\n")
+

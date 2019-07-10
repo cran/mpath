@@ -126,7 +126,7 @@ ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "cl
 	    z <- y*fk_old
 	    h <- -y*(gradient(family=rfamily, u=z, s=s)/B-z)
         }
-	RET <- lm.wfit(x, h, weights, offset)
+    RET <- lm.wfit(x, h, weights, offset)
 	fk <- RET$fitted.values
                                         #if(rfamily=="closs")
                                         #fk <- pmin(1, pmax(-1, fk)) ### truncated at -1 or 1

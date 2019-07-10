@@ -284,6 +284,8 @@ C     dev
      +           (y(i)+theta)*dlog((y(i)+theta)/(mu(i) + theta)))) 
          endif
          if(cisnan(dev).NE.0) then
+             call intpr("dev is NA in Fortran src/deveval, check if
+     +        some columns of x have the same values", -1, 1, 1)
             call intpr("i=", -1, i, 1)
             call dblepr("y(i)=", -1, y(i), 1)
             call dblepr("mu(i)=", -1, mu(i), 1)

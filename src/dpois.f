@@ -6,7 +6,7 @@ C if log_true=1, log density value is computed
       external :: Factorial
 
       if(lambda .LT. 0)then
-              call intpr("lambda should be nonnegative")
+              call dblepr("lambda should be nonnegative", -1, lambda, 1)
       endif
       if(log_true==1)then
               res=0

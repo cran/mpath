@@ -69,7 +69,7 @@
 data("bioChemists", package = "pscl")
 fm_pois <- cv.glmreg(art ~ ., data = bioChemists, family = "poisson")
 title("Poisson Family",line=2.5)
-predict(fm_pois, newx=bioChemists)
+predict(fm_pois, newx=bioChemists[,-1])[1:4]
 coef(fm_pois)
 }
 \keyword{models}

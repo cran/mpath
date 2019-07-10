@@ -11,7 +11,7 @@ C
       integer n,m,i,ii,j,jj,penalty,nlambda, standardize, maxit,
      +     trace, iter, rfamily, jk, activeset(m), 
      +     activeset_old(m), m_act, nlambdacal, uturn, decreasing, 
-     +     cutpoint, nact, conv, jc, fakejk, AllocateStatus, varsel(m) 
+     +     cutpoint, nact, conv, jc, fakejk, AllocateStatus
       double precision x(n, m), y(n), weights(n),start(m+1),etastart(n),
      +     mustart(n), offset(n), lambda(nlambda), alpha, gam, eps, 
      +     penaltyfactor(m), thresh, beta(m, nlambda), epscycle,

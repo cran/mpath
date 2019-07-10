@@ -29,7 +29,9 @@ if(!is.null(object$terms)){
   n <- dim(newx)[1]
   m <- dim(newx)[2]
   if(is.list(newx))
-	  newx <- as.matrix(as.data.frame(lapply(newx, as.numeric)))
+      newx <- matrix(unlist(newx), ncol=m)
+      #newx <- as.matrix(as.data.frame(lapply(newx, as.numeric)))
+  if(dim(object$beta)[1] != m) stop("number of columns in newx should be the same as number of rows in beta\n")
   res <- .Fortran("pred",
 				  n=as.integer(n),
 				  m=as.integer(m),

@@ -8,7 +8,7 @@ C function
       external :: Factorial, rlgamma
 
       if(size_n .LE. 0)then
-              call intpr("size should be strictly positive", -1, 1, 0)
+        call dblepr("size should be strictly positive", -1, size_n, 1)
       endif
 
       p = size_n/(size_n+mu)
