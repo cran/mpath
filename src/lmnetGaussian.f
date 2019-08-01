@@ -85,12 +85,13 @@ C     mu
 C     yhat
 C     jj
 C     input: others except the above mentioned output
-      subroutine lmnetGaus(x, y, n, m, weights, lambda, alpha, 
-     +     gam,thresh, maxit, eps, standardize, penalty, xd,beta, b0, 
-     +     avg, jj, rescale, converged, activeset, jk, fullset)
+      subroutine lmnetGaus(x, y, n, m, weights, lambda, alpha, gam, 
+     + thresh, maxit, eps, standardize, intercept, penalty, 
+     + xd,beta, b0, avg, jj, rescale, converged, activeset, jk, fullset)
 
       implicit none
-      integer maxit, standardize, penalty, n,m,i,j,jj,converged,jkold,
+      integer maxit, standardize, intercept, penalty, n,m,i,j,jj,
+     +     converged,jkold,
      +     rescale,fullset(m),k,activeset(m),activesetold(m),convact,jk 
       double precision x(n, m), y(n), weights(n), lambda(m),
      +     meanx(m), xd(m), resid(n),
@@ -104,6 +105,9 @@ C     input: others except the above mentioned output
          b0 = 0
       else 
          b0 = avg
+      endif
+      if(intercept .EQ. 0)then
+          b0 = 0
       endif
       wsum=0
 C     compute weighted means sum(weights_i*y_i)
@@ -128,7 +132,7 @@ C     that repeats itself, default is 2 (k <= 2)
       do 2000 while (k <= 2 .AND. convact == 0)
 C     set maxit=1, and have a complete cycle through all the variables
          call loop_gaussian(x,y,n,m,penalty,thresh,eps,1,
-     +        standardize,
+     +        standardize, intercept,
      +        beta,b0,resid,xd,lambda,alpha,gam,weights,avg,meanx, 
      +        jj,rescale, converged, fullset, m)
          call find_activeset(m, beta, eps, activesetold, jkold)
@@ -139,12 +143,12 @@ C     it is possible, jk=0 if beta=0, like intercept-only model
          endif
 C     restrict further iterations to the active set till convergence
          call loop_gaussian(x,y,n,m,penalty,thresh,eps,maxit,
-     +        standardize,
+     +        standardize, intercept,
      +        beta,b0,resid,xd,lambda,alpha,gam,weights,avg,meanx, 
      +        jj,rescale, converged, activesetold, jkold)
 C     set maxit=1, and have a complete cycle through all the variables
          call loop_gaussian(x,y,n,m,penalty,thresh,eps,1,
-     +        standardize,
+     +        standardize, intercept,
      +        beta,b0,resid,xd,lambda,alpha,gam,weights,avg,meanx, 
      +        jj,rescale, converged, fullset, m)
          call find_activeset(m, beta, eps, activeset, jk)
@@ -272,10 +276,10 @@ C     endif
 
 
       subroutine loop_gaussian(x, y, n, m, penalty, thresh, eps, maxit, 
-     +     standardize, beta, b0, resid,xd, lambda, alpha, gam,wtold,
-     +     avg, meanx, jj, rescale, converged, activeset, jk)
+     +    standardize, intercept, beta, b0, resid,xd, lambda, alpha, 
+     +    gam, wtold, avg, meanx, jj, rescale, converged, activeset, jk)
       implicit none
-      integer n, m, maxit, standardize, jj, i,j,penalty,converged
+      integer n, m, maxit,standardize,intercept,jj,i,j,penalty,converged
       integer rescale, activeset(m), jk, ii
       double precision x(n, m), y(n), thresh, eps,beta(m),beta_old(m) 
       double precision lambda(m), alpha, gam, wtold(n), avg, meanx(m)
@@ -331,13 +335,15 @@ C     endif
  70            continue
             endif
  40      continue
-         if(standardize.EQ.0)then
+         if(intercept == 1)then
+          if(standardize.EQ.0)then
             b0 = 0.0D0
             do 80 ii = 1, jk
                j = activeset(ii)
                b0 = b0 + meanx(j) * beta(j)
  80         continue
             b0 = avg - b0
+          endif
          endif
          call checkConvergence(m, beta, beta_old, eps, thresh, 
      +        converged, activeset, jk)

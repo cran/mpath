@@ -80,7 +80,7 @@ compute.2d <- function(y, f, s, family=c("clossR", "closs", "gloss", "qloss")){
         sqrt(2/pi)*u/s^3*exp(-u^2/(2*s^2))
 }
 
-nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, reltol=1e-5, penalty=c("enet","mnet","snet"), nlambda=100, lambda=NULL, type.path=c("active", "nonactive", "onestep"), decreasing=FALSE, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, penalty.factor = NULL, maxit=1000, type.init=c("bst", "ncl", "heu"), mstop.init=10, nu.init=0.1, eps=.Machine$double.eps, epscycle=10, thresh=1e-6, trace=FALSE){
+nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, reltol=1e-5, penalty=c("enet","mnet","snet"), nlambda=100, lambda=NULL, type.path=c("active", "nonactive", "onestep"), decreasing=FALSE, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, intercept=TRUE, penalty.factor = NULL, maxit=1000, type.init=c("bst", "ncl", "heu"), mstop.init=10, nu.init=0.1, eps=.Machine$double.eps, epscycle=10, thresh=1e-6, trace=FALSE){
 ### compute h value
     compute.h <- function(rfamily, y, fk_old, s, B){
         if(rfamily=="clossR")
@@ -218,7 +218,7 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
         h <- RET$h                               
 ### If standardize=TRUE, x has already been standardized. Therefore, in the sequel, we don't standardize x again
 ### method A, to obtain lambda values from fitting the penalized regression. 
-        lambda <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda.min.ratio=lambda.min.ratio, nlambda=nlambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=1, eps=eps, family="gaussian", penalty=penalty)$lambda
+        lambda <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda.min.ratio=lambda.min.ratio, nlambda=nlambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, intercept=intercept, penalty.factor = penalty.factor, maxit=1, eps=eps, family="gaussian", penalty=penalty)$lambda
 ### with type.init, add two different lambda sequences and make lambda values flexible to have different solution paths
         #if(type.init %in% c("bst", "heu")){
             if(!decreasing)#{### solution path backward direction
@@ -293,7 +293,7 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
                     stopit <- TRUE
                     break
                 }
-		RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
+		RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, intercept=intercept, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
 		RET$b0 <- RET$b0/sqrt(B)
 ### for LASSO, the above two lines are equivalent to the next line
                                         #RET <- glmreg_fit(x=x, y=h, weights=weights, lambda=lambda[i]/B,alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty)
@@ -367,6 +367,7 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
 			        gam=as.double(gamma), 
 				rescale=as.integer(0),
 			       	standardize=as.integer(0),
+			       	intercept=as.integer(intercept),
 				penaltyfactor=as.double(penalty.factor.act),
 				thresh=as.double(thresh), 
 				epsbino=as.double(0), 
@@ -465,6 +466,7 @@ if(any(is.na(RET$beta))){
 			    alpha=as.double(alpha),
 		        gam=as.double(gamma), 
 			    standardize=as.integer(0), 
+			    intercept=as.integer(intercept), 
 			    penaltyfactor=as.double(penalty.factor),
 			    maxit=as.integer(maxit), 
 			    eps=as.double(eps), 
@@ -502,6 +504,7 @@ if(any(is.na(RET$beta))){
 			    alpha=as.double(alpha),
 		        gam=as.double(gamma), 
 			    standardize=as.integer(0), 
+			    intercept=as.integer(intercept), 
 			    penaltyfactor=as.double(penalty.factor),
 			    maxit=as.integer(maxit), 
 			    eps=as.double(eps), 
@@ -538,7 +541,7 @@ if(any(is.na(RET$beta))){
 	while(d1 > reltol && k <= iter){
 	    fk_old <- fk
             h <- compute.h(rfamily, y, fk_old, s, B)
-	    RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lam, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
+	    RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lam, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, intercept=intercept, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
             RET$b0 <- RET$b0/sqrt(B)
 	    fk <- predict(RET, newx=x)
             start <- coef(RET)
@@ -548,7 +551,7 @@ if(any(is.na(RET$beta))){
             k <- k + 1
         }
 ### fit a solution path    
-        RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
+        RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, intercept=intercept, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
         RET$b0 <- RET$b0/sqrt(B)
         for(i in 1:nlambda){
             los[i] <- weighted.mean(loss(y, f=RET$fitted.values[,i], cost, family = rfamily, s=s, fk=NULL), w=w)

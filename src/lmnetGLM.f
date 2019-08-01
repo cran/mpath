@@ -16,11 +16,11 @@ C     X
 C     y
 
       subroutine loop_glm(x,y,z,n,m,w,mu, penalty,thresh, eps, 
-     +     standardize, family, beta, b0, lambda, alpha, gam,
+     +     standardize, intercept, family, beta, b0, lambda, alpha, gam,
      +     wtold,trace,jj,rescale,converged,theta,pll,activeset, jk)
       implicit none
-      integer trace, n, m, standardize,family, jj, i,j,penalty,
-     +     converged, rescale, activeset(m), jk, ii
+      integer trace, n, m, standardize, intercept, family, jj, i,j,
+     + penalty, converged, rescale, activeset(m), jk, ii
       double precision x(n, m), y(n), thresh, eps,beta(m),beta_old(m) 
       double precision lambda(m), alpha, gam, wtold(n)
       double precision z(n), b0, b0_old, xd(m), yhat(n), w(n),
@@ -84,10 +84,12 @@ C     intercept
          xwr = xwr + wtnew(i) * w(i) * r(i)
          xwx = xwx + wtnew(i) * w(i)
  200  continue
-      b0 = xwr/xwx + b0_old
+         if(intercept .EQ. 1)then
+             b0 = xwr/xwx + b0_old
       do 210 i=1, n
          r(i) = r(i) - (b0 - b0_old)
  210  continue
+         endif
 C     calculate response z
 C     cycle through in the active set (begin with if statement)
       do 40 ii = 1, jk
@@ -126,8 +128,10 @@ C     check if beta(j) strictly increases penalized loglikehood function
          endif
 C     70: cycle through in the active set (end with endif statement) 
  40   continue
+         if(intercept .EQ. 1)then
       call checkConvergence(1, b0, b0_old, eps, thresh, converged,
      +     1, 1)      
+         endif
       if(converged.EQ.1) then
         call checkConvergence(m, beta, beta_old, eps, thresh, converged,
      +     activeset, jk)

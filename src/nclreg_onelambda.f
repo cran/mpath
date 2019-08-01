@@ -4,10 +4,11 @@ C     input: start_act, etastart, mustart
 C     output: start_act, etastart, mustart, beta_1, b0_1, fk
       subroutine nclreg_onelambda(x_act, y, weights, n,m_act,start_act, 
      +     etastart, mustart, yhat, offset, lambda_i, alpha, gam, 
-     +     penaltyfactor_act, maxit, eps, penalty, trace, iter,
+     +     intercept,penaltyfactor_act,maxit, eps, penalty, trace, iter,
      +     del, rfamily, B, s, thresh, beta_1, b0_1, fk)
       implicit none
-      integer n,k,j, penalty,maxit,trace,iter,rfamily,m_act,satu
+      integer n,k,j,intercept,penalty,maxit,trace,iter,rfamily,m_act,
+     +        satu
       double precision y(n), weights(n),etastart(n), mustart(n), 
      +     offset(n),lambda_i,alpha,gam,eps,los,penval,pll,pll_old,
      +     thresh, b0_1, yhat(n), d, del, fk_old(n), s, B, 
@@ -41,7 +42,7 @@ C 30         continue
 C            endif
             call glmreg_fit_fortran(x_act, h,weights,n,m_act,start_act, 
      +           etastart, mustart, offset, 1, lambda_i, alpha,
-     +           gam, 0, 0, penaltyfactor_act, thresh,
+     +           gam, 0, 0, intercept, penaltyfactor_act, thresh,
      +           0.0D0, maxit, eps, 0.0D0, 1,
      +           penalty, trace, beta_1, b0_1, yhat, satu)
             call dcopy(n, yhat, 1, fk, 1)

@@ -4,7 +4,7 @@ C             theta
 C     outputs: coefc, coefz, thetaout
       subroutine zipath_nonactive(x, z, y, y1, weights, n, kx, kz, 
      +     start_count, start_zero, mustart_count, mustart_zero, 
-     +     offsetx, offsetz, nlambda, lambda_count,
+     +     offsetx, offsetz, intercept, nlambda, lambda_count,
      +     lambda_zero, alpha_count, alpha_zero,  
      +     gam_count, gam_zero, penaltyfactor_count, 
      +     penaltyfactor_zero, maxit, eps, family,
@@ -13,7 +13,7 @@ C     outputs: coefc, coefz, thetaout
      +     theta_fixed, maxit_theta, theta, thetaout)
       implicit none
       integer n,i,ii,j,kx, kz, penalty,nlambda,family, 
-     +     maxit, y1(n), trace, iter, 
+     +     maxit, y1(n), trace, iter, intercept,
      +     rescale, jk_count, jk_zero, stopit,m_count_act, maxit_theta,
      +     m_zero_act, satu, varsel_count(kx), varsel_count_old(kx),
      +     varsel_zero(kz), varsel_zero_old(kz), theta_fixed
@@ -80,8 +80,8 @@ C     outputs: coefc, coefz, thetaout
         call zi_onelambda(x_act, z_act, y, y1, probi, weights, n, 
      +           m_count_act, m_zero_act, start_count_act, 
      +           start_zero_act, mustart_count, mustart_zero, offsetx, 
-     +           offsetz, lambda_count(i), lambda_zero(i), alpha_count,
-     +           alpha_zero, gam_count, gam_zero, 
+     +           offsetz, intercept, lambda_count(i), lambda_zero(i), 
+     +           alpha_count, alpha_zero, gam_count, gam_zero, 
      +           penaltyfactor_count_act, penaltyfactor_zero_act,
      +           maxit, eps, family, penalty, trace, yhat, iter, del,
      +           rescale, thresh, epsbino, theta_fixed,

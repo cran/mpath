@@ -8,7 +8,7 @@
 
 \usage{
 zipath_fit(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, 
-           family = c("poisson", "negbin", "geometric"), 
+           intercept = TRUE, family = c("poisson", "negbin", "geometric"), 
            link = c("logit", "probit", "cloglog", "cauchit", "log"), 
            penalty = c("enet", "mnet",  "snet"), start = NULL, y = TRUE, x = FALSE, 
            nlambda=100, lambda.count=NULL, lambda.zero=NULL, 
@@ -29,7 +29,9 @@ zipath_fit(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE,
     included in the linear predictor of the count model.}
   \item{offsetz}{optional numeric vector with an a priori known component to be
     included in the linear predictor of the zero model.}
-\item{standardize}{Logical flag for x variable standardization, prior to
+  \item{intercept}{Should intercept(s) be fitted (default=TRUE) or set to
+   zero (FALSE)}
+  \item{standardize}{Logical flag for x variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
     the original scale. Default is \code{standardize=TRUE}.}
   \item{family}{character specification of count model family (a log link is 

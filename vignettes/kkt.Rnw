@@ -24,7 +24,7 @@
 \begin{document}
 
 \maketitle
-Some technical details on the solution path are presented, supplementary to the publications \cite{wang2014zip, wang2014zinb}. 
+This technical report details the calculation of solution path of the \textbf{\textsf{R}} package \textbf{mpath} on penalized zero-inflated regression, supplementary to the publications \cite{wang2014zip, wang2014zinb}. 
 \section{Zero-inflated Poisson regression}
 Assume response variable $Y$ has a zero-inflated Poisson distribution, denote $d_1+1$ and $d_2+1$-dimensional vectors $B_i$ and $G_i$. 
 The parameters $\mu=(\mu_{1}, \mu_{2}, ... \mu_{n})^\intercal$ and $\pi_i$ are modeled with $\log(\mu_i)=B^\intercal\beta$ and logit$(\pi_i)=\log(\pi_i/(1-\pi_i))=G_i^\intercal\zeta$ for covariate matrix $B$ and $G$, which can be different. To include an intercept, let $B_{i0}=G_{i0}=1$. 
@@ -37,16 +37,16 @@ The log-likelihood function $\ell_{ZIP}(\Phi;y)$ is given by
   \end{aligned}
 \end{equation}
 
-We define a penalized log-likelihood function for ZIP model:
+We minimize a penalized negative log-likelihood function for ZIP model:
 \begin{equation}\label{eqn:plik}
-  p\ell_{ZIP}(\Phi;y)=\ell_{ZIP}(\Phi;y) - 
+  p\ell_{ZIP}(\Phi;y)=-\ell_{ZIP}(\Phi;y) + 
   p(\zeta, \beta), 
 \end{equation}
 where
 \begin{equation}\label{eqn:plik1}
   p(\zeta, \beta)=n\sum_{j=1}^{d_1}(\alpha_1\lambda_1|\zeta_j|+\frac{\lambda_1(1-\alpha_1)}{2}\zeta_j^2) + n\sum_{k=1}^{d_2}(\alpha_2\lambda_2|\beta_k|+\frac{\lambda_2(1-\alpha_2)}{2}\beta_k^2). 
 \end{equation}
-In the \textbf{\textsf{R}} package \textbf{mpath}, $\alpha_1, \alpha_2$ are labeled as \texttt{alpha.zero, alpha.count}, respectively; $\lambda_1, \lambda_2$ are labeled as \texttt{lambda.zero, lambda.count}, respectively. For an maximizer $\hat\Phi$ of $p\ell_{ZIP}(\Phi; y)$ if and only if the subdifferential of $p\ell_{ZIP}(\Phi; y)$ at $\hat\Phi$ is 0. Take derivatives:
+In the \textbf{\textsf{R}} package \textbf{mpath}, $\alpha_1, \alpha_2$ are labeled as \texttt{alpha.zero, alpha.count}, respectively; $\lambda_1, \lambda_2$ are labeled as \texttt{lambda.zero, lambda.count}, respectively. A point $\hat\Phi$ is a minimizer of $p\ell_{ZIP}(\Phi; y)$ if and only if $p\ell_{ZIP}(\Phi; y)$ is subdifferentiable at $\hat\Phi$ and $\Phi=0$ is a subgradient of $p\ell_{ZIP}(\Phi; y)$ at $\hat\Phi$. Take derivatives:
 \begin{equation}\label{eqn:deri1}
   \begin{aligned}
     \frac{\partial\ell_{ZIP}(\Phi; y)}{\partial\zeta_j}=&\sum_{y_i=0}\frac{\exp(G_i^\intercal\zeta)G_{ij}}{\exp(G_i^\intercal\zeta)+\exp(-\exp(B_i^\intercal\beta))} - \sum_{i=1}^n\frac{\exp(G_i^\intercal\zeta)G_{ij}}{1+\exp(G_i^\intercal\zeta)},\\
@@ -56,7 +56,7 @@ In the \textbf{\textsf{R}} package \textbf{mpath}, $\alpha_1, \alpha_2$ are labe
 \end{equation}
 In this document, we take $j=1, ..., d_1, k=1, ..., d_2$ unless otherwise specified.
 The subdifferential of $p(\zeta, \beta)$ at $\hat\zeta_j\neq0$ is $n\alpha_1\lambda_1\text{sign}(\zeta_j)+\lambda_1(1-\alpha_1)\zeta_j$, and the subdifferential of $p(\zeta, \beta)$ at $\hat\beta_k\neq0$ is  $n\alpha_2\lambda_2\text{sign}(\beta_k)+\lambda_2(1-\alpha_2)\beta_k$.
-The subdifferential of $p(\zeta, \beta)$ at $\hat\zeta_j=0$ is $n\alpha_1\lambda_1e_1$ for $e_1\in [-1,1]$, and the subdifferential of $p(\zeta, \beta)$ at $\hat\beta_k=0$ is $n\alpha_2\lambda_2e_2$ for $e_2\in [-1,1]$. Together, we have the KKT conditions for an maximizer $\hat\Phi$ of $p\ell_{ZIP}(\Phi; y)$:
+The subdifferential of $p(\zeta, \beta)$ at $\hat\zeta_j=0$ is $n\alpha_1\lambda_1e_1$ for $e_1\in [-1,1]$, and the subdifferential of $p(\zeta, \beta)$ at $\hat\beta_k=0$ is $n\alpha_2\lambda_2e_2$ for $e_2\in [-1,1]$. Together, we have the KKT conditions for a minimizer $\hat\Phi$ of $p\ell_{ZIP}(\Phi; y)$:
 \begin{equation}\label{eqn:kktp}
   \begin{aligned}
     \text{if } \hat\zeta_j&\neq0: -\frac{\partial\ell_{ZIP}(\Phi; y)}{\partial\zeta_j}+n\alpha_1\lambda_1\text{sign}(\zeta_j)+\lambda_1(1-\alpha_1)\zeta_j=0,\\
@@ -70,7 +70,7 @@ Therefore, for $\hat\zeta_j=0, \hat\beta_k=0$, it must be:
   \left|\frac{\partial\ell_{ZIP}(\Phi; y)}{\partial\zeta_j}\right| \leq n\alpha_1\lambda_1,\\
   \left|\frac{\partial\ell_{ZIP}(\Phi; y)}{\partial\beta_k}\right| \leq n\alpha_2\lambda_2.
 \end{equation}
-Denote $\lambda_{1, \max}$ and $\lambda_{2, \max}$ the smallest values of $\lambda_1$ and $\lambda_2$, respectivley, such that $\hat\zeta_j=0, \hat\beta_k=0$, and $(\lambda_{1, \max}, \lambda_{2, \max})$ can be determined by (\ref{eqn:lmax}) and the following quantities:
+Denote $\lambda_{1, \max}$ and $\lambda_{2, \max}$ the smallest values of $\lambda_1$ and $\lambda_2$, respectively, such that $\hat\zeta_j=0, \hat\beta_k=0$, and $(\lambda_{1, \max}, \lambda_{2, \max})$ can be determined by (\ref{eqn:lmax}) and the following quantities:
 \begin{equation}
   \begin{aligned}
     \frac{\partial\ell_{ZIP}(\Phi; y)}{\partial\zeta_j}=&\sum_{y_i=0}\frac{\exp(\zeta_0)G_{ij}}{\exp(\zeta_0)+\exp(-\exp(\beta_0))} - \sum_{i=1}^n\frac{\exp(\zeta_0)G_{ij}}{1+\exp(\zeta_0)},\\
@@ -87,12 +87,10 @@ The complete data $(y, z)$ log-likelihood function can be written as
                              &+ \sum_{i=1}^n(1-z_i)\left\{y_iB_i^\intercal\beta-\exp(B_i^\intercal\beta)-\log(y_i!)\right\}.
   \end{aligned}
 \end{equation}
-The complete data penalized log-likelihood function is then given by
+The complete data penalized negative log-likelihood function is then given by
 \begin{equation}\label{eqn:plzip}
   \begin{aligned}
-      p\ell_{ZIP}^c(\Phi;y,z)=&\sum_{i=1}^n \left\{z_iG_i^\intercal\zeta - \log(1+\exp(G_i^\intercal\zeta))\right\}\\ 
-    &+\sum_{i=1}^n(1-z_i)\left\{y_iB_i^\intercal\beta-\exp(B_i^\intercal\beta)-\log(y_i!)\right\}
-      -p(\zeta, \beta).
+      p\ell_{ZIP}^c(\Phi;y,z)=-\ell_{ZIP}^c+p(\zeta, \beta).
   \end{aligned}
 \end{equation}
 Taking derivatives of (\ref{eqn:cllik}), we obtain
@@ -102,7 +100,7 @@ Taking derivatives of (\ref{eqn:cllik}), we obtain
          \frac{\partial\ell_{ZIP}^c(\Phi;y,z)}{\partial \beta_k}&=\sum_{i=1}^n(1-z_i)\left\{y_iB_{ik}-\exp(B_i^\intercal\beta)B_{ik}\right\}.
      \end{aligned}
 \end{equation}
-The KKT conditions of an maximizer $\hat\Phi$ for $p\ell_{ZIP}^c(\Phi;y,z)$ are given by:
+The KKT conditions of a minimizer $\hat\Phi$ of $p\ell_{ZIP}^c(\Phi;y,z)$ are given by:
 \begin{equation}\label{eqn:kktpc}
   \begin{aligned}
     \text{if } \hat\zeta_j&\neq0: -\frac{\partial\ell_{ZIP}^c(\Phi; y)}{\partial\zeta_j}+n\alpha_1\lambda_1\text{sign}(\zeta_j)+\lambda_1(1-\alpha_1)\zeta_j=0,\\
@@ -138,7 +136,7 @@ Let $\zeta^{(m)}=\zeta, \beta^{(m)}=\beta$, then (\ref{eqn:z}) becomes
                                                                   \end{cases}
                                                                    \end{aligned}
                                                                     \end{equation}
-It is a simple exercise to show that the right hand side of (\ref{eqn:deri2}) is the same as that of (\ref{eqn:deri1}) once (\ref{eqn:z1}) is plugged into (\ref{eqn:deri2}). Hence, the KKT conditions (\ref{eqn:kktpc}) are the same as (\ref{eqn:kktp}) once (\ref{eqn:z1}) is plugged into (\ref{eqn:deri2}). These connections offer a different method (see \citet{wang2014zip}) to derive $(\hat\lambda_{1, \max}, \hat\lambda_{2, \max})$ such that $\hat\zeta_j=0, \hat\beta_k=0$ hold. We first estimate
+It is a simple exercise to show that the right hand side of (\ref{eqn:deri2}) is the same as that of (\ref{eqn:deri1}) once (\ref{eqn:z1}) is plugged into (\ref{eqn:deri2}). Hence, the KKT conditions (\ref{eqn:kktpc}) are the same as (\ref{eqn:kktp}) once (\ref{eqn:z1}) is plugged into (\ref{eqn:deri2}). These connections offer a different method to derive $(\hat\lambda_{1, \max}, \hat\lambda_{2, \max})$ such that $\hat\zeta_j=0, \hat\beta_k=0$ hold \citep{wang2014zip}. We first estimate
 $\zeta_0, \beta_0$ for an intercept-only ZIP model, then (\ref{eqn:z1}) reduces to
 \begin{equation}\label{eqn:z2}
      \begin{aligned}
@@ -152,7 +150,7 @@ $\zeta_0, \beta_0$ for an intercept-only ZIP model, then (\ref{eqn:z1}) reduces 
                                                                     \end{equation}
 
 Plugging in (\ref{eqn:z2}), $(\hat\lambda_{1, \max}, \hat\lambda_{2, \max})$ are computed based on 
-(\ref{eqn:lmax1}). Furthermore, we have shown that $(\lambda_{1, \max}, \lambda_{2, \max})=(\hat\lambda_{1, \max}, \hat\lambda_{2, \max})$ holds.
+(\ref{eqn:lmax1}). Furthermore, we have shown that $(\lambda_{1, \max}, \lambda_{2, \max})=(\hat\lambda_{1, \max}, \hat\lambda_{2, \max})$ holds, a special case of a more general result \citep{wang2016robust3}.
 \section{Zero-inflated negative binomial regression}
 Assume response variable $Y$ has a zero-inflated negative binomial distribution, denote $d_1+1$ and $d_2+1$-dimensional vectors $B_i$ and $G_i$, respectively. As before, the first entry of these vectors is 1. 
 In ZINB regression, assume $\log(\mu_i)=B_i^\intercal\beta$ and $\log(\frac{p_i}{1-p_i})=G_i^\intercal\zeta$ where $\zeta=(\zeta_0, \zeta_1, ..., \zeta_{d_1})$ and $\beta=(\beta_0, \beta_1, ..., \beta_{d_2})$ are unknown  parameters. Here $\zeta_0$ and $\beta_0$ are intercepts.
@@ -189,18 +187,18 @@ where
       \frac{\partial u_i}{\partial \beta_k}&=B_{ik}\exp(B_i^\intercal\beta).
   \end{aligned}
 \end{equation*}
-For variable selection, consider a penalized ZINB model:
+For variable selection, consider minimizing a penalized negative loss function:
 \begin{equation}\label{eqn:pll}
-    p\ell_{ZINB}(\Phi; y)=\ell(\Phi)-p(\zeta, \beta),
+    p\ell_{ZINB}(\Phi; y)=-\ell(\Phi)+p(\zeta, \beta),
 \end{equation}
 where $p(\zeta, \beta)$ is given by (\ref{eqn:plik1}).
-The KKT conditions for an maximizer $\hat\Phi$ of $p\ell_{ZINB}(\Phi)$ can be derived. 
+The KKT conditions for a minimizer $\hat\Phi$ of $p\ell_{ZINB}(\Phi)$ can be derived. 
 Therefore, for $\hat\zeta_j=0, \hat\beta_k=0$, it must be:
 \begin{equation}\label{eqn:lmaxnb}
   \left|\frac{\partial\ell_{ZINB}(\Phi; y)}{\partial\zeta_j}\right| \leq n\alpha_1\lambda_1,\\
   \left|\frac{\partial\ell_{ZINB}(\Phi; y)}{\partial\beta_k}\right| \leq n\alpha_2\lambda_2.
 \end{equation}
-Denote $\lambda_{1, \max}$ and $\lambda_{2, \max}$ the smallest values of $\lambda_1$ and $\lambda_2$, respectivley, such that $\hat\zeta_j=0, \hat\beta_k=0$, and $(\lambda_{1, \max}, \lambda_{2, \max})$ can be determined by (\ref{eqn:deri3}), (\ref{eqn:lmaxnb}) and the following quantities:
+Denote $\lambda_{1, \max}$ and $\lambda_{2, \max}$ the smallest values of $\lambda_1$ and $\lambda_2$, respectively, such that $\hat\zeta_j=0, \hat\beta_k=0$, and $(\lambda_{1, \max}, \lambda_{2, \max})$ can be determined by (\ref{eqn:deri3}), (\ref{eqn:lmaxnb}) and the following quantities:
 \begin{equation}
     p_i=\frac{\exp(\zeta_0)}{1+\exp(\zeta_0)}, 
     \frac{\partial p_i}{\partial \zeta_j}=\frac{G_{ij}\exp(\zeta_0)}{(1+\exp(\zeta_0))^2}, 
@@ -212,11 +210,10 @@ Since $z=(z_1, ..., z_n)^T$ is not observable, it is often treated as missing da
 \begin{equation}\label{eqn:zinblik}
     \ell^c_{ZINB}(\Phi; y)=\sum_{i=1}^n \left\{(z_iG_i^\intercal\zeta-\log(1+\exp(G_i^\intercal\zeta))+(1-z_i)\log(f(y_i;\beta, \theta))\right\},
 \end{equation}
-and the complete data penalized log-likelihood function is given by
+and the complete data penalized negative log-likelihood function is given by
 \begin{equation*}
     \begin{aligned}
-    p\ell^c_{ZINB}(\Phi; y, z)=&\sum_{i=1}^n \left\{(z_iG_i^\intercal\zeta-\log(1+\exp(G_i^\intercal\zeta))+(1-z_i)\log(f(y_i;\beta, \theta))\right\}\\
-  &-p(\zeta, \beta),
+    p\ell^c_{ZINB}(\Phi; y, z)=-\ell^c_{ZINB}(\Phi; y, z)+p(\zeta, \beta),
     \end{aligned}
 \end{equation*}
 where $f(y_i;\beta, \theta)=
@@ -233,7 +230,7 @@ and $\mu_i=\exp(B_i^\intercal\beta)$. Taking derivatives of (\ref{eqn:zinblik}),
              \right\}.
      \end{aligned}
 \end{equation}
-The KKT conditions of an maximizer $\hat\Phi$ for $\ell_{ZINB}^c(\Phi;y,z)$ can be derived. Therefore, for $\hat\zeta_j=0, \hat\beta_k=0$, it must be:
+The KKT conditions of a minimizer $\hat\Phi$ of $\ell_{ZINB}^c(\Phi;y,z)$ can be derived. Therefore, for $\hat\zeta_j=0, \hat\beta_k=0$, it must be:
 \begin{equation}\label{eqn:lmaxnb1}
   \left|\frac{\partial\ell_{ZINB}^c(\Phi; y)}{\partial\zeta_j}\right| \leq n\alpha_1\lambda_1,\\
   \left|\frac{\partial\ell_{ZINB}^c(\Phi; y)}{\partial\beta_k}\right| \leq n\alpha_2\lambda_2.
@@ -259,7 +256,8 @@ Let $\zeta^{(m)}=\zeta, \beta^{(m)}=\beta$, then (\ref{eqn:znb}) becomes
 \end{equation}
 It is simple to show that the right hand side of (\ref{eqn:deri4}) is the same as that of (\ref{eqn:deri3}) once (\ref{eqn:znb1}) is plugged into (\ref{eqn:deri4}). 
 Hence, the KKT conditions (\ref{eqn:lmaxnb1}) are the same as (\ref{eqn:lmaxnb}) once (\ref{eqn:znb1}) is plugged into (\ref{eqn:deri4}). 
-These connections offer a different method (see \citet{wang2014zinb}) to derive $(\hat\lambda_{1, \max}, \hat\lambda_{2, \max})$ such that $\hat\zeta_j=0, \hat\beta_k=0$ hold. We first estimate $\zeta_0, \beta_0$ for an
+These connections offer a different method 
+to derive $(\hat\lambda_{1, \max}, \hat\lambda_{2, \max})$ such that $\hat\zeta_j=0, \hat\beta_k=0$ hold \citep{wang2014zinb}. We first estimate $\zeta_0, \beta_0$ for an
 intercept-only ZINB model, then (\ref{eqn:znb1}) becomes
 \begin{equation}\label{eqn:znb2}
   \begin{aligned}

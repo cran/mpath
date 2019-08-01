@@ -10,7 +10,7 @@ C     ypre: yhat
 
       subroutine outloop(x,y,weights, wt, n,m, penalty, nlambda, lam, 
      +     alpha,gam,theta,rescale,mu,eta, offset,
-     #family,standardize, nulldev, 
+     #family,standardize, intercept, nulldev, 
      +     thresh, maxit, innermaxit, eps, trace, start, startv,b, bz,
      +     resdev,ypre, convout, satu, good, ep, outpll)
 
@@ -18,7 +18,7 @@ C     ypre: yhat
       integer n,m,i,j,k,kk,penalty, nlambda, family, standardize, maxit,
      +     innermaxit, trace,convmid,convout(nlambda), startv, rescale, 
      +     satu,good,convact,fullset(m),activeset(m),activesetold(m),
-     +     jk,jkold
+     +     jk,jkold,intercept
       double precision x(n,m), y(n), wt(n), lam(m, nlambda),alpha,
      +     gam, theta,mu(n),eta(n), nulldev,thresh, eps, b(m,nlambda),
      +     bz(nlambda),xold(n,m), yold(n), start(m+1), resdev(nlambda), 
@@ -91,8 +91,8 @@ C     For family=1, active set is implemented in midloop -> lmnetGaus
 C     -> loop_gaussian
             call midloop(n,m,x,y, xold,yold,weights,mu, eta, offset,
      +           family, penalty,lamk,alpha,gam,theta,rescale,
-     +           standardize, eps,innermaxit, maxit, thresh, nulldev, 
-     +           wt, beta, b0, yhat, dev, trace, convmid, ep,
+     +           standardize, intercept, eps,innermaxit, maxit, thresh,
+     +           nulldev, wt, beta, b0, yhat, dev, trace, convmid, ep,
      +           normx,xd,avg, activeset, jk, fullset)
          else 
 C     active set applies for family!=1. 
@@ -104,8 +104,8 @@ C     that repeats itself, default is 2 (kk <= 2)
             do 2000 while (kk <= 2 .AND. convact == 0)
 C     set maxit=1, and have a complete cycle through all the variables
                call midloopGLM(n,m,x,y,yold,weights,mu,eta,offset,
-     +              family, 
-     +              penalty,lamk,alpha,gam,theta,rescale,standardize,
+     +              family, penalty,lamk,alpha,gam,theta,rescale,
+     +              standardize, intercept,
      +              eps,1,thresh,nulldev,wt,beta,b0,yhat, 
      +              dev,trace,convmid,satu,ep,pll,fullset,m)
                call find_activeset(m, beta, eps, activesetold, jkold)
@@ -116,15 +116,15 @@ C     it is possible, jk=0 if beta=0, like intercept-only model
                endif
 C     now cycle through only the active set
                call midloopGLM(n,m,x,y,yold,weights,mu,eta,offset,
-     +              family, 
-     +              penalty,lamk,alpha,gam,theta,rescale,standardize,
+     +              family, penalty,lamk,alpha,gam,theta,rescale,
+     +              standardize, intercept,
      +              eps,maxit,thresh,nulldev,wt,beta,b0,yhat,
      +              dev,trace,convmid,satu,ep,pll,
      +              activesetold, jkold)
 C     set maxit=1, and have a complete cycle through all the variables
                call midloopGLM(n,m,x,y,yold,weights,mu,eta,offset,
-     +              family, 
-     +              penalty,lamk,alpha,gam,theta,rescale,standardize,
+     +              family, penalty,lamk,alpha,gam,theta,rescale,
+     +              standardize, intercept,
      +              eps,1,thresh,nulldev,wt,beta,b0,yhat, 
      +              dev,trace,convmid,satu,ep,pll,fullset,m)
 C     update the active set with only non-zero coefficients 

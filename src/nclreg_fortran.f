@@ -3,12 +3,12 @@ C     output: nlambdacal: number of lambda actually computed including
 C     repeated ones
       subroutine nclreg_fortran(x, y, weights, n,m,start, etastart,
      +     mustart, offset, iter, nlambda, lambda, alpha, gam, 
-     +     standardize, penaltyfactor, maxit, eps, epscycle, 
+     +     standardize, intercept, penaltyfactor, maxit, eps, epscycle, 
      +     penalty, trace, del,rfamily, B, s, thresh, cost, 
      +     decreasing, active, beta, b0, yhat, los, pll, nlambdacal)
       implicit none
       integer n,m,i,ii,j,jj,penalty,nlambda, standardize, maxit,
-     +     trace, iter, rfamily, jk, active, activeset(m), 
+     +     trace, iter, rfamily, jk, active, activeset(m), intercept, 
      +     m_act, nlambdacal, uturn, decreasing, cutpoint, 
      +     AllocateStatus, DeAllocateStatus, varsel(m), varsel_old(m)
       double precision x(n, m), y(n), weights(n),start(m+1),etastart(n),
@@ -63,8 +63,8 @@ C     repeated ones
          lambda_i=lambda(i)/B
          call nclreg_onelambda(x_act, y,weights, n,m_act,start_act,
      +        etastart, mustart, yhat, offset, lambda_i, alpha, gam, 
-     +        penaltyfactor_act, maxit, eps, penalty, trace, iter,
-     +        del, rfamily, B, s, thresh, beta_1, b0_1, fk)
+     +        intercept, penaltyfactor_act, maxit, eps, penalty, trace, 
+     +        iter, del, rfamily, B, s, thresh, beta_1, b0_1, fk)
          nlambdacal=nlambdacal+1
          call loss(n, y, fk, cost, rfamily, s, los(i))
          call penGLM(beta_1, m_act, lambda_i*penaltyfactor_act, 

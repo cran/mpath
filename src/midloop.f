@@ -25,15 +25,14 @@ C     yhat
 C     dev
 
       subroutine midloop(n,m,x,y,xold,yold,weights, mu, eta, offset,
-     +     family,
-     +     penalty,lamk, 
-     +     alpha, gam, theta, rescale, standardize,eps,innermaxit,
+     +     family, penalty,lamk, alpha, gam, theta, rescale, 
+     +     standardize, intercept, eps,innermaxit,
      +     maxit, thresh, nulldev, wt, beta, b0,yhat,dev,trace,convmid, 
      +     ep, normx, xd, avg, activeset, jk, fullset)
       
       implicit none
-      integer standardize, trace, penalty, maxit, i, j, nmid, n, 
-     +     family, innermaxit, m,converged,convmid, rescale,
+      integer standardize, intercept, trace, penalty, maxit, i, j, 
+     +     nmid, n, family, innermaxit, m,converged,convmid, rescale,
      +     fullset(m),activeset(m), jk
       double precision x(n,m),y(n), mu(n), z(n), eta(n), wt(n), w(n), 
      +     del,olddev,weights(n),xold(n,m), yold(n),normx(m),xd(m), 
@@ -54,7 +53,7 @@ C     innermaxit serves as maxit here
       call preprocess(x, z, n, m, wtw, family, standardize,
      +     normx, xd, avg)
       call lmnetGaus(x, z, n, m, wtw, lamk, alpha, gam, thresh, 
-     +     innermaxit, eps, standardize, penalty, xd, 
+     +     innermaxit, eps, standardize, intercept, penalty, xd, 
      +     beta, b0, avg, nmid,rescale, converged, activeset, jk,
      +     fullset)
       do 220 i = 1, n

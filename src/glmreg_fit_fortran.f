@@ -4,11 +4,11 @@ C subroutine?
 c output: yhat is the updated mustart as output
       subroutine glmreg_fit_fortran(x, y, weights, n,m,start, etastart,
      +         mustart, offset, nlambda, lambda, alpha, gam, rescale, 
-     +         standardize, penaltyfactor, thresh, epsbino, maxit, 
-     +         eps, theta, family, penalty, trace, beta, b0, yhat, satu)
+     +         standardize, intercept, penaltyfactor, thresh, epsbino, 
+     +         maxit,eps,theta,family,penalty,trace,beta,b0, yhat, satu)
       implicit none
       integer n,m, i,j, penalty, nlambda, family, standardize, maxit,
-     +     innermaxit, trace, rescale, good,
+     +     innermaxit, trace, rescale, good, intercept,
      +     satu, convout(nlambda), startv
 C      double precision, intent(in) :: etastart(n),mustart(n),start(m+1)
       double precision :: etastart(n),mustart(n),start(m+1)
@@ -65,10 +65,9 @@ C    need to check if satu is input or output
           good = nlambda
       call outloop(x,y,weights,wt,n,m,penalty,nlambda,lam,alpha,gam,
      +            theta,rescale,mustart,etastart,offset,family,
-     +            standardize,nulldev,thresh,maxit,innermaxit,eps,trace,
-     +            start,startv,beta,b0,resdev,yhat,
-     +              convout, satu, good, epsbino,outpll)
-
+     +            standardize,intercept, nulldev,thresh,maxit,
+     +            innermaxit,eps,trace,start,startv,beta,b0,resdev,yhat,
+     +            convout, satu, good, epsbino,outpll)
       if (standardize .EQ. 1)then
          do 200 j=1, nlambda
          do 250 i=1, m
@@ -79,6 +78,7 @@ C     compute crossproduct, like crossprod(meanx, beta) in R
 C http://www.tat.physik.uni-tuebingen.de/~kley/lehre/ftn77/tutorial/blas.html
          call DGEMV('T',m, nlambda, 1.0D0, beta, m, meanx, 1, 0.0D0, 
      +             crossprod_beta, 1)
+        if(intercept .EQ. 1)then
          do 300 j=1, nlambda
                 b0(j)=b0(j) - crossprod_beta(j)
  300      continue
@@ -89,6 +89,7 @@ C http://www.tat.physik.uni-tuebingen.de/~kley/lehre/ftn77/tutorial/blas.html
                 b0(j)=b0(j) + meany - meanoffset
  400        continue
          endif
+        endif
       endif
       return
       end

@@ -147,6 +147,7 @@ ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "cl
     RET$h <- h
     RET$x <- x
     RET$y <- y
+    RET$s <- s
     RET$call <- call
     RET$cost <- cost
     RET$rfamily <- RET$family <- rfamily

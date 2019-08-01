@@ -168,4 +168,8 @@
                CHANGES in `mpath' VERSION 0.3-16 (07-09-2019)
   o to avoid mismatch between predictor variables and the estimated coefficients - this can happen if the input data contains response variable but not appropriately handled, add the following line in R/predict.glmreg.R
     if(dim(object$beta)[1] != m) stop("number of columns in newx should be the same as number of rows  in beta\n")
+  
+               CHANGES in `mpath' VERSION 0.3-17 (07-11-2019)
+  o add intercept option in penalized regression
+  o make clarity in vignettes/kkt.Rnw  
 

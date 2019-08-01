@@ -10,8 +10,8 @@
 \usage{
 glmreg_fit(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, offset = rep(0, nobs), 
 nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, 
-gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars),thresh=1e-6, 
-eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, 
+gamma=3, rescale=TRUE, standardize=TRUE, intercept=TRUE, penalty.factor = rep(1, nvars),
+thresh=1e-6, eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, 
 family=c("gaussian", "binomial", "poisson", "negbin"), penalty=c("enet","mnet","snet"), 
 convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
 }
@@ -43,6 +43,7 @@ convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
  \item{standardize}{logical value for x variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
     the original scale. Default is \code{standardize=TRUE}.}
+ \item{intercept}{logical value: if TRUE (default), intercept(s) are fitted; otherwise, intercept(s) are set to zero}
  \item{penalty.factor}{This is a number that multiplies \code{lambda} to allow
     differential shrinkage of coefficients. Can be 0 for some variables, which implies
     no shrinkage, and that variable is always included in the

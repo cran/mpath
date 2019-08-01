@@ -27,13 +27,13 @@ C     dev
 
       subroutine midloopGLM(n,m,x,y,yold,weights, mu, eta, offset,
      +     family, penalty,lamk, 
-     +     alpha, gam, theta, rescale, standardize,eps,
+     +     alpha, gam, theta, rescale, standardize, intercept, eps,
      +     maxit, thresh, nulldev, wt, beta, b0,yhat,dev,trace,convmid, 
      +     satu, ep, pll, activeset, jk)
       
       implicit none
       integer standardize, trace, penalty, maxit, i, j, jj, nmid, n, 
-     +     family, m,converged,convmid, satu,
+     +     family, m,converged,convmid, satu, intercept,
      +     rescale,activeset(m), jk, ii
       double precision x(n,m),y(n), mu(n), z(n), eta(n), wt(n), w(n), 
      +     del,olddev,weights(n),yold(n), 
@@ -70,7 +70,7 @@ C     dev
             z(i)=z(i) - offset(i)
  10      continue
          call loop_glm(x, y, z, n, m, w, mu, penalty, thresh, eps, 
-     +        standardize, family, beta, b0, lamk, alpha, gam, 
+     +        standardize, intercept,family,beta, b0, lamk, alpha, gam, 
      +        weights,trace,nmid, rescale, converged, theta,
      +        pll(jj),activeset, jk)
          do 220 i = 1, n

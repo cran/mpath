@@ -7,8 +7,8 @@ C     m_zero_act: number of zero model variables of z having no intercept column
 C     outputs: betax, b0_x, betaz, b0z, theta, start_count_act, start_zero_act
       subroutine zi_onelambda(x_act, z_act, y, y1, probi, weights, n, 
      +     m_count_act, m_zero_act, start_count_act, start_zero_act,
-     +     mustart_count, mustart_zero, offsetx, offsetz, lambda_count,
-     +     lambda_zero, alpha_count, alpha_zero,  
+     +     mustart_count, mustart_zero, offsetx, offsetz,
+     +     intercept,lambda_count,lambda_zero, alpha_count,alpha_zero,  
      +     gam_count, gam_zero, penaltyfactor_count_act, 
      +     penaltyfactor_zero_act, maxit, eps, family,
      +     penalty, trace, yhat, iter, del, rescale, thresh, 
@@ -16,7 +16,7 @@ C     outputs: betax, b0_x, betaz, b0z, theta, start_count_act, start_zero_act
      +     betax, b0_x, betaz, b0z, satu)
       implicit none
       integer n,ii,k,j,penalty, family, maxit, y1(n), trace, iter, 
-     +     rescale, stopit,m_count_act, maxit_theta,
+     +     rescale, stopit,m_count_act, maxit_theta, intercept,
      +     m_zero_act, theta_fixed, satu
       double precision weights(n), dpois, dnbinom, 
      +     etastart_count(n), etastart_zero(n),
@@ -58,14 +58,14 @@ C     outputs: betax, b0_x, betaz, b0z, theta, start_count_act, start_zero_act
             call glmreg_fit_fortran(x_act,y,wt,n,m_count_act,
      +           start_count_act,etastart_count,mustart_count,
      +           offsetx,1, lambda_count, alpha_count, gam_count,
-     +           rescale,0, penaltyfactor_count_act, thresh,
+     +           rescale,0, intercept, penaltyfactor_count_act, thresh,
      +           epsbino, maxit, eps, theta, family,  
      +           penalty, 0, betax, b0_x, yhat, satu)
          else
             thetastart = theta 
             call glmregnb_fortran(x_act,y,wt,n,m_count_act,offsetx,
      +           1, lambda_count, penalty,alpha_count, gam_count, 
-     +           rescale, 0, penaltyfactor_count_act, thresh,
+     +           rescale, 0, intercept, penaltyfactor_count_act, thresh,
      +           maxit_theta, maxit, eps, epsbino, start_count_act, 
      +           etastart_count, mustart_count, thetastart, 0, 
      +           theta0, trace, betax, b0_x, theta, yhat)
@@ -88,7 +88,7 @@ C     mean values by the link function.
          call glmreg_fit_fortran(z_act,probi,weights,n,m_zero_act,
      +        start_zero_act, etastart_zero, mustart_zero,offsetz,
      +        1, lambda_zero, alpha_zero, gam_zero, rescale,
-     +        0, penaltyfactor_zero_act, thresh,
+     +        0, intercept, penaltyfactor_zero_act, thresh,
      +        epsbino, maxit, eps, theta, 2,  
      +        penalty, 0, betaz, b0z, yhat, satu)
          call dcopy(n, yhat, 1, mustart_zero, 1)

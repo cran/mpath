@@ -17,8 +17,8 @@ glmreg.default <- function(x, ...) {
 glmreg.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL, 
                            x.keep=FALSE, y.keep=TRUE, ...){
     ## extract x, y, etc from the model formula and frame
-    if(!attr(terms(formula, data=data), "intercept"))
-        stop("non-intercept model is not implemented")
+    #if(!attr(terms(formula, data=data), "intercept"))
+    #    stop("non-intercept model is not implemented")
     if(missing(data)) data <- environment(formula)
     mf <- match.call(expand.dots = FALSE)
     m <- match(c("formula", "data", "weights",
@@ -71,7 +71,7 @@ glmreg.matrix <- function(x, y, weights, offset=NULL, ...){
     return(RET)
 }
 
-glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, offset=rep(0, nobs), nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars),thresh=1e-6, eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, family=c("gaussian", "binomial", "poisson", "negbin"), penalty=c("enet","mnet","snet"), convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE){
+glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, offset=rep(0, nobs), nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, intercept=TRUE, penalty.factor = rep(1, nvars),thresh=1e-6, eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, family=c("gaussian", "binomial", "poisson", "negbin"), penalty=c("enet","mnet","snet"), convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE){
 	#if(!is.null(start) && !is.null(etastart) && !is.null(mustart))
 	#stop("start, etastart and mustart is for testing only\n")
     family <- match.arg(family)
@@ -262,6 +262,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
 	          	    offset=as.double(offset),
                     family=as.integer(famtype),
                     standardize=as.integer(stantype),
+                    intercept=as.integer(intercept),
                     nulldev=as.double(nulldev),
                     thresh=as.double(thresh),
                     maxit=as.integer(maxit),
@@ -299,10 +300,12 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     if (standardize){ 
                                         #if (family != "gaussian" && standardize){ 
         beta <- as.matrix(beta/as.vector(normx))
+        if(intercept){
         b0 <- b0 - crossprod(meanx,beta)
         if (family == "gaussian"){
             b0 <- mean(y) + b0    ### changed 4/22/2015
             b0 <- b0 - mean(offset)
+        }
 	}
     }
     else normx <- NULL
@@ -340,15 +343,16 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     if(standardize)
         RET$pllres <- RET$twologlik/2 - n*penval
     else RET$pllres <- RET$twologlik/2 - penval
+    if(intercept) npar <- 1+RET$df else npar <- RET$df
     if(nlambda == 1){
         RET$df <- sum(abs(beta) > 0) ### df= number of nonzero coefficients (intercept excluded)
-        RET$aic <- -RET$twologlik + 2*(1+RET$df)
-        RET$bic <- -RET$twologlik + log(n)*(1+RET$df)
+        RET$aic <- -RET$twologlik + 2*npar
+        RET$bic <- -RET$twologlik + log(n)*npar
     }
     else{
         RET$df <- apply(abs(beta) > 0, 2, sum) ##number of nonzero coefficients for each lambda
-        RET$aic <- -RET$twologlik + 2*(1+RET$df) #intercept included
-        RET$bic <- -RET$twologlik + log(n)*(1+RET$df) #intercept included
+        RET$aic <- -RET$twologlik + 2*npar
+        RET$bic <- -RET$twologlik + log(n)*npar
     }
     RET  
 }

@@ -2,13 +2,13 @@ C###Adapted from file MASS/R/glmregNB.R
 C input: theta0 is useful if theta_fixed=1, in which case theta0 is a 
 C  vector of length nlambda
       subroutine glmregnb_fortran(x, y, weights, n, m, offset, nlambda,
-     +    lambda, penalty, alpha, gam, rescale, standardize, 
+     +    lambda, penalty, alpha, gam, rescale, standardize, intercept, 
      +    penaltyfactor, thresh, maxit_theta, maxit, eps,epsbino,start, 
      +    etastart, mustart, thetastart, theta_fixed, theta0, trace,
      +    beta, b0, tht, yhat)
       implicit none
       integer k, i, j, n, m, trace, nlambda, penalty, maxit_theta, 
-     +  maxit, rescale, standardize, iter, theta_fixed, satu
+     +  maxit, rescale, standardize, iter, theta_fixed, satu, intercept
       double precision x(n, m), y(n), lambda(nlambda), weights(n),
      +  offset(n), start(m+1), etastart(n), mustart(n), thetastart, 
      +  del, epsbino, theta0(nlambda), d, tht(nlambda), eps, thresh, 
@@ -30,8 +30,8 @@ C      convout <- twologlik <- rep(NA, nlambda)
 30        if(d .GT. del .AND. iter <= maxit_theta)then
             call glmreg_fit_fortran(x, y, weights, n, m,start,
      +       etastart, mustart, offset, 1, lambda(k), alpha, gam, 
-     +       rescale, standardize, penaltyfactor, thresh, epsbino,
-     +       maxit,eps, thetastart, 4, penalty, trace, beta_1, 
+     +       rescale, standardize, intercept, penaltyfactor, thresh, 
+     +       epsbino, maxit,eps, thetastart, 4, penalty, trace, beta_1, 
      +       b0_1, yhat, satu)
             call dcopy(n, yhat, 1, mustart, 1)
             do i=1, n
