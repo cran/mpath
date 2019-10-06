@@ -85,6 +85,7 @@ C     dev
             eta(i) = eta(i) + offset(i)
  350     continue
          call linkinv(n, eta, family, mu)
+         olddev = dev
 C     compute deviance dev
          call deveval(n, yold, mu, theta, weights, family, dev)
          if(family .EQ. 2)then

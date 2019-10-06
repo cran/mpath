@@ -69,10 +69,11 @@ C            do 120 ii=1, n
 C               d=d+(fk_old(ii) - fk(ii))**2
 C  120       continue
             if(trace .EQ. 1)then
-               call dblepr("b0_1", -1, b0_1, 1)
+C               call dblepr("b0_1", -1, b0_1, 1)
                call dblepr("beta_1", -1, beta_1, m_act)
                call dblepr("updated start_act", -1, start_act, m_act+1)
-               call dblepr("     d=", -1, d, 1)
+C              d is not an array
+C              call dblepr("     d=", -1, d, 1) 
             endif
             k = k + 1
             goto 500

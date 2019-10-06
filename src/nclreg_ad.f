@@ -90,7 +90,7 @@ C
             enddo
             if(j .NE. nact)then
                if(trace .EQ. 1)then
-                  call dblepr("b0_1=", -1, b0_1, 1)
+C                  call dblepr("b0_1=", -1, b0_1, 1)
                   call dblepr("beta_1=", -1, beta_1, m_act)
                   call intpr("begin fullset nclreg_onelambda", -1, 1, 1)
                   call dblepr("start=", -1, start, m+1)

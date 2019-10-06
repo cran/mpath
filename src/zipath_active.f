@@ -58,6 +58,8 @@ C     find current active set
 C     When all coef are zero except intercept, choose a predictor
       fakec=0
       fakez=0
+      jz=0
+      jc=0
       if(jk_count==0)then
          jk_count = 1
          activeset_count(1)=kx
@@ -129,7 +131,8 @@ C     When all coef are zero except intercept, choose a predictor
       i=1
  10   if(i .LE. nlambda)then
          if(trace .EQ. 1)then
-            call intpr("Fortran lambda iteration i=", -1, i, 1)
+C            i is not array
+C            call intpr("Fortran lambda iteration i=", -1, i, 1), 
             call intpr("kx=", -1, kx, 1)
             call intpr("kz=", -1, kz, 1)
             call intpr("m_count_act", -1, m_count_act, 1)

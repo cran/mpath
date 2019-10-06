@@ -55,8 +55,11 @@ In the \textbf{\textsf{R}} package \textbf{mpath}, $\alpha_1, \alpha_2$ are labe
   \end{aligned}
 \end{equation}
 In this document, we take $j=1, ..., d_1, k=1, ..., d_2$ unless otherwise specified.
-The subdifferential of $p(\zeta, \beta)$ at $\hat\zeta_j\neq0$ is $n\alpha_1\lambda_1\text{sign}(\zeta_j)+\lambda_1(1-\alpha_1)\zeta_j$, and the subdifferential of $p(\zeta, \beta)$ at $\hat\beta_k\neq0$ is  $n\alpha_2\lambda_2\text{sign}(\beta_k)+\lambda_2(1-\alpha_2)\beta_k$.
-The subdifferential of $p(\zeta, \beta)$ at $\hat\zeta_j=0$ is $n\alpha_1\lambda_1e_1$ for $e_1\in [-1,1]$, and the subdifferential of $p(\zeta, \beta)$ at $\hat\beta_k=0$ is $n\alpha_2\lambda_2e_2$ for $e_2\in [-1,1]$. Together, we have the KKT conditions for a minimizer $\hat\Phi$ of $p\ell_{ZIP}(\Phi; y)$:
+It is clear that $n\alpha_1\lambda_1\text{sign}(\zeta_j)+\lambda_1(1-\alpha_1)\zeta_j$ is a subgradient of $p(\zeta, \beta)$ at $\hat\zeta_j\neq0$, 
+$n\alpha_2\lambda_2\text{sign}(\beta_k)+\lambda_2(1-\alpha_2)\beta_k$ is a subgradient of 
+$p(\zeta, \beta)$ at $\hat\beta_k\neq0$,  
+$n\alpha_1\lambda_1e_1$ for $e_1\in [-1,1]$ is a subgradient of $p(\zeta, \beta)$ at $\hat\zeta_j=0$, and 
+$n\alpha_2\lambda_2e_2$ for $e_2\in [-1,1]$ is a subgradient of $p(\zeta, \beta)$ at $\hat\beta_k=0$. If $\hat\Phi$ is a minimizer of $p\ell_{ZIP}(\Phi; y)$, then $0 \in \partial p\ell_{ZIP}(\hat\Phi; y)$, the subdifferential of $p\ell_{ZIP}(\Phi; y)$ at $\hat\Phi$, which leads to the KKT conditions:
 \begin{equation}\label{eqn:kktp}
   \begin{aligned}
     \text{if } \hat\zeta_j&\neq0: -\frac{\partial\ell_{ZIP}(\Phi; y)}{\partial\zeta_j}+n\alpha_1\lambda_1\text{sign}(\zeta_j)+\lambda_1(1-\alpha_1)\zeta_j=0,\\

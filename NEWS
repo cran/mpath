@@ -172,4 +172,7 @@
                CHANGES in `mpath' VERSION 0.3-17 (07-11-2019)
   o add intercept option in penalized regression
   o make clarity in vignettes/kkt.Rnw  
+  
+               CHANGES in `mpath' VERSION 0.3-18 (10-03-2019)
+  o gfortran in GCC trunk aka 10.0.0 is reporting new warnings
 

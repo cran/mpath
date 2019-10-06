@@ -35,7 +35,7 @@ C     outputs: betax, b0_x, betaz, b0z, theta, start_count_act, start_zero_act
       k = 1
       d = 10
       call gfunc(mustart_count, n, family,epsbino,etastart_count)
-      call gfunc(mustart_zero, n, 2, 0, etastart_zero)
+      call gfunc(mustart_zero, n, 2, 0.0D0, etastart_zero)
       call ziloss(n, y, offsetx, offsetz, weights, etastart_count,
      +     etastart_zero, family, theta, los_old)
       call penGLM(betax, m_count_act, 
