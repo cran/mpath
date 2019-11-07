@@ -1,4 +1,4 @@
-832429b42e822bb2731364185036bbe1 *DESCRIPTION
+87bf42b5dbcda87ce131fb66ae40c00d *DESCRIPTION
 d12368df6db4fb8e1b8e181071f2af11 *NAMESPACE
 294b0c960e759925a47349528cd2df24 *NEWS
 91b4d5848989a31cd0518229f6dccd34 *R/balanced.folds.R
@@ -29,12 +29,12 @@ be6e34ea5d9b33135588eb0f14c93aef *build/vignette.rds
 a6ed7eeca70bd726d3c35572af2dd466 *inst/COPYRIGHTS
 7f9ec186aad6d4bc319fb52b947a513f *inst/doc/brcancer.R
 c3b8da2f69a8d21e1c333d07dea760ec *inst/doc/brcancer.Rnw
-982e68d41520f23a661c4be85677fbbf *inst/doc/brcancer.pdf
+a28b7cf85773e4efcb1a183948e9a57f *inst/doc/brcancer.pdf
 15220a6162acb36960decd1a9aa49239 *inst/doc/german.R
 e3749864047269fcac3dda423038dcb4 *inst/doc/german.Rnw
-1bf0ab1885d9649180f844f5763d8607 *inst/doc/german.pdf
+521d4838c4215bb46060cbeab8574d18 *inst/doc/german.pdf
 4b7e82f96678a7e3925efefdc722c105 *inst/doc/kkt.Rnw
-65901a5f3e43af3bbaec53e4ccf00394 *inst/doc/kkt.pdf
+dc19555ae3202a3dc96dad33cd1449b0 *inst/doc/kkt.pdf
 357f41f5fdcf8fcb8d260373402d4791 *inst/doc/static_brcancer.pdf
 416058daf27d987a29f421b47624f0f6 *inst/doc/static_brcancer.pdf.asis
 467936ef796e208cf43b124c8687a03b *inst/doc/static_german.pdf
