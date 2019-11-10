@@ -175,4 +175,12 @@
   
                CHANGES in `mpath' VERSION 0.3-18 (10-03-2019)
   o gfortran in GCC trunk aka 10.0.0 is reporting new warnings
+  
+               CHANGES in `mpath' VERSION 0.3-19 (11-07-2019)
+
+  o no change
+  
+               CHANGES in `mpath' VERSION 0.3-20 (11-10-2019)
+
+  o glmnet 3.0_0 doesn't export nonzeronCoef and plotCoef function, therefore copy the relevant R files in glmnet
 
