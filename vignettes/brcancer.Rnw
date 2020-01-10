@@ -28,7 +28,7 @@
 \setkeys{Gin}{width=0.6\textwidth, keepaspectratio}
 \maketitle
 
-This document presents analysis for the MAQC-II project, human breast cancer data set with penalized classification algorithms developed in \cite{wang2016robust3} and implemented in R package \R{mpath}. 
+This document presents analysis for the MAQC-II project, human breast cancer data set with penalized classification algorithms developed in \cite{wang2019mm} and implemented in R package \R{mpath}. 
 
 Dataset comes from the MicroArray Quality Control (MAQC) II project and includes 278 breast cancer samples with 164 estrogen receptor (ER) positive cases. The data files \verb|GSE20194_series_matrix.txt.gz| and \verb|GSE20194_MDACC_Sample_Info.xls| can be downloaded from \url{http://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?token=rhojvaiwkcsaihq&acc=GSE20194}. After reading the data, some unused variables are removed. From 22283 genes, the dataset is pre-screened to obtain 3000 genes with the largest absolute values of the two-sample t-statistics. The 3000 genes are standardized. 
 <<echo=FALSE,results='hide'>>=

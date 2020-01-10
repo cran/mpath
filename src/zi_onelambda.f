@@ -92,7 +92,7 @@ C     mean values by the link function.
      +        epsbino, maxit, eps, theta, 2,  
      +        penalty, 0, betaz, b0z, yhat, satu)
          call dcopy(n, yhat, 1, mustart_zero, 1)
-         call gfunc(mustart_zero, n, 2, 0, etastart_zero)
+         call gfunc(mustart_zero, n, 2, 0.0D0, etastart_zero)
          do ii=1, n
             if(y1(ii) .EQ. 0)then
                probi(ii)=mustart_zero(ii) 

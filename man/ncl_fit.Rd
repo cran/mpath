@@ -35,6 +35,12 @@ An object with S3 class \code{"ncl"} for the various types of models.
 \item{h}{ pseudo response values in the MM algorithm }
 }
 
+\references{
+  Zhu Wang (2019)
+  \emph{MM for Penalized Estimation},
+ https://arxiv.org/abs/1912.11119
+ }
+
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link{ncl}}}

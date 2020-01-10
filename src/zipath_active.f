@@ -209,18 +209,18 @@ C     start_zero_act
                endif
             endif
 C     check if converged here!
-            if(trace==1)then
-               call intpr("activeset_count",-1,activeset_count,jk_count)
-               call intpr("activeset_count_old",
-     +              -1,activeset_count_old,m_count_act)
-               call intpr("activeset_zero", -1, activeset_zero, jk_zero)
-               call intpr("activeset_zero_old", -1,activeset_zero_old,
-     +              m_zero_act)
-               call intpr("jk_count=", -1, jk_count, 1)
-               call intpr("m_count_act=", -1, m_count_act, 1)
-               call intpr("jk_zero=", -1, jk_zero, 1)
-               call intpr("m_zero_act=", -1, m_zero_act, 1)
-            endif
+C            if(trace==1)then
+C               call intpr("activeset_count",-1,activeset_count,jk_count)
+C               call intpr("activeset_count_old",
+C     +              -1,activeset_count_old,m_count_act)
+C               call intpr("activeset_zero", -1, activeset_zero, jk_zero)
+C               call intpr("activeset_zero_old", -1,activeset_zero_old,
+C     +              m_zero_act)
+C               call intpr("jk_count=", -1, jk_count, 1)
+C               call intpr("m_count_act=", -1, m_count_act, 1)
+C               call intpr("jk_zero=", -1, jk_zero, 1)
+C               call intpr("m_zero_act=", -1, m_zero_act, 1)
+C            endif
             if(jk_count .NE. m_count_act)then
                conv=0
             else if(jk_zero .NE. m_zero_act)then

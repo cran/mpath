@@ -182,5 +182,9 @@
   
                CHANGES in `mpath' VERSION 0.3-20 (11-10-2019)
 
-  o glmnet 3.0_0 doesn't export nonzeronCoef and plotCoef function, therefore copy the relevant R files in glmnet
+  o glmnet 3.0_0 doesn't export nonzeroCoef and plotCoef function, therefore copy the relevant R files in glmnet
+  
+               CHANGES in `mpath' VERSION 0.3-21 (11-20-2019)
+
+  o subroutine linkinv in midloopGLM.f needs safeguard with too small mu for poission, just like negbin
 

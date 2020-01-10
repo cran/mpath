@@ -20,12 +20,13 @@ C     y
      +     wtold,trace,jj,rescale,converged,theta,pll,activeset, jk)
       implicit none
       integer trace, n, m, standardize, intercept, family, jj, i,j,
-     +     penalty, converged, rescale, activeset(m), jk, ii
+     +     penalty, converged, rescale, interset(1),activeset(m), jk, ii
       double precision x(n, m), y(n), thresh, eps,beta(m),beta_old(m) 
       double precision lambda(m), alpha, gam, wtold(n)
       double precision z(n), b0, b0_old, xd(m), yhat(n), w(n),
      +     r(n),xwx,xwr, wtnew(n), wsum,mu(n), theta, pll_old, pll,
      +     b0_ch(1), b0_old_ch(1)
+         
       wsum = 0
       do i=1, n
          wsum = wsum + wtold(i)
@@ -128,13 +129,12 @@ C     check if beta(j) strictly increases penalized loglikehood function
          endif
 C     70: cycle through in the active set (end with endif statement) 
  40   continue
+         interset(1)=1
       if(intercept .EQ. 1)then
          b0_ch(1) = b0
          b0_old_ch(1) = b0_old
-C     call checkConvergence(1, b0, b0_old, eps, thresh, converged,
-C     +     1, 1)      
          call checkConvergence(1, b0_ch, b0_old_ch, eps, thresh, 
-     +        converged, 1, 1)      
+     +        converged, interset, 1)      
       endif
       if(converged.EQ.1) then
          call checkConvergence(m, beta, beta_old, eps, thresh, 

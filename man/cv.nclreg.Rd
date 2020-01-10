@@ -54,6 +54,13 @@
   \item{lambda.which}{index of \code{lambda} that gives minimum \code{cv} value.}
   \item{lambda.optim}{value of \code{lambda} that gives minimum \code{cv} value.}
 }
+
+\references{
+  Zhu Wang (2019)
+  \emph{MM for Penalized Estimation},
+ https://arxiv.org/abs/1912.11119
+ }
+
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link{nclreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.nclreg"} object.}
