@@ -187,4 +187,7 @@
                CHANGES in `mpath' VERSION 0.3-21 (11-20-2019)
 
   o subroutine linkinv in midloopGLM.f needs safeguard with too small mu for poission, just like negbin
+  
+               CHANGES in `mpath' VERSION 0.3-22 (02-19-2019)
 
+  o copy R function zeroinfl from package pscl, which is scheduled to be archival on 2020-03-04, and archiving this will necessitate also archiving its strong reverse dependencies. Consequently, changes were made on NAMESPACE file. 

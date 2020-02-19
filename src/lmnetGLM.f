@@ -129,8 +129,8 @@ C     check if beta(j) strictly increases penalized loglikehood function
          endif
 C     70: cycle through in the active set (end with endif statement) 
  40   continue
-         interset(1)=1
       if(intercept .EQ. 1)then
+         interset(1)=1
          b0_ch(1) = b0
          b0_old_ch(1) = b0_old
          call checkConvergence(1, b0_ch, b0_old_ch, eps, thresh, 
