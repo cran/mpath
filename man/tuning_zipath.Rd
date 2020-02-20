@@ -55,7 +55,7 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 \examples{
 \dontrun{
 ## data
-data("bioChemists", package = "pscl")
+data("bioChemists")
 
 ## inflation with regressors
 ## ("art ~ . | ." is "art ~ fem + mar + kid5 + phd + ment | fem + mar + kid5 + phd + ment")

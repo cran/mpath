@@ -66,7 +66,7 @@
 
 \seealso{\code{\link{glmreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.glmreg"} object.}
 \examples{
-data("bioChemists", package = "pscl")
+data("bioChemists")
 fm_pois <- cv.glmreg(art ~ ., data = bioChemists, family = "poisson")
 title("Poisson Family",line=2.5)
 predict(fm_pois, newx=bioChemists[,-1])[1:4]

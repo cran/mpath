@@ -78,7 +78,7 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 
 \examples{
 ## data
-data("bioChemists", package = "pscl")
+data("bioChemists")
 ## with simple inflation (no regressors for zero component)
 fm_zip <- zipath(art ~ 1 | ., data = bioChemists, nlambda=10)
 summary(fm_zip)

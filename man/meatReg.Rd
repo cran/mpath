@@ -27,7 +27,7 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \examples{
-data("bioChemists", package = "pscl")
+data("bioChemists")
 fm_zinb <- zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10, maxit.em=1)
 meatReg(fm_zinb, which=which.min(fm_zinb$bic))
 }

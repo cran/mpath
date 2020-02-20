@@ -63,7 +63,7 @@ Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Pra
 \seealso{\code{\link{glmregNB}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.glmregNB"} object.}
 \examples{
 \dontrun{
-data("bioChemists", package = "pscl")
+data("bioChemists")
 fm_nb <- cv.glmregNB(art ~ ., data = bioChemists)
 plot(fm_nb)
 }

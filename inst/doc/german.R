@@ -12,7 +12,7 @@ ptm <- proc.time()
 ###################################################
 library("mpath")
 library("zic")
-library("pscl")
+#library("pscl")
 data(docvisits)
 
 

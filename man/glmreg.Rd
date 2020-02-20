@@ -88,7 +88,7 @@ x=matrix(rnorm(100*20),100,20)
 g2=sample(0:1,100,replace=TRUE)
 fit2=glmreg(x,g2,family="binomial")
 #poisson and negative binomial
-data("bioChemists", package = "pscl")
+data("bioChemists")
 fm_pois <- glmreg(art ~ ., data = bioChemists, family = "poisson")
 coef(fm_pois)
 fm_nb1 <- glmreg(art ~ ., data = bioChemists, family = "negbin", theta=1)

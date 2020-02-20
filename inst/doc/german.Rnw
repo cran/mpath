@@ -39,7 +39,7 @@ As shown in the figure, many doctor office visits are zeros, which can be diffic
 <<echo=TRUE, results=hide>>=
 library("mpath")
 library("zic")
-library("pscl")
+#library("pscl")
 data(docvisits)
 @
 <<fig=TRUE, echo=TRUE, results=hide>>=
