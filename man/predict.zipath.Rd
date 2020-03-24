@@ -84,7 +84,7 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 
 \examples{
 \dontrun{
-data("bioChemists")
+data("bioChemists", package = "pscl")
 fm_zip <- zipath(art ~ . | ., data = bioChemists, nlambda=10)
 plot(residuals(fm_zip) ~ fitted(fm_zip))
 coef(fm_zip, model = "count")

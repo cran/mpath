@@ -95,7 +95,7 @@ An object with S3 class \code{"glmreg", "glmregNB"} for the various types of mod
 \seealso{\code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and \code{\link{plot}} methods, and the \code{\link{cv.glmregNB}} function.}
 \examples{
 \dontrun{
-data("bioChemists")
+data("bioChemists", package = "pscl")
 fm_nb <- glmregNB(art ~ ., data = bioChemists)
 coef(fm_nb)
 ### ridge regression

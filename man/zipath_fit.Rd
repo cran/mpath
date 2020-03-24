@@ -15,7 +15,7 @@ zipath_fit(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE,
            type.path=c("active", "nonactive"), penalty.factor.count=NULL, 
            penalty.factor.zero=NULL, lambda.count.min.ratio=.0001, 
            lambda.zero.min.ratio=.1, alpha.count=1, alpha.zero=alpha.count, gamma.count=3,
-           gamma.zero=gamma.count, rescale=FALSE, init.theta=1, theta.fixed=FALSE, 
+           gamma.zero=gamma.count, rescale=FALSE, init.theta=NULL, theta.fixed=FALSE, 
            EM=TRUE, maxit.em=200, convtype=c("count", "both"), maxit= 1000, 
            maxit.theta =10, reltol = 1e-5, thresh=1e-6, eps.bino=1e-5, shortlist=FALSE, 
            trace=FALSE, ...)
@@ -45,7 +45,7 @@ zipath_fit(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE,
   \item{lambda.count}{A user supplied \code{lambda.count} sequence. Typical usage is to have the program compute its own \code{lambda.count} and \code{lambda.zero} sequence based on
     \code{nlambda} and \code{lambda.min.ratio}.} 
   \item{lambda.zero}{A user supplied \code{lambda.zero} sequence.}
-\item{type.path}{solution path. If \code{type.path="nonactive"}, no active set for each element of the lambda sequence and cycle through all the predictor variables. If \code{type.path="active"}, then cycle through only the active set, then cycle through all the variables for the same penalty parameter. See details below.} 
+\item{type.path}{solution path with default value \code{"active"}, which is less time computing than \code{"nonactive"}. If \code{type.path="nonactive"}, no active set for each element of the lambda sequence and cycle through all the predictor variables. If \code{type.path="active"}, then cycle through only the active set, then cycle through all the variables for the same penalty parameter. See details below.} 
   \item{penalty.factor.count, penalty.factor.zero}{These are numeric vectors with the same length as predictor variables. that multiply \code{lambda.count, lambda.zero}, respectively, to allow differential shrinkage of coefficients. Can be 0 for some variables, which implies
     no shrinkage, and that variable is always included in the
     model. Default is same shrinkage for all variables.}
@@ -60,8 +60,8 @@ Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}.
   \item{gamma.count}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the count part of model.}
   \item{gamma.zero}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the zero part of model.}
   \item{rescale}{logical value, if TRUE, adaptive rescaling}
-  \item{init.theta}{The initial value of \code{theta} for \code{family="negbin"}.} 
-  \item{theta.fixed}{Logical value only used for \code{family="negbin"}. If \code{TRUE}, \code{theta} is not updated.}
+  \item{init.theta}{The initial value of \code{theta} for \code{family="negbin"}. This is set to \code{NULL} since version 0.3-24.} 
+  \item{theta.fixed}{Logical value only used for \code{family="negbin"}. If \code{TRUE} and \code{init.theta} is provided with a numeric value > 0, then \code{init.theta} is not updated. If \code{theta.fixed=FALSE}, then \code{init.theta} will be updated. In this case, if \code{init.theta=NULL}, its initial value is computed with intercept-only zero-inflated negbin model. }
 \item{EM}{Using \code{EM} algorithm. Not implemented otherwise}
 \item{convtype}{convergency type, default is for count component only for speedy computation} 
 \item{maxit.em}{Maximum number of EM algorithm}

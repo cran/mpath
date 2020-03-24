@@ -143,6 +143,7 @@
   o  changes were made on how active set works in src/outloop.f file. Now, we cycle through the active set until convergence, then cycle through all the variables ONCE, this is an reverse to the previous procedure. This includes changes in outloop.f, midloop.f, midloopGLM.f, lmnetGLM, add src/find_activeset.f to simplify the codes.
   o  R/nclreg seems to be incorrect when update beta[activeset, i], since activeset is relative to the current x.act, not x. The new Fortran subroutine using dynamic allocation to deal with this. The Fortran subroutine nclreg_fortran.f conducts the three layers of iteration loops, lambda, MM and internal penalty estimation loop.
   o  Not a good idea to convert theta.ml R function to Fortran subroutine since the speed actually is slower in Fortran. This is probably because digamma and trigamma functions in a Fortran subroutine used C functions. In contrast, the R function theta.ml directly used these C functions. Maybe there are other reasons. But we leave a glmregNB.R with the Fortran subroutine glmregnb_fortran.
+  o To do: coefficients of zipath are on the rescaled predictors when standardize=TRUE; needs to be converted to the original scale (somehow the related codes at the end of zipath_fit are commented) 
 
                CHANGES in `mpath' VERSION 0.3-9 (04-06-2019)
   o  Major improvement on zipath.R. Replace the R codes with Fortran codes to compute lmax. Compute the solution path with zipath_fortran subroutine to replace the R codes.
@@ -159,6 +160,7 @@
   o  in man/nclreg.Rd, provide examples of different solution paths
  
                CHANGES in `mpath' VERSION 0.3-14 (05-24-2019)
+  o  changes related to zipath: src/zi_onelambda to replace src/zi.f, and convergency criteria is changed 
   o  zipath can be slow for some data, and change outloop subroutine from active set to nonactive set can help substantially. The reason is that the active set approach can repeat the cycle without convergence. Will be addressed in version 0.3-15.
   
                CHANGES in `mpath' VERSION 0.3-15 (06-03-2019)
@@ -188,6 +190,12 @@
 
   o subroutine linkinv in midloopGLM.f needs safeguard with too small mu for poission, just like negbin
   
-               CHANGES in `mpath' VERSION 0.3-22 (02-19-2019)
+               CHANGES in `mpath' VERSION 0.3-22 (02-19-2020)
 
-  o copy R function zeroinfl from package pscl, which is scheduled to be archival on 2020-03-04, and archiving this will necessitate also archiving its strong reverse dependencies. Consequently, changes were made on NAMESPACE file. 
+  o copy R function zeroinfl from package pscl, which is scheduled to be archival on 2020-03-04, and archiving this will necessitate also archiving its strong reverse dependencies. Consequently, changes were made on NAMESPACE file.
+  
+               CHANGES in `mpath' VERSION 0.3-24 (02-29-2020)
+
+  o remove zeroinfl function and data from pscl
+  o offset related updates: R functions init, logLik.glm, cv.glmreg.R, cv.glmregNegbin.R, zipath (fit0); Fortran subroutine zi_onelambda remove 4 lines and simply use the updated mu and eta, and compute yhat=yhat+offset in midloop and midloopGLM
+  o change the default value of init.theta from 1 to NULL in R/zipath.R. This allows user specified initial value of theta regardless whether theta.fixed is TRUE/FALSE  

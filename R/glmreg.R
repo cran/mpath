@@ -156,19 +156,26 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
 ### compute the pathwise coordinate descent, cf: section 2.5 in Friedman et al., JSS 2010, 33(1)
     if(is.null(weights)) weights <- rep(1, n)
     wt <- weights/sum(weights)
-    if(is.null(mustart) || is.null(etastart)){
-        tmp <- init(wt, y, offset, family=family)
-        mu <- tmp$mu
-        eta <- tmp$eta
+    if(is.null(mustart) || is.null(etastart) || is.null(lambda)){
+        #tmp <- init(wt, y, offset, family=family)
+        #mu <- tmp$mu
+        #eta <- tmp$eta
+    if(family!="negbin") tmpres <- glm(y~rep(1, nobs)-1, weights=wt, offset=offset, family=family)
+    else tmpres <- glm(y~rep(1, nobs)-1, weights=wt, offset=offset, family=negative.binomial(theta))
+    eta <- predict(tmpres, type="link")
+    mu <- predict(tmpres, type="response")
     }
     else{
         mu <- mustart
         eta <- etastart
     }
     if(is.null(lambda)){
-        tmp <- init(wt, y, offset, family=family)
-        mu <- tmp$mu
-        eta <- tmp$eta
+        #tmp <- init(wt, y, offset, family=family)
+        #mu <- tmp$mu
+        #eta <- tmp$eta
+        #tmpres <- glm(y~rep(1, nobs)-1, weights=wt, offset=offset, family=family)
+        #eta <- predict(tmpres, type="link")
+        #mu <- predict(tmpres, type="response")
         w <- .Fortran("glmlink",
                       n=as.integer(1),
                       mu=as.double(mu),
@@ -187,7 +194,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
                       z=as.double(rep(0,n)),
                       PACKAGE="mpath")$z
 	z <- z - offset
-    lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, mu=mu, w=w, z=z, alpha=alpha, penalty.factor=penalty.factor, standardize=standardize) 
+    lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, w=w, z=z, alpha=alpha, penalty.factor=penalty.factor, standardize=standardize) 
                                         #    if(penalty %in% c("mnet", "snet") && !rescale) lmax <- 0.5 * sqrt(lmax)
 	lpath <- seq(log(lmax), log(lambda.min.ratio * lmax), length.out=nlambda)
         lambda <- exp(lpath)
@@ -321,7 +328,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     lambda <- lambda[good]
     nlambda <- length(lambda[good])
     b0 <- matrix(b0, ncol=nlambda)
-    RET <- list(family=family,standardize=standardize, satu=tmp$satu, lambda=lambda, nlambda=nlambda, beta=beta, b0=b0, meanx=meanx, normx=normx, theta=theta[good], nulldev=nulldev, resdev=resdev, pll = pll, fitted.values=yhat, converged=tmp$convout[good], convex.min=convex.min, penalty.factor=penalty.factor, gamma=gamma, alpha=alpha, is.offset=is.offset)
+    RET <- list(family=family,standardize=standardize, satu=tmp$satu, lambda=lambda, nlambda=nlambda, beta=beta, b0=b0, meanx=meanx, normx=normx, theta=theta[good], nulldev=nulldev, resdev=resdev, pll = pll, fitted.values=yhat, converged=tmp$convout[good], convex.min=convex.min, penalty.factor=penalty.factor, gamma=gamma, alpha=alpha, is.offset=is.offset, offset=offset)
     if(x.keep) RET$x <- x
     if(y.keep) RET$y <- y
     class(RET) <- "glmreg"
@@ -382,9 +389,10 @@ g <- function(mu, family, eps.bino=1e-5){
     return(eta)
 }
 
-### eta is the estimated beta_0 in the intercept-only model
+### eta is the estimated beta_0 in the intercept-only model, need to check 2/29/2020
 init <- function(wt, y, offset, family){
     mu <- as.vector(wt %*% y) + offset
+    ### is the above mu wrong such that mu < 0?
     switch(family,
            "gaussian"={
                eta <- mu
@@ -402,7 +410,7 @@ init <- function(wt, y, offset, family){
     list(mu=mu, eta=eta)
 }
 
-findlam <- function(x, y, weights, family, theta=NULL,mu, w, z, alpha, penalty.factor, eps.bino=1e-5, standardize=TRUE){ 
+findlam <- function(x, y, weights, family, theta=NULL, w, z, alpha, penalty.factor, eps.bino=1e-5, standardize=TRUE){ 
     if(all(penalty.factor==0)) return(0)
     	if (alpha <= 0 || alpha > 1){
         stop("alpha must be greater than 0 and less than or equal to 1, but alpha=", alpha)

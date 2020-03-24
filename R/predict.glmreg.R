@@ -32,6 +32,10 @@ if(!is.null(object$terms)){
       newx <- matrix(unlist(newx), ncol=m)
       #newx <- as.matrix(as.data.frame(lapply(newx, as.numeric)))
   if(dim(object$beta)[1] != m) stop("number of columns in newx should be the same as number of rows in beta\n")
+  if(is.null(newoffset))
+      offset <- object$offset
+    else
+      offset <- newoffset
   res <- .Fortran("pred",
 				  n=as.integer(n),
 				  m=as.integer(m),
@@ -39,20 +43,22 @@ if(!is.null(object$terms)){
 				  x=as.double(newx),
 				  b=as.double(object$beta[,which]),
 				  a0=as.double(object$b0[which]),
+				  offset=as.double(offset),
                   family=as.integer(famtype),
 				  eta = as.double(matrix(0,n,nlambda)),
 				  mu = as.double(matrix(0,n,nlambda)),
 				  PACKAGE="mpath")
   eta <- matrix(res$eta, ncol=nlambda)
   mu <- matrix(res$mu, ncol=nlambda)
-  if(object$is.offset){
-	  if(is.null(newoffset)) stop("newoffset is required\n")
-          else 
-     {
-      eta <- eta + newoffset
-      mu <- eta
-     }
-  }
+#  to be considered below: 02/28/2020
+#  if(object$is.offset){
+#	  if(is.null(newoffset)) stop("newoffset is required\n")
+#          else 
+#     {
+#      eta <- eta + newoffset
+#      mu <- eta
+#     }
+#  }
   colnames(eta) <- colnames(mu) <- colnames(object$beta[,which])
   #pihat <- exp(eta)/(1+exp(eta))
     if (object$family=="gaussian" | type=="link") return(eta)

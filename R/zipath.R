@@ -73,13 +73,13 @@ zipath.matrix <- function(X, Z, Y, weights, offsetx=NULL, offsetz=NULL, ...){
     RET$call <- match.call()
     return(RET)
 }
-zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, intercept=TRUE, family = c("poisson", "negbin", "geometric"), link = c("logit", "probit", "cloglog", "cauchit", "log"), penalty = c("enet", "mnet", "snet"), start = NULL, y = TRUE, x = FALSE, nlambda=100, lambda.count=NULL, lambda.zero=NULL, type.path=c("active", "nonactive"), penalty.factor.count=NULL, penalty.factor.zero=NULL, lambda.count.min.ratio=.0001, lambda.zero.min.ratio=.1, alpha.count=1, alpha.zero=alpha.count, gamma.count=3, gamma.zero=gamma.count, rescale=FALSE, init.theta=1, theta.fixed=FALSE, EM=TRUE, maxit.em=200, convtype=c("count", "both"), maxit= 1000, maxit.theta =10, reltol = 1e-5, thresh=1e-6, eps.bino=1e-5, shortlist=FALSE, trace=FALSE, ...)
+zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, intercept=TRUE, family = c("poisson", "negbin", "geometric"), link = c("logit", "probit", "cloglog", "cauchit", "log"), penalty = c("enet", "mnet", "snet"), start = NULL, y = TRUE, x = FALSE, nlambda=100, lambda.count=NULL, lambda.zero=NULL, type.path=c("active", "nonactive"), penalty.factor.count=NULL, penalty.factor.zero=NULL, lambda.count.min.ratio=.0001, lambda.zero.min.ratio=.1, alpha.count=1, alpha.zero=alpha.count, gamma.count=3, gamma.zero=gamma.count, rescale=FALSE, init.theta=NULL, theta.fixed=FALSE, EM=TRUE, maxit.em=200, convtype=c("count", "both"), maxit= 1000, maxit.theta =10, reltol = 1e-5, thresh=1e-6, eps.bino=1e-5, shortlist=FALSE, trace=FALSE, ...)
 {
+    family <- match.arg(family)
     if(is.null(init.theta) && family=="negbin" && theta.fixed)
         stop("missing argument init.theta while family=='negbin' and theta.fixed is TRUE\n")
     if(length(gamma.count) > 1 || length(gamma.zero) > 1)
         stop("gamma.count or gamma.zero must be a scalar")
-    family <- match.arg(family)
     if(family=="geometric"){
         family <- "negbin"
         init.theta <- 1
@@ -461,20 +461,22 @@ zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, int
 ### How to incorporate offset here?
     if(all(diff(weights)==0)) weightsnow <- rep.int(1L, n) 
     else weightsnow <- weights
-    fit0 <- zeroinfl(Y~1|1, weights=weightsnow, dist=family)
+    fit0 <- zeroinfl(Y~1+offset(offsetx)|1+offset(offsetz), weights=weightsnow, dist=family)
+    if(family=="negbin" && is.null(init.theta))
+            init.theta <- fit0$theta
 ### find solution of intercept model with family = negbin and fixed theta parameter, and replace the estimates for fit0
     ## ML estimation of theta
     if(family=="negbin" && theta.fixed) {
-        if(is.null(init.theta)){
-            init.theta <- fit0$theta
-        }
+        #if(is.null(init.theta)){
+        #    init.theta <- fit0$theta
+        #}
         Xtmp <- X
         Ztmp <- Z
         X <- as.matrix(X[,1])
         Z <- as.matrix(Z[,1])
         kx <- 1
         kz <- 1 
-### find the solution of estimates for the intercept-only model with fixed init.theta 
+### find the solution of estimates for the intercept-only model with fixed init.theta; what about offset? 
         fit0.nb <- optim(fn = ziNegBin2, gr = gradfun,
                          par = c(fit0$coef$count, fit0$coef$zero), #if(dist == "negbin") log(start$theta) else NULL),
                          method = "Nelder-Mead", hessian = FALSE, control = list(fnscale=-1))
@@ -498,10 +500,10 @@ zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, int
                                         #for poisson family or negbin using KKT conditions to compute lambda_count and lambda_zero values
     if(is.null(lambda.count) || is.null(lambda.zero)){
         if(family=="poisson") thetanow <- 10000
-        else
-            if(family=="negbin")
-                if(theta.fixed) thetanow <- init.theta
-                else thetanow <- fit0$theta
+            else thetanow <- init.theta
+            #if(family=="negbin")
+            #    if(theta.fixed) thetanow <- init.theta
+            #    else thetanow <- fit0$theta
 	    lmax <- .Fortran("lmax_zipath",
                          B=as.double(X),
                          G=as.double(Z),
@@ -538,9 +540,9 @@ zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, int
     start <- list(count = model_count$coefficients, zero = model_zero$coefficients)
     vcov <- vector("list", length=nlambda)
     if(family == "negbin"){
-        if(!theta.fixed)
-            start$theta <- fit0$theta
-        else start$theta <- init.theta
+        #if(!theta.fixed)
+        #    start$theta <- fit0$theta
+        #else start$theta <- init.theta
     }
     if(is.null(start$theta)) start$theta <- 1
     if(active==1 && (kx == 1 || kz == 1))

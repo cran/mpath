@@ -24,6 +24,7 @@ C     beta
 C     b0
 C     yhat
 C     dev
+C     eta, mu
 
       subroutine midloopGLM(n,m,x,y,yold,weights, mu, eta, offset,
      +     family, penalty,lamk, 
@@ -80,9 +81,10 @@ C     dev
                   yhat(i) = yhat(i) + x(i,j) * beta(j)
  230        continue
  220     continue
-         call DCOPY(n, yhat, 1, eta, 1)
+C        call DCOPY(n, yhat, 1, eta, 1)
          do 350 i = 1, n
-            eta(i) = eta(i) + offset(i)
+            yhat(i) = yhat(i) + offset(i)
+            eta(i) = yhat(i)
  350     continue
          call linkinv(n, eta, family, mu)
          olddev = dev
@@ -286,7 +288,7 @@ C     dev
          endif
          if(cisnan(dev).NE.0) then
              call intpr("dev is NA in Fortran src/deveval, check if some
-     +columns of x have the same values", -1, 1, 1)
+     + columns of x have the same values", -1, 1, 1)
             call intpr("i=", -1, i, 1)
             call dblepr("y(i)=", -1, y(i), 1)
             call dblepr("mu(i)=", -1, mu(i), 1)
@@ -333,17 +335,19 @@ CCC   ref R/loglik.R
       end
       
 
-C     predict value eta = a0 + x * b
-      subroutine pred(n,m, nlambda,x,b,a0,family, eta,mu)
+C     linear predict value eta = a0 + x * b + offset
+C input: n, m, nlambda, x, b, a0, offset, family
+C output: eta, mu
+      subroutine pred(n,m, nlambda,x,b,a0,offset, family, eta,mu)
       implicit none
       integer n,m,nlambda,family,k,i,j
       double precision b(m,nlambda),a0(nlambda),eta(n,nlambda)
-      double precision mu(n,nlambda),x(n,m)
+      double precision mu(n,nlambda),x(n,m), offset(n)
       external linkinv
 
       do 30 k=1,nlambda
          do 20 i=1,n
-            eta(i,k) = a0(k)
+            eta(i,k) = a0(k) + offset(i)
             do 10 j=1,m
                eta(i,k) = eta(i,k) + x(i,j) * b(j,k)
  10         continue

@@ -37,7 +37,7 @@ extern void F77_NAME(outloop)(void *, void *, void *, void *, void *, void *, vo
 extern void F77_NAME(outprod)(void *, void *, void *, void *, void *);
 extern void F77_NAME(penglm)(void *, void *, void *, void *, void *, void *, void *);
 extern void F77_NAME(pnorm_fortran)(void *);
-extern void F77_NAME(pred)(void *, void *, void *, void *, void *, void *, void *, void *, void *);
+extern void F77_NAME(pred)(void *, void*, void *, void *, void *, void *, void *, void *, void *, void *);
 extern void F77_NAME(theta_ml)(void *, void *, void *, void *, void *, void *, void *, void *);
 extern void F77_NAME(zeval)(void *, void *, void *, void *, void *, void *, void *);
 extern void F77_NAME(ziloss)(void *, void *, void *, void *, void *, void *, void *, void *, void *, void *);
@@ -67,7 +67,7 @@ static const R_FortranMethodDef FortranEntries[] = {
 	    {"outprod",                    (DL_FUNC) &F77_NAME(outprod),             5},
 	    {"penglm",                     (DL_FUNC) &F77_NAME(penglm),              7},
 	    {"pnorm_fortran",              (DL_FUNC) &F77_NAME(pnorm_fortran),       1},
-	    {"pred",                       (DL_FUNC) &F77_NAME(pred),                9},
+	    {"pred",                       (DL_FUNC) &F77_NAME(pred),               10},
 	    {"theta_ml",                   (DL_FUNC) &F77_NAME(theta_ml),            8},
 	    {"zeval",                      (DL_FUNC) &F77_NAME(zeval),               7},
 	    {"ziloss",                     (DL_FUNC) &F77_NAME(ziloss),             10},

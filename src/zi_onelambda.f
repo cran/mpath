@@ -72,10 +72,10 @@ C     outputs: betax, b0_x, betaz, b0z, theta, start_count_act, start_zero_act
          endif
 C     yhat: the fitted mean values, obtained by transforming the
 C     linear predictors by the inverse of the link function.
-         call dcopy(n, yhat, 1, mustart_count, 1)
+C         call dcopy(n, yhat, 1, mustart_count, 1)
 C     etastart_count: linear predictors, obtained by transforming the
 C     mean values by the link function.
-         call gfunc(mustart_count, n, family,epsbino,etastart_count)
+C         call gfunc(mustart_count, n, family,epsbino,etastart_count)
          start_count_act(1) = b0_x
          if(m_count_act .GT. 0)then
             do 100 j=1, m_count_act
@@ -91,8 +91,8 @@ C     mean values by the link function.
      +        0, intercept, penaltyfactor_zero_act, thresh,
      +        epsbino, maxit, eps, theta, 2,  
      +        penalty, 0, betaz, b0z, yhat, satu)
-         call dcopy(n, yhat, 1, mustart_zero, 1)
-         call gfunc(mustart_zero, n, 2, 0.0D0, etastart_zero)
+C         call dcopy(n, yhat, 1, mustart_zero, 1)
+C         call gfunc(mustart_zero, n, 2, 0.0D0, etastart_zero)
          do ii=1, n
             if(y1(ii) .EQ. 0)then
                probi(ii)=mustart_zero(ii) 

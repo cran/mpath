@@ -2,11 +2,13 @@ C     outer loop: sequence of lambda
 C     input:
 C     start
 C     mu: a vector
+C     eta: a vector
 C     output
 C     b: beta
 C     bz: b0
 C     resdev: residual deviance
 C     ypre: yhat
+C     mu, eta: uppdated values
 
       subroutine outloop(x,y,weights, wt, n,m, penalty, nlambda, lam, 
      +     alpha,gam,theta,rescale,mu,eta, offset,

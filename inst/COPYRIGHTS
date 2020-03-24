@@ -1,5 +1,4 @@
-R/zeroinfl.R and data/bioChemists.rda, man/bioChemists.man copied from package pscl version 1.5.2
-zipath and predprob derived from package pscl
+zipath, and predprob derived from package pscl
 Author: Simon Jackman, with contributions from Alex Tahk, Achim Zeileis, Christina Maimone and Jim Fearon
 License GPL-2
 

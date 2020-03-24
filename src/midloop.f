@@ -66,9 +66,10 @@ C     innermaxit serves as maxit here
             endif
  230     continue
  220  continue
-      call DCOPY(n, yhat, 1, eta, 1)
+C     call DCOPY(n, yhat, 1, eta, 1)
       do 350 i = 1, n
-         eta(i) = eta(i) + offset(i)
+         yhat(i) = yhat(i) + offset(i)
+         eta(i) = yhat(i)
  350  continue
       call linkinv(n, eta, family, mu)
       olddev = dev

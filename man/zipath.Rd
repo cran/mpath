@@ -78,7 +78,7 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 
 \examples{
 ## data
-data("bioChemists")
+data("bioChemists", package = "pscl")
 ## with simple inflation (no regressors for zero component)
 fm_zip <- zipath(art ~ 1 | ., data = bioChemists, nlambda=10)
 summary(fm_zip)
@@ -99,7 +99,7 @@ summary(fm_zinb2)
 fm_zinb3 <- zipath(art ~ . | ., data = bioChemists, family = "negbin", 
 lambda.count=0, lambda.zero=0, reltol=1e-12)
 summary(fm_zinb3)
-fm_zinb4 <- zerofinfl(art ~ . | ., data = bioChemists, dist = "negbin")
+fm_zinb4 <- zeroinfl(art ~ . | ., data = bioChemists, dist = "negbin")
 summary(fm_zinb4)
 ### offset
 exposure <- rep(0.5, dim(bioChemists)[1])

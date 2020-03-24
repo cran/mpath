@@ -76,6 +76,7 @@ cv.glmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
     nobs <- n <- nm[1]
     nvars <- m <- nm[2]
     if(missing(weights)) weights <- rep(1, nobs)
+    if(is.null(offset)) offset <- rep(0, nobs)
     K <- nfolds
     glmreg.obj <- glmreg_fit(x, y, weights, offset=offset, lambda=lambda, family=family, ...)
     lambda <- glmreg.obj$lambda
@@ -94,7 +95,7 @@ cv.glmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
     residmat <- foreach(i=seq(K), .packages=c("mpath")) %dopar% {
         omit <- all.folds[[i]]
         fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offset[- omit], lambda=lambda, family=family, ...)
-	logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit])
+	logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit], offset=offset[omit])
     }
     stopImplicitCluster()
     residmat <- sapply(residmat, '[', seq(max(sapply(residmat, length))))
@@ -105,8 +106,8 @@ cv.glmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
        if(trace)
          cat("\n CV Fold", i, "\n\n")
        omit <- all.folds[[i]]
-       fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], lambda=lambda, family=family, ...)
-       residmat[1:fitcv$nlambda, i] <- logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit])
+       fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offset[- omit], lambda=lambda, family=family, ...)
+       residmat[1:fitcv$nlambda, i] <- logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit], offset=offset[omit])
      }
     }
     cv <- apply(residmat, 1, mean)
