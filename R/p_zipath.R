@@ -59,15 +59,19 @@ pval.zipath <- function(formula, data, weights, subset, na.action, offset, stand
         }
         coef <- summary(fit)$coef
 ### excluding intercept
+        if(length(rhs1c) > 0){
         pc <- rep(1, length(rhs1.0))
-        pz <- rep(1, length(rhs2.0))
         pc[rhs1c] <- coef$count[2:(1+length(rhs1c)),4] 
-        pz[rhs2z] <- coef$zero[2:(1+length(rhs2z)),4] 
         ### 4. Define the adjusted p-values as 
         pc <- pc*(length(rhs1c)+length(rhs2z)) 
-        pz <- pz*(length(rhs1c)+length(rhs2z)) 
         count.pval <- rbind(count.pval, pmin(1, pc)) 
+        }
+        if(length(rhs2z) > 0){
+        pz <- rep(1, length(rhs2.0))
+        pz[rhs2z] <- coef$zero[2:(1+length(rhs2z)),4] 
+        pz <- pz*(length(rhs1c)+length(rhs2z)) 
         zero.pval <- rbind(zero.pval, pmin(1, pz))
+        }
         j <- j + 1
     }
     colnames(count.pval) <- rhs1.0

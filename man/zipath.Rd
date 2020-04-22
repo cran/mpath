@@ -99,6 +99,7 @@ summary(fm_zinb2)
 fm_zinb3 <- zipath(art ~ . | ., data = bioChemists, family = "negbin", 
 lambda.count=0, lambda.zero=0, reltol=1e-12)
 summary(fm_zinb3)
+library("pscl")
 fm_zinb4 <- zeroinfl(art ~ . | ., data = bioChemists, dist = "negbin")
 summary(fm_zinb4)
 ### offset

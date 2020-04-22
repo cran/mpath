@@ -37,9 +37,3 @@ Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Pra
 \seealso{
 \code{\link{summary}}, \code{\link[MASS]{glm.nb}}}
 \keyword{models}
-\examples{
-\dontrun{
-data(quine, package="MASS")
-summary(glmregNB(Days ~ Eth*Age*Lrn*Sex, quine, link = log))
-}
-}

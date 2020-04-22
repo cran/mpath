@@ -78,17 +78,21 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 \examples{
 \dontrun{
 data("bioChemists", package = "pscl")
-fm_zip <- cv.zipath(art ~ . | ., data = bioChemists, family = "poisson", nlambda=10)
+fm_zip <- zipath(art ~ . | ., data = bioChemists, family = "poisson", nlambda=10)
+fm_cvzip <- cv.zipath(art ~ . | ., data = bioChemists, family = "poisson", nlambda=10)
 ### prediction from the best model
-predict(fm_zip, newdata=bioChemists)
-fm_zip_predict <- predict(object=fm_zip$fit, which=fm_zip$lambda.which, 
-			  type="response", model=c("full"))
-coef(fm_zip)
-fm_znb <- cv.zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)
-coef(fm_znb)
-fm_zinb2 <- cv.zipath(art ~ . +offset(log(phd))| ., data = bioChemists, 
+pred <- predict(fm_zip, newdata=bioChemists, which=fm_cvzip$lambda.which)
+coef(fm_zip, which=fm_cvzip$lambda.which)
+fm_znb <- zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)
+fm_cvznb <- cv.zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)
+pred <- predict(fm_znb, which=fm_cvznb$lambda.which)
+coef(fm_znb, which=fm_cvznb$lambda.which)
+fm_zinb2 <- zipath(art ~ . +offset(log(phd))| ., data = bioChemists, 
 		      family = "poisson", nlambda=10)
-coef(fm_zinb2)
+fm_cvzinb2 <- cv.zipath(art ~ . +offset(log(phd))| ., data = bioChemists, 
+		      family = "poisson", nlambda=10)
+pred <- predict(fm_zinb2, which=fm_cvzinb2$lambda.which)
+coef(fm_zinb2, which=fm_cvzinb2$lambda.which)
 }
 }
 \keyword{models}

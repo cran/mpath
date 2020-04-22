@@ -198,4 +198,11 @@
 
   o remove zeroinfl function and data from pscl
   o offset related updates: R functions init, logLik.glm, cv.glmreg.R, cv.glmregNegbin.R, zipath (fit0); Fortran subroutine zi_onelambda remove 4 lines and simply use the updated mu and eta, and compute yhat=yhat+offset in midloop and midloopGLM
-  o change the default value of init.theta from 1 to NULL in R/zipath.R. This allows user specified initial value of theta regardless whether theta.fixed is TRUE/FALSE  
+  o change the default value of init.theta from 1 to NULL in R/zipath.R. This allows user specified initial value of theta regardless whether theta.fixed is TRUE/FALSE 
+  
+               CHANGES in `mpath' VERSION 0.3-25 (03-25-2020)
+
+  o fix bugs in R/p_zipath.R when no variable is selected in zipath
+  o remove fit object in the output of cv.zipath so that predict an object of cv.zipath is not feasible, and should be via zipath. The reason for such change is that cv.zipath can take both formula and matrix, hence predict on cv.zipath object can easily lead to problems in codes.
+  o minor bugs fix after running: R CMD check --run-dontrun mpath_0.3-25.tar.gz
+

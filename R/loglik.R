@@ -22,7 +22,7 @@ famtype <- switch(family,
  nvars <- nm[2]
  if(is.matrix(beta)){
  if(dim(beta)[1] != nvars)
- stop("newx has a wrong dimension, possibly the 1st column for the intecept\n")
+ stop("the dimension of coefficients beta and that of newx do not match\n")
 }
 if(missing(weights)) weights <- rep(1, nobs)
 w <- weights

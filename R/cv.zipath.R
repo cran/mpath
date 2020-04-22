@@ -41,7 +41,6 @@ cv.zipath.formula <- function(formula, data, weights, offset=NULL,              
      ## call model.frame()
      mf[[1]] <- as.name("model.frame")
      mf <- eval(mf, parent.frame())
- 
      ## extract terms, model matrices, response
      mt <- attr(mf, "terms")
      mtX <- terms(ffc, data = data)
@@ -67,6 +66,12 @@ mtZ <- terms(ffz, data = data)
    offsetz <- as.vector(offsetz)
      RET <- cv.zipath_fit(X, Z, Y, weights=weights, offsetx=offsetx, offsetz=offsetz, ...)
      RET$call <- match.call()
+     RET$terms = list(count = mtX, zero = mtZ, full = mt)
+     RET$call = cl
+     RET$formula = ff
+     RET$levels = .getXlevels(mt, mf)
+     RET$contrasts = list(count = attr(X, "contrasts"), zero = attr(Z,            "contrasts"))
+     RET$model <- mf
      RET
 
 }
@@ -84,7 +89,8 @@ cv.zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, nlambda=100, lambd
         stop("smallest nfolds should be 3\n")
     n <- length(Y)
     K <- nfolds
-    zipath.obj <- zipath_fit(X, Z, Y, weights, offsetx, offsetz, nlambda=nlambda, lambda.count=lambda.count, lambda.zero=lambda.zero, ...)
+    ### only to obtain lambda values
+    zipath.obj <- zipath_fit(X, Z, Y, weights, offsetx, offsetz, nlambda=nlambda, lambda.count=lambda.count, lambda.zero=lambda.zero, maxit=1, ...)
     #zipath.obj <- do.call("zipath", list(formula, data, weights, nlambda=nlambda, lambda.count=lambda.count, lambda.zero=lambda.zero, ...))
     if(is.null(lambda.count) || is.null(lambda.zero)){
     lambda.count <- zipath.obj$lambda.count
@@ -124,7 +130,8 @@ cv.zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, nlambda=100, lambd
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.max(cv)
-    obj<-list(fit=zipath.obj, residmat=residmat, bic=bic, cv = cv, cv.error = cv.error, foldid=all.folds, nlambda=nlambda, lambda.which= lambda.which, lambda.optim = list(count=lambda.count[lambda.which], zero=lambda.zero[lambda.which]))
+    obj<-list(residmat=residmat, bic=bic, cv = cv, cv.error = cv.error, foldid=all.folds, nlambda=nlambda, lambda.which= lambda.which, lambda.optim = list(count=lambda.count[lambda.which], zero=lambda.zero[lambda.which]))
+    #obj<-list(fit=zipath.obj, residmat=residmat, bic=bic, cv = cv, cv.error = cv.error, foldid=all.folds, nlambda=nlambda, lambda.which= lambda.which, lambda.optim = list(count=lambda.count[lambda.which], zero=lambda.zero[lambda.which]))
     class(obj) <- c("cv.zipath")
     if(plot.it) plot(obj,se=se)
     obj

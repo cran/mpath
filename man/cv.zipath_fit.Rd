@@ -67,22 +67,6 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link{zipath}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.zipath"} object.}
-\examples{
-\dontrun{
-data("bioChemists")
-fm_zip <- cv.zipath(art ~ . | ., data = bioChemists, family = "poisson", nlambda=10)
-### prediction from the best model
-predict(fm_zip, newdata=bioChemists)
-fm_zip_predict <- predict(object=fm_zip$fit, which=fm_zip$lambda.which, 
-			  type="response", model=c("full"))
-coef(fm_zip)
-fm_znb <- cv.zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)
-coef(fm_znb)
-fm_zinb2 <- cv.zipath(art ~ . +offset(log(phd))| ., data = bioChemists, 
-		      family = "poisson", nlambda=10)
-coef(fm_zinb2)
-}
-}
 \keyword{models}
 \keyword{regression}
 
