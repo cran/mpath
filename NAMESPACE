@@ -1,8 +1,6 @@
 useDynLib(mpath)
 
 export(glmreg, glmregNB, zipath, llfun, predictzeroinfl1, cv.folds, cv.glmreg, cv.glmreg_fit, cv.glmregNB, cv.zipath, tuning.zipath, pval.zipath, conv2glmreg, conv2zipath, estfunReg, sandwichReg, breadReg, meatReg, hessianReg, se, be.zeroinfl, rzi, ncl, nclreg, ncl_fit, nclreg_fit, cv.nclreg, cv.nclreg_fit, stan, zipath_fit)
-exportClasses("zipath")
-exportMethods("show")
 
 import("methods")
 import("stats")
