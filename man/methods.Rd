@@ -18,7 +18,7 @@
 }
 \arguments{
   \item{object}{ objects of class \code{glmreg} or \code{zipath}.}
- \item{\dots}{ additional arguments passed to callies. }
+ \item{\dots}{ additional arguments passed to calls. }
   \item{k}{  numeric, the \emph{penalty} per parameter to be used; the default
              \code{k = 2} is the classical AIC. \code{k} has been hard coded in the function and there is no impact to the value of \code{AIC} if \code{k} is changed }
 }

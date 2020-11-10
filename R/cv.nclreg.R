@@ -58,7 +58,7 @@ cv.nclreg.matrix <- function(x, y, weights, offset=NULL, ...){
     return(RET)
 }
 
-cv.nclreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE, 
+cv.nclreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE, 
                           rfamily=c("clossR", "closs", "gloss", "qloss"), s=1.5,  
                           nfolds=10, foldid, type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE,  
                           ...){
@@ -72,24 +72,29 @@ cv.nclreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
     nvars <- m <- nm[2]
     if(missing(weights)) weights <- rep(1, nobs)
     K <- nfolds
-    nclreg.obj <- nclreg_fit(x, y, weights, lambda=lambda, rfamily=rfamily, s=s, ...)
+    nclreg.obj <- nclreg_fit(x, y, weights, offset=offset, lambda=lambda, rfamily=rfamily, s=s, ...)
     lambda <- nclreg.obj$lambda
     nlambda <- length(lambda)
     if(missing(foldid)){
         if(rfamily %in% c("closs", "gloss", "qloss") && balance)  
-            all.folds <- balanced.folds(y, K)
+            invisible(capture.output(all.folds <- eval(parse(text="pamr:::balanced.folds(y, K)"))))
         else all.folds <- cv.folds(length(y), K)
     }
     else all.folds <- foldid
     if(parallel){
-    registerDoParallel(cores=n.cores)
+    cl <- eval(parse(text="parallel:::makeCluster(n.cores)"))
+    registerDoParallel(cl)
     i <- 1  ###needed to pass R CMD check with parallel code below
     residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
         omit <- all.folds[[i]]
-        fitcv <- nclreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], s=s, lambda=lambda, rfamily=rfamily, ...)
-	predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], type=type)
+        if(!is.null(offset)){
+          offsetnow <- offset[- omit]
+          newoffset <- offset[omit]
+          }else offsetnow <- newoffset <- NULL
+        fitcv <- nclreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, s=s, lambda=lambda, rfamily=rfamily, ...)
+	predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], newoffset=newoffset, type=type)
     }
-    stopImplicitCluster()
+    eval(parse(text="parallel:::stopCluster(cl)"))
     }
     else{
         residmat <- matrix(NA, nlambda, K)
@@ -97,8 +102,12 @@ cv.nclreg_fit <- function(x, y, weights, lambda=NULL, balance=TRUE,
         if(trace)
           cat("\n CV Fold", i, "\n\n")
         omit <- all.folds[[i]]
-        fitcv <- nclreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], s=s, lambda=lambda, rfamily=rfamily, ...)
-	    residmat[,i] <- predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], type=type)
+        if(!is.null(offset)){
+          offsetnow <- offset[- omit]
+          newoffset <- offset[omit]
+          }else offsetnow <- newoffset <- NULL
+        fitcv <- nclreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, s=s, lambda=lambda, rfamily=rfamily, ...)
+	    residmat[,i] <- predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], newoffset=newoffset, type=type)
         }
     }
     cv <- apply(residmat, 1, mean)

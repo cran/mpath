@@ -1,6 +1,7 @@
 ###Adapted from file MASS/R/negbin.R
-glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars), thresh=1e-3, maxit.theta=10, maxit=1000, eps=.Machine$double.eps, trace=FALSE, start = NULL, etastart = NULL, mustart = NULL, theta.fixed=FALSE, theta0=NULL, init.theta=ifelse(!theta.fixed, theta0[1],NULL), link=log, penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
+glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars), thresh=1e-3, maxit.theta=10, maxit=1000, eps=.Machine$double.eps, trace=FALSE, start = NULL, etastart = NULL, mustart = NULL, theta.fixed=FALSE, theta0=NULL, init.theta=NULL, link=log, penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, parallel=TRUE, n.cores=2, ...)
 {
+    if(!theta.fixed) init.theta <- theta0[1]
     if(theta.fixed)
         if(length(theta0)!=nlambda)
             stop("length of theta0 must be the same as nlambda if theta.fixed=TRUE\n")
@@ -12,7 +13,7 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
         sum(w*(lgamma(th + y) - lgamma(th) - lgamma(y + 1) + th * log(th) +
                y * log(mu + (y == 0)) - (th + y) * log(th + mu)))
     link <- substitute(link)
-    fam0 <- if(missing(init.theta))
+    fam0 <- if(missing(init.theta) || is.null(init.theta))
                 do.call("poisson", list(link = link))
             else
                 do.call("negative.binomial", list(theta = init.theta, link = link))
@@ -68,15 +69,11 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
     fitted <- matrix(NA, ncol=nlambda, nrow=n)
     pll <- matrix(NA, ncol=nlambda, nrow=maxit)
     b0 <- tht <- nulldev <- resdev <- rep(NA, nlambda)                           
-    k <- 1
     convout <- twologlik <- rep(NA, nlambda)
-    while(k <= nlambda){  
-        if(trace) message("loop in lambda:", k, "\n")
-        if(k==1){
-            if(trace){ cat("Initial fit family is:")
-                print(fam0)
-            }
-            if(trace) message("Initial fit:")
+    if(parallel){
+        cl <- parallel::makeCluster(n.cores)
+        registerDoParallel(cl)
+        fitall <- foreach(k=1:nlambda) %dopar%{
             if(!missing(method)) {
                 if(!exists(method, mode = "function"))
                     stop("unimplemented method: ", sQuote(method))
@@ -94,63 +91,136 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
                 mu <- mustart
                 th <- init.theta
             }
+            if(theta.fixed) th <- theta0[k]
+            iter <- 0
+                                        #d1 <- sqrt(2 * max(1, fit$df.residual))
+            d2 <- del <- 1
+            Lm <- loglik(n, th, mu, Y, w)
+            converged <- FALSE                                    
+            while((iter <- iter + 1) <= maxit.theta && !converged){
+                eta <- log(mu)
+                fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, start = start, etastart=eta, mustart = mu, offset=offset, lambda=lambda[k],alpha=alpha,gamma=gamma,rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace, penalty=penalty)
+                t0 <- th
+                mu <- fit$fitted.values
+                if(!theta.fixed){
+                                        #      th <- theta.ml(Y, mu, sum(w), w, limit=maxit.theta,
+                    th <- theta.ml(Y, mu, sum(w), w,
+                                   trace = trace)
+                }
+                else th <- theta0[k]
+                start <- c(fit$b0, fit$beta)
+                del <- t0 - th
+                Lm0 <- Lm
+                penval <- ifelse(standardize, n*fit$penval, fit$penval)
+                Lm <- loglik(n, th, mu, Y, w) - penval
+                fit$df.residual <- n - fit$df - 1
+                d1 <- sqrt(2 * max(1, fit$df.residual))
+                converged <- abs((Lm0 - Lm)/d1) + abs(del/d2) < 1e-8
+            }
+            Lm <- loglik(n, th, mu, Y, w)
+            fit$converged <- converged
+            fit$twologlik <- 2 * Lm
+            fit$th <- th
+            fit
+        }
+                                        #stopImplicitCluster()
+        parallel::stopCluster(cl)
+        for(k in 1:nlambda){
+            tht[k] <- fitall[[k]]$th
+            beta[,k] <- fitall[[k]]$beta
+            b0[k] <- fitall[[k]]$b0
+            fitted[,k] <- fitall[[k]]$fitted
+            convout[k] <- fitall[[k]]$converged
+            twologlik[k] <- fitall[[k]]$twologlik
+            nulldev[k] <- fitall[[k]]$nulldev
+            resdev[k] <- fitall[[k]]$resdev
             if(trace)
-                message("Initial value for theta:", signif(th))
+                pll[,k] <- fitall[[k]]$pll
         }
-        if(theta.fixed) th <- theta0[k]
-        iter <- 0
-	#d1 <- sqrt(2 * max(1, fit$df.residual))
-        d2 <- del <- 1
-        Lm <- loglik(n, th, mu, Y, w)
-        converged <- FALSE                                    
-        while((iter <- iter + 1) <= maxit.theta && !converged){
-            eta <- log(mu)
-	    fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, start = start, etastart=eta, mustart = mu, offset=offset, lambda=lambda[k],alpha=alpha,gamma=gamma,rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace, penalty=penalty)
-            t0 <- th
-            mu <- fit$fitted.values
-            if(!theta.fixed){
-                #      th <- theta.ml(Y, mu, sum(w), w, limit=maxit.theta,
-                th <- theta.ml(Y, mu, sum(w), w,
-                               trace = trace)
+        fit <- fitall[[nlambda]] ### Why the last model?
+    }else{
+        k <- 1
+        while(k <= nlambda){
+            if(trace) message("loop in lambda:", k, "\n")
+            if(k==1){
+                if(trace){ cat("Initial fit family is:")
+                    print(fam0)
+                }
+                if(trace) message("Initial fit:")
+                if(!missing(method)) {
+                    if(!exists(method, mode = "function"))
+                        stop("unimplemented method: ", sQuote(method))
+                    glm.fitter <- get(method)
+                } else {
+                    method <- "glm.fit"
+                    glm.fitter <- stats::glm.fit
+                }
+                if(is.null(mustart) || missing(init.theta)){
+                    fit <- glm.nb(Y ~ 1, weights=weights)
+                    mu <- fit$fitted.values
+                    th <- fit$theta
+                }
+                else{
+                    mu <- mustart
+                    th <- init.theta
+                }
+                if(trace)
+                    message("Initial value for theta:", signif(th))
             }
-            else th <- theta0[k]
-            start <- c(fit$b0, fit$beta)
-            del <- t0 - th
-            Lm0 <- Lm
-            penval <- ifelse(standardize, n*fit$penval, fit$penval)
-            Lm <- loglik(n, th, mu, Y, w) - penval
-            fit$df.residual <- n - fit$df - 1
-            d1 <- sqrt(2 * max(1, fit$df.residual))
-            converged <- abs((Lm0 - Lm)/d1) + abs(del/d2) < 1e-8
-            if(trace) {
-                Ls <- loglik(n, th, Y, Y, w)
-                Dev <- 2 * (Ls - Lm)
-                message("Theta(", iter, ") =", signif(th),
-                        ", 2(Ls - Lm) =", signif(Dev))
+            if(theta.fixed) th <- theta0[k]
+            iter <- 0
+                                        #d1 <- sqrt(2 * max(1, fit$df.residual))
+            d2 <- del <- 1
+            Lm <- loglik(n, th, mu, Y, w)
+            converged <- FALSE
+            while((iter <- iter + 1) <= maxit.theta && !converged){
+                eta <- log(mu)
+                fit <- glmreg_fit(x=X[,-1], y=Y, weights=w, start = start, etastart=eta, mustart = mu, offset=offset, lambda=lambda[k],alpha=alpha,gamma=gamma,        rescale=rescale, standardize=standardize, penalty.factor = penalty.factor, thresh=thresh, maxit=maxit, eps=eps, family="negbin", theta=th, trace=trace,        penalty=penalty)
+                t0 <- th
+                mu <- fit$fitted.values
+                if(!theta.fixed){
+                    th <- theta.ml(Y, mu, sum(w), w,
+                                   trace = trace)
+                }
+                else th <- theta0[k]
+                start <- c(fit$b0, fit$beta)
+                del <- t0 - th
+                Lm0 <- Lm
+                penval <- ifelse(standardize, n*fit$penval, fit$penval)
+                Lm <- loglik(n, th, mu, Y, w) - penval
+                fit$df.residual <- n - fit$df - 1
+                d1 <- sqrt(2 * max(1, fit$df.residual))
+                converged <- abs((Lm0 - Lm)/d1) + abs(del/d2) < 1e-8
+                if(trace) {
+                    Ls <- loglik(n, th, Y, Y, w)
+                    Dev <- 2 * (Ls - Lm)
+                    message("Theta(", iter, ") =", signif(th),
+                            ", 2(Ls - Lm) =", signif(Dev))
+                }
             }
+            if(!is.null(attr(th, "warn"))) fit$th.warn <- attr(th, "warn")
+            if(trace && iter > maxit.theta) {
+                warning("alternation limit reached")
+                fit$th.warn <- gettext("alternation limit reached")
+            }
+            tht[k] <- th
+            beta[,k] <- as.vector(fit$beta)
+            b0[k] <- fit$b0
+            Lm <- loglik(n, th, mu, Y, w)
+            twologlik[k] <- as.vector(2 * Lm)
+            nulldev[k] <- fit$nulldev
+            resdev[k] <- fit$resdev
+            if(trace) pll[,k] <- fit$pll
+            convout[k] <- converged
+            fitted[,k] <- fit$fitted.values
+            k <- k + 1
         }
-        if(!is.null(attr(th, "warn"))) fit$th.warn <- attr(th, "warn")
-        if(trace && iter > maxit.theta) {
-            warning("alternation limit reached")
-            fit$th.warn <- gettext("alternation limit reached")
-        }
-        tht[k] <- th
-        beta[,k] <- as.vector(fit$beta)
-        b0[k] <- fit$b0
-        Lm <- loglik(n, th, mu, Y, w)
-        twologlik[k] <- as.vector(2 * Lm)
-        nulldev[k] <- fit$nulldev
-        resdev[k] <- fit$resdev
-        if(trace) pll[,k] <- fit$pll
-        convout[k] <- converged
-        fitted[,k] <- fit$fitted.values
-        k <- k + 1
     }
     class(fit) <- c("glmregNB", "glmreg", "lm")
     fit$terms <- Terms
     fit$formula <- as.vector(attr(Terms, "formula"))
-    ## make result somewhat reproducible
-    Call$init.theta <- signif(as.vector(th), 10)
+    ## make result somewhat reproducible, but not sure what does init.theta mean here!
+    Call$init.theta <- signif(as.vector(fit$theta), 10)
     Call$link <- link
     fit$call <- Call
     if(model) fit$model <- mf

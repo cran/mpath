@@ -106,7 +106,8 @@ cv.zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, nlambda=100, lambd
     }
     bic <- matrix(NA, nlambda, K)
     if(parallel){
-    registerDoParallel(cores=n.cores)
+    cl <- eval(parse(text="parallel:::makeCluster(n.cores)"))
+    registerDoParallel(cl)
     i <- 1  ###needed to pass R CMD check with parallel code below
     residmat <- foreach(i=seq(K), .combine=cbind, .packages='mpath') %dopar% {
         omit <- all.folds[[i]]
@@ -114,7 +115,7 @@ cv.zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, nlambda=100, lambd
         fitcv <- zipath_fit(X[-omit,,drop=FALSE], Z[-omit,,drop=FALSE], Y[-omit], weights[-omit], offsetx[-omit], offsetz[-omit], nlambda=nlambda, lambda.count=lambda.count, lambda.zero=lambda.zero, ...)
         logLik(fitcv, X=X[omit,, drop=FALSE], Z=Z[omit,, drop=FALSE], y=Y[omit], weights=weights[omit], offsetx=offsetx[omit], offsetz=offsetz[omit])
     }
-    stopImplicitCluster()
+    eval(parse(text="parallel:::stopCluster(cl)"))
     }
     else{
      residmat <- matrix(NA, nlambda, K)

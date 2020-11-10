@@ -1,5 +1,5 @@
 C similar to and derived from R/glmreg_fit
-C input: start, etastart, mustart - are these changed in outloop
+C input: maxit, start, etastart, mustart - are these changed in outloop
 C subroutine?
 c output: yhat is the updated mustart as output
       subroutine glmreg_fit_fortran(x, y, weights, n,m,start, etastart,
@@ -9,10 +9,10 @@ c output: yhat is the updated mustart as output
       implicit none
       integer n,m, i,j, penalty, nlambda, family, standardize, maxit,
      +     innermaxit, trace, rescale, good, intercept,
-     +     satu, convout(nlambda), startv
+     +     satu, convout(nlambda), startv, tmpit
 C      double precision, intent(in) :: etastart(n),mustart(n),start(m+1)
       double precision :: etastart(n),mustart(n),start(m+1)
-      double precision x(n, m), y(n), weights(n), 
+      double precision x(n, m), xold(n,m), y(n), weights(n), 
 Cstart(m+1),etastart(n), mustart(n), 
      +     offset(n), lambda(nlambda), lam(m, nlambda), 
      +     alpha, gam, thresh, epsbino, eps, theta, penaltyfactor(m),
@@ -21,9 +21,14 @@ Cstart(m+1),etastart(n), mustart(n),
      +     penfac(m), resdev(nlambda), yhat(n), mu(n), sumwt,
      +     crossprod_beta(nlambda), meany, meanoffset
 
-C      if(family.EQ.1)then
-C            rescale = 0
-C      endif
+      if(family.EQ.2)then
+          do i=1, n
+          if(y(i) < 0 .OR. y(i) > 1)then
+          call rexit("y value should be between 0 and 1 in
+     +     src/glmreg_fit_fortran")
+      endif
+          enddo
+      endif
       call  deveval(n, y, mustart, theta, weights, family, nulldev)
       startv = 1
       sumpen = sum(penaltyfactor)
@@ -34,9 +39,10 @@ C generate outer product of two vectors penfac and lambda, return lam
       call outprod(m, penfac, nlambda, lambda, lam)
       if(family.EQ.1)then 
         innermaxit = maxit
-        maxit = 1
+        tmpit = 1
       else 
               innermaxit = 1
+              tmpit = maxit
       endif
                     
       sumwt = sum(weights)
@@ -56,6 +62,13 @@ C        normx <- sqrt(one %*% xx^2)
 C        xx <- scale(x, meanx, normx)
 C    }
 C choose family=2 (any interger except 1 to avoid centering/scaling y) below
+      if(family .EQ. 1 .AND. standardize .EQ. 1)then
+           do 1100 j=1, m
+          do 1110 i=1, n
+             xold(i,j)=x(i,j)
+ 1110     continue
+ 1100  continue
+      endif
       if(standardize .EQ. 1)then
               call preprocess(x,y,n,m,weights, 2,standardize,normx,xd,
      +     mu)
@@ -65,7 +78,7 @@ C    need to check if satu is input or output
           good = nlambda
       call outloop(x,y,weights,wt,n,m,penalty,nlambda,lam,alpha,gam,
      +            theta,rescale,mustart,etastart,offset,family,
-     +            standardize,intercept, nulldev,thresh,maxit,
+     +            standardize,intercept, nulldev,thresh,tmpit,
      +            innermaxit,eps,trace,start,startv,beta,b0,resdev,yhat,
      +            convout, satu, good, epsbino,outpll)
       if (standardize .EQ. 1)then
@@ -91,5 +104,13 @@ C http://www.tat.physik.uni-tuebingen.de/~kley/lehre/ftn77/tutorial/blas.html
          endif
         endif
       endif
+      if(family .EQ. 1 .AND. standardize .EQ. 1)then
+           do 1200 j=1, m
+          do 1210 i=1, n
+             x(i,j)=xold(i,j)
+ 1210     continue
+ 1200  continue
+         endif
+
       return
       end

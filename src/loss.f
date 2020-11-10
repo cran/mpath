@@ -3,29 +3,32 @@ C family = c("gaussian", "binom", "poisson"), s=-1, sh, fk=NULL
 C      gausssian: 1, bino: 2, poisson:3, negative binomial: 4, clossR: 11, closs: 12, gloss:
 C      13, qloss: 14
 C sh and fk are not used below, but may needed in the future release
+C cost: but not implemented in optimization problem, unlike in bst!
 C output: los is the average loss
 
-      subroutine loss(n, y, f, cost, family, s, los)
+      subroutine loss(n, y, f, family, s, los)
        implicit none
        integer family, i, n
-       double precision x, y(n),f(n),u, cost, s, los, ly(n)
+       double precision x, y(n),f(n),u, s, los
        external nonconvexloss
 
-      if(family .EQ. 2)then
-           do 10 i=1, n
-               if(y(i) .EQ. 1.0)then
-                 ly(i)=1-cost
-               else  
-                 ly(i)=cost
-               endif
-10         continue 
-      endif
+C      if(family .EQ. 2)then
+C           do 10 i=1, n
+C               if(y(i) .EQ. 1.0)then
+C                 ly(i)=1-cost
+C               else  
+C                 ly(i)=1.0D0
+C                 ly(i)=cost
+C               endif
+C10         continue 
+C      endif
       los = 0.d0
       do 20 i=1, n
         if(family .EQ. 1)then
           los = los + 0.5D0*(y(i) - f(i))**2
         else if(family .EQ. 2)then
-          los =  los + ly(i)*dlog(1+dexp(-y(i)*f(i))) 
+          los =  los + dlog(1+dexp(-y(i)*f(i))) 
+C          los =  los + ly(i)*dlog(1+dexp(-y(i)*f(i))) 
         else if(family .EQ. 11)then
                 u=y(i)-f(i)
           call nonconvexloss(family, u, s, x)

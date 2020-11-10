@@ -5,7 +5,8 @@
   and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
 cv.glmregNB(formula, data, weights, offset=NULL, lambda=NULL, nfolds=10, 
-foldid, plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, ...)
+            foldid, plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, 
+            parallel=FALSE, ...)
 }
 \arguments{
   \item{formula}{symbolic description of the model}

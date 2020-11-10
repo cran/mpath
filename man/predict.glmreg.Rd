@@ -7,9 +7,8 @@ This function returns predictions from
 a fitted \code{"glmreg"} object.
 }
 \usage{
-\method{predict}{glmreg}(object,newx,which=1:length(object$lambda),
-type=c("link","response","class","coefficients","nonzero"), newoffset = NULL, 
-na.action=na.pass, ...)
+\method{predict}{glmreg}(object,newx,newoffset,which=1:length(object$lambda),
+type=c("link","response","class","coefficients","nonzero"), na.action=na.pass, ...)
 \method{coef}{glmreg}(object,which=1:length(object$lambda),...)
 }
 \arguments{

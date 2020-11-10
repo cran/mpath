@@ -116,8 +116,9 @@ coef <- coef(fm_pois)
 fm_nb <- glmregNB(art ~ ., data = bioChemists)
 coef <- coef(fm_nb)
 ### high-dimensional
-bioChemists <- cbind(matrix(rnorm(915*100), nrow=915), bioChemists)
-fm_zinb <- zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)
+#R CMD check --use-valgrind can be too time extensive for the following model
+#bioChemists <- cbind(matrix(rnorm(915*100), nrow=915), bioChemists)
+#fm_zinb <- zipath(art ~ . | ., data = bioChemists, family = "negbin", nlambda=10)
 }
 }
 

@@ -8,8 +8,9 @@
   }
 \usage{
 pval.zipath(formula, data, weights, subset, na.action, offset, standardize=TRUE,
-family = c("poisson", "negbin", "geometric"),penalty = c("enet", "mnet", "snet"), 
-gamma.count = 3, gamma.zero = 3, prop=0.5, trace=TRUE, B=10, ...)
+            family = c("poisson", "negbin", "geometric"),
+            penalty = c("enet", "mnet", "snet"), gamma.count = 3, 
+            gamma.zero = 3, prop=0.5, trace=TRUE, B=10, ...)
 }
 
 \arguments{

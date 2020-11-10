@@ -34,7 +34,7 @@ x.keep=FALSE, y.keep=TRUE, ...)
   \item{...}{Other arguments passing to \code{ncl_fit}}
 }
 \details{
-  The robust linear model is fit by majorization-minimization along with linear regression. Note that the objective function is \deqn{1/2*weights*loss}.
+  The robust linear model is fit by majorization-minimization along with linear regression. Note that the objective function is \deqn{weights*loss}.
   }
 
 \value{
@@ -47,8 +47,8 @@ An object with S3 class \code{"ncl"} for the various types of models.
 \references{
   Zhu Wang (2019)
   \emph{MM for Penalized Estimation},
- https://arxiv.org/abs/1912.11119
- }
+ \url{https://arxiv.org/abs/1912.11119
+ }}
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 \seealso{\code{\link{print}}, \code{\link{predict}}, \code{\link{coef}}.}

@@ -1,4 +1,4 @@
-zipath, and predprob derived from package pscl
+zipath and predprob were derived from zeroinfl (Achim Zeileis) and predprob.R (Simon Jackman), respectively  in package pscl
 Author: Simon Jackman, with contributions from Alex Tahk, Achim Zeileis, Christina Maimone and Jim Fearon
 License GPL-2
 
@@ -10,11 +10,7 @@ Authors@R: c(person("Brian", "Ripley", role = c("aut", "cre", "cph"),
         person("David", "Firth", role = "ctb"))
 License: GPL-2 | GPL-3
 
-balanced.folds copied from pamr version 1.54
-Author: T. Hastie, R. Tibshirani, Balasubramanian Narasimhan, Gil Chu
-License GPL-2
-
-convexMin modified from ncvreg ersion: 3.1-0
+convexMin modified from ncvreg version: 3.1-0
 Author: Patrick Breheny
 License GPL-2
 
@@ -23,13 +19,12 @@ Author: Thomas Lumley [aut], Achim Zeileis [aut, cre]
 Maintainer: Achim Zeileis <Achim.Zeileis at R-project.org> 
 License: GPL-2 
 
-nonzeroCoef and plotCoef are from glmnet_3.0-0 which doesn't export nonzeronCoef and plotCoef function
-Authors@R: c(person("Jerome", "Friedman", role=c("aut")),
-          person("Trevor", "Hastie", role=c("aut", "cre"), email = "hastie@      stanford.edu")
-          person("Rob", "Tibshirani", role=c("aut")),
-          person("Balasubramanian", "Narasimhan", role=c("aut")),
-          person("Noah", "Simon", role=c("aut")),
-          person("Junyang", "Qian", role=c("ctb")))
+nonzeroCoef and plotCoef are from glmnet_3.0-0 which doesn't export     nonzeronCoef and plotCoef function
+ Authors@R: c(person("Jerome", "Friedman", role=c("aut")),
+           person("Trevor", "Hastie", role=c("aut", "cre"), email="hastie@stanford.edu")
+           person("Rob", "Tibshirani", role=c("aut")),
+           person("Balasubramanian", "Narasimhan", role=c("aut")),
+           person("Noah", "Simon", role=c("aut")),
+           person("Junyang", "Qian", role=c("ctb")))
 License GPL-2
-
 

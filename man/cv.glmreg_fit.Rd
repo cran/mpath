@@ -5,8 +5,9 @@
   and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
 cv.glmreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE, 
-family=c("gaussian", "binomial", "poisson", "negbin"), nfolds=10, foldid, 
-plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, ...)
+              family=c("gaussian", "binomial", "poisson", "negbin"), 
+              type=c("loss", "error"), nfolds=10, foldid, plot.it=TRUE,
+              se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, ...)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{glmreg}.}
@@ -17,16 +18,15 @@ plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, ...)
     \code{NULL}, and \code{glmreg} chooses its own sequence}
  \item{balance}{for \code{family="binomial"} only}
  \item{family}{response variable distribution}
-  \item{nfolds}{number of folds >=3, default is 10}
+\item{type}{ cross-validation criteria. For \code{type="loss"}, loss function (log-negative-likelihood) values and \code{type="error"} is misclassification error if \code{family="binomial"}. } 
+ \item{nfolds}{number of folds >=3, default is 10}
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
     identifying what fold each observation is in. If supplied,
     \code{nfold} can be missing and will be ignored.}
  \item{plot.it}{ a logical value, to plot the estimated log-likelihood values if \code{TRUE}. }
   \item{se}{ a logical value, to plot with standard errors. }
- \item{n.cores}{The number of CPU cores to use. The cross-validation loop
-  will attempt to send different CV folds off to different cores.}
+\item{parallel, n.cores}{a logical value, parallel computing or not with the number of CPU cores to use. The cross-validation loop will attempt to send different CV folds off to different cores.}
  \item{trace}{ a logical value, print progress of cross validation or not} 
-\item{parallel}{a logical value, parallel computing or not}
 \item{\dots}{Other arguments that can be passed to \code{glmreg}.}
 }
 \details{The function runs \code{glmreg} \code{nfolds}+1 times; the
@@ -41,7 +41,7 @@ plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, ...)
   list with the ingredients of the cross-validation fit.
  \item{fit}{a fitted glmreg object for the full data.}
   \item{residmat}{matrix of log-likelihood values with row values for \code{lambda} and column values for \code{k}th cross-validation}
-  \item{cv}{The mean cross-validated log-likelihood values - a vector of length
+  \item{cv}{The mean cross-validated log-likelihood values - a vector of
     \code{length(lambda)}.}
  \item{cv.error}{estimate of standard error of \code{cv}.}
   \item{foldid}{an optional vector of values between 1 and \code{nfold}

@@ -8,7 +8,7 @@ C
       subroutine gradient(family, n, u, s, g)
       implicit none
       integer family, n, i
-      double precision u(n), s, g(n), cval, pi
+      double precision u(n), s, g(n), cval, PI
 
       if(family .EQ. 11)then
               do 10 i=1, n
@@ -24,9 +24,9 @@ C
               g(i)=-2**s*s*dexp(u(i))*(dexp(u(i))+1)**(-s-1)
 30    continue 
       else if(family .EQ. 14)then
-              pi = 3.14159
+              PI=4.D0*DATAN(1.D0)
               do 40 i=1, n
-              g(i) = -sqrt(2.0)/(dsqrt(pi)*s)*dexp(-u(i)**2/(2*s**2))
+              g(i) = -sqrt(2.0)/(dsqrt(PI)*s)*dexp(-u(i)**2/(2*s**2))
 40    continue 
       endif
 

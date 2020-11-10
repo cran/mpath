@@ -71,7 +71,7 @@ glmreg.matrix <- function(x, y, weights, offset=NULL, ...){
     return(RET)
 }
 
-glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, offset=rep(0, nobs), nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, intercept=TRUE, penalty.factor = rep(1, nvars),thresh=1e-6, eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, family=c("gaussian", "binomial", "poisson", "negbin"), penalty=c("enet","mnet","snet"), convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE){
+glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, offset=NULL, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, intercept=TRUE, penalty.factor = rep(1, nvars),thresh=1e-6, eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, family=c("gaussian", "binomial", "poisson", "negbin"), penalty=c("enet","mnet","snet"), convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE){
 	#if(!is.null(start) && !is.null(etastart) && !is.null(mustart))
 	#stop("start, etastart and mustart is for testing only\n")
     family <- match.arg(family)
@@ -87,10 +87,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     if (gamma <= 2 && penalty=="snet") stop("gamma must be greater than 2 for the snet penalty")
     if (alpha < 0 || alpha > 1){
         cat("alpha=", alpha)
-        stop("alpha must be greater than 0 and less than or equal to 1")
-    }
-    if (alpha == 0 && is.null(lambda)){
-        stop("not designed for alpha=0 and lambda=NULL\n")
+        stop("alpha must be equal or greater than 0; and less than or equal to 1")
     }
     if(!is.null(etastart) && !is.null(mustart)){
         if((length(etastart) != length(mustart)) || length(etastart) != length(y))
@@ -111,11 +108,10 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     if( !is.null(weights) && any(weights < 0) ){
         stop("negative weights not allowed")
     }
-    if (is.null(offset))
-	    offset <- rep.int(0, nobs)
-    if (all(offset==0))
+    if (is.null(offset)){
 	    is.offset <- FALSE
-    else is.offset <- TRUE
+	    offset <- rep.int(0, nobs)
+    }else is.offset <- TRUE
     if(family=="binomial"){
         if(is.factor(y))
             y <- as.integer(y) - 1
@@ -160,8 +156,8 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
         #tmp <- init(wt, y, offset, family=family)
         #mu <- tmp$mu
         #eta <- tmp$eta
-    if(family!="negbin") tmpres <- glm(y~rep(1, nobs)-1, weights=wt, offset=offset, family=family)
-    else tmpres <- glm(y~rep(1, nobs)-1, weights=wt, offset=offset, family=negative.binomial(theta))
+    if(family!="negbin") tmpres <- glm(y~rep(1, nobs)-1, weights=weights, offset=offset, family=family)
+    else tmpres <- glm(y~rep(1, nobs)-1, weights=weights, offset=offset, family=negative.binomial(theta))
     eta <- predict(tmpres, type="link")
     mu <- predict(tmpres, type="response")
     }
@@ -194,9 +190,9 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
                       z=as.double(rep(0,n)),
                       PACKAGE="mpath")$z
 	z <- z - offset
-    lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, w=w, z=z, alpha=alpha, penalty.factor=penalty.factor, standardize=standardize) 
+    lmax <- findlam(x=x, y=y, weights=weights, family=family, theta=theta, w=w, z=z, alpha=ifelse(alpha > 0, alpha, 1e-3), penalty.factor=penalty.factor, standardize=standardize) 
                                         #    if(penalty %in% c("mnet", "snet") && !rescale) lmax <- 0.5 * sqrt(lmax)
-	lpath <- seq(log(lmax), log(lambda.min.ratio * lmax), length.out=nlambda)
+    lpath <- seq(log(lmax), log(lambda.min.ratio * lmax), length.out=nlambda)
         lambda <- exp(lpath)
     }
     else nlambda <- length(lambda)
@@ -332,7 +328,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     if(x.keep) RET$x <- x
     if(y.keep) RET$y <- y
     class(RET) <- "glmreg"
-    RET$twologlik <- try(2*logLik(RET, newx=x, y=y, weights=weights))
+    RET$twologlik <- try(2*logLik(RET, newx=x, y=y, weights=weights, offset=offset))
 ###penalized log-likelihood function value for rescaled beta
     penval <- rep(NA, nlambda)
     for(j in (1:nlambda)){

@@ -26,7 +26,8 @@ C     mu, eta: uppdated values
      +     bz(nlambda),xold(n,m), yold(n), start(m+1), resdev(nlambda), 
      +     ypre(n,nlambda), lamk(m), beta(m), b0,dev,
      +     weights(n),yhat(n),ep, pll(maxit), outpll(maxit, nlambda),
-     +     normx(m),xd(m),avg, offset(n) 
+     +     normx(m),xd(m),avg, offset(n)
+
       if(family .NE. 1)then
          call preprocess(x, y, n, m, weights, family, standardize,
      +        normx, xd, avg)
@@ -49,7 +50,6 @@ C     keep a copy of x and y in case x and y will be changed in subroutine lmnet
             beta(j) = start(j+1)
          enddo
       endif
-
       k = 1
       satu = 0
 C     good = nlambda

@@ -3,9 +3,9 @@
 \title{Cross-validation for zipath}
 \description{Internal function k-fold cross-validation for zipath, produces a plot, and returns cross-validated log-likelihood values for \code{lambda}}
 \usage{
-cv.zipath_fit(X, Z, Y, weights, offsetx, offsetz, nlambda=100, lambda.count=NULL, 
-	      lambda.zero=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
-	      trace=FALSE, parallel=FALSE, ...)
+cv.zipath_fit(X, Z, Y, weights, offsetx, offsetz, nlambda=100, lambda.count=NULL,
+              lambda.zero=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, 
+              n.cores=2, trace=FALSE, parallel=FALSE, ...)
 }
 \arguments{
    \item{X}{predictor matrix of the count model}

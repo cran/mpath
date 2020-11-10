@@ -92,6 +92,7 @@ C     compute deviance dev
          call deveval(n, yold, mu, theta, weights, family, dev)
          if(family .EQ. 2)then
            if(dev/nulldev .LT.0.01)then
+C           if(dev/nulldev .LT.0.01 .OR. nulldev .LT. 0.01)then
 C          because dev in deveval depends on weights, if we scale
 C          weights/n, then dev can be very small, but maybe not that
 C          important      

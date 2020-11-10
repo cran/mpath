@@ -6,13 +6,14 @@
     Fit a negative binomial linear model via penalized maximum likelihood. The regularization path is computed for the lasso (or elastic net penalty), snet and mnet penalty, at a grid of values for the regularization parameter lambda. }
 \usage{
 glmregNB(formula, data, weights, offset=NULL, nlambda = 100, lambda=NULL, 
-lambda.min.ratio = ifelse(nobs<nvars,0.05,0.001), alpha=1, gamma=3, rescale=TRUE, 
-standardize = TRUE, penalty.factor = rep(1, nvars), thresh = 0.001, maxit.theta = 10, 
-maxit=1000, eps=.Machine$double.eps, trace=FALSE, start = NULL, 
-etastart = NULL, mustart = NULL, theta.fixed=FALSE, theta0=NULL, 
-init.theta=ifelse(!theta.fixed, theta0[1],NULL), link=log, 
-penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, 
-x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
+         lambda.min.ratio = ifelse(nobs<nvars,0.05,0.001), alpha=1, gamma=3, 
+         rescale=TRUE, standardize = TRUE, penalty.factor = rep(1, nvars), 
+         thresh = 0.001, maxit.theta = 10, maxit=1000, eps=.Machine$double.eps,
+         trace=FALSE, start = NULL, etastart = NULL, mustart = NULL, 
+         theta.fixed=FALSE, theta0=NULL, init.theta=NULL, link=log, 
+         penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, 
+         x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, 
+         parallel=TRUE, n.cores=2, ...)
 }
 
 \arguments{
@@ -62,6 +63,7 @@ x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, ...)
     of the fit (model frame, response, model matrix) are returned.}
 \item{contrasts}{the contrasts corresponding to \code{levels} from the
     respective models}
+\item{parallel, n.cores}{a logical value, parallel computing or not for sequence of \code{lambda} with the number of CPU cores to use. The \code{lambda} loop will attempt to send different \code{lambda} off to different cores.}
 }
 \details{
  The sequence of models implied by \code{lambda} is fit by coordinate
@@ -96,8 +98,9 @@ An object with S3 class \code{"glmreg", "glmregNB"} for the various types of mod
 \examples{
 \dontrun{
 data("bioChemists", package = "pscl")
-fm_nb <- glmregNB(art ~ ., data = bioChemists)
-coef(fm_nb)
+system.time(fm_nb1 <- glmregNB(art ~ ., data = bioChemists, parallel=FALSE))
+system.time(fm_nb2 <- glmregNB(art ~ ., data = bioChemists, parallel=TRUE, n.cores=2))
+coef(fm_nb1)
 ### ridge regression
 fm <- glmregNB(art ~ ., alpha=0, data = bioChemists, lambda=seq(0.001, 1, by=0.01))
 fm <- cv.glmregNB(art ~ ., alpha=0, data = bioChemists, lambda=seq(0.001, 1, by=0.01))

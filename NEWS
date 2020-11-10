@@ -205,4 +205,99 @@
   o fix bugs in R/p_zipath.R when no variable is selected in zipath
   o remove fit object in the output of cv.zipath so that predict an object of cv.zipath is not feasible, and should be via zipath. The reason for such change is that cv.zipath can take both formula and matrix, hence predict on cv.zipath object can easily lead to problems in codes.
   o minor bugs fix after running: R CMD check --run-dontrun mpath_0.3-25.tar.gz
+  
+               CHANGES in `mpath' VERSION 0.4-2.1 (05-05-2020)
 
+  o remove cost argument in ncl, nclreg, co, coreg since they weren't used in optimization problems, unlike the bst package, but still use bst/loss function with cost=0.5, then mutiply 2, to be consistent with the optimization problem. Fix cost in src/loss.f accordingly. Make similar changes to src/loss2.f
+  
+               CHANGES in `mpath' VERSION 0.4-2.2 (05-10-2020)
+
+  o remove cost argument in R/co, R/coreg since they weren't used in optimization problems, unlike the bst package. Remove cost in src/coreg_ad src/coreg_fortran, src/loss2
+  
+               CHANGES in `mpath' VERSION 0.4-2.3 (05-10-2020)
+
+  o remove cost argument in src/loss, src/nclreg_ad, src/ncl_fortran
+  
+               CHANGES in `mpath' VERSION 0.4-2.4 (05-11-2020)
+
+  o make type.init="co" work in R/coreg function for dfun=1, 4 or 5
+  o make type.init="bst" or "heu" work in R/coreg function for cfun=4 and dfun=1 or 4
+  o complete src/compute_u for dfun from 1-7
+  o complete src/compute_z for sfun from 1-7
+  o complete src/compute_g for dfun from 1-7
+  o complete src/compute_v for cfun from 1-7
+  o develop loss2 to compute composite loss values
+  o problems occur in nclreg, and revoke version 0.4_2.2 the following files: R/ncl.R, R/nclreg.R, src/loss.f, src/mpath_init.c, src/nclreg_ad.f, src/nclreg_fortran.f
+  
+               CHANGES in `mpath' VERSION 0.4-2.5 (05-13-2020)
+
+  o add R/check_s for R/co and R/coreg
+  o remove cost argument in src/loss.f, and make changes accordingly in: R/ncl.R, R/nclreg.R, src/loss.f, src/mpath_init.c, src/nclreg_ad.f, src/nclreg_fortran.f
+  
+               CHANGES in `mpath' VERSION 0.4-2.6 (05-14-2020)
+
+  o update check_s in R/co.R
+  o remove 1/2 in objective function in man/ncl.Rd, ncl,_fit.Rd, nclreg.Rd, nclreg_fit.Rd
+  o add man/co.Rd, co_fit.Rd, coreg.Rd, coreg_fit.Rd
+  o add co_evalerr R function and replace evalerr in co.R and coreg.R 
+  o changes to R/co.R on initial values when cfun is not 4
+  o develop assign_s to assign default s value when missing in R/co.R and R/coreg.R
+  o src/lmnetGLM.f: removing checking convergency of b0, intercept
+  o src/glmreg_fit_fortran.f: add a check about y value: 0 <= y <= 1 if family=2
+  o R/predict.glmreg.R has a bug with new offset
+  o fix bugs with new offset in predict.nclreg, predict.coreg, predict.ncl, predict.co, cv.glmreg.R, cv.glmregNegbin.R
+  o make b0=0 if intercept=FALSE in src/lmnetGLM.f 
+  o R/glmreg.R: compute lambda sequence for alpha=0 with alpha=1e-3
+  
+               CHANGES in `mpath' VERSION 0.4-2.8 (06-30-2020)
+
+  o add weights in src/loss2.f and change codes calling loss2 in R and src folders 
+  o fix a bug in src/compute_z.f for cfun=6 when z=0 - rewrite the expression
+  o for cfun=6, the domain of s value is changed from >= 1 to 0 < s <= 1 such that g(z) is concave when z >= 0.
+  
+               CHANGES in `mpath' VERSION 0.4-2.9 (07-14-2020)
+
+  o add a factor to cfun in src/compute_v.f from cfun=2-6 such that For gcave and $\sigma=1, z=0$, the derivative is -1. For other concave functions, we have derivative -1 at $z=0$. Furthermore, the derivative = -1 as $\sigma \to \infty$ except for dcave, where the derivative = $-\frac{1}{z+1}$ as $\sigma \to \infty$
+  
+               CHANGES in `mpath' VERSION 0.4-2.10 (07-18-2020)
+
+  o change definition of gcave for cfun, derivative, loss function in both src and R codes. This expands the range of gcave for s from (0, 1] to (0, \infty) and derivative bounded away from \infty at argument 0 when s \in (0, 1).
+  o change the parameterization of tcave from 1-sigma to sigma
+  
+               CHANGES in `mpath' VERSION 0.4-2.11 (07-29-2020)
+
+  o add parallel computing in R/glmregNB
+  o modify src/coreg_fortran to simplify. TODO: similar changes in src/coreg_ad, src/ncvreg_ad, src/ncvreg_fortran
+  o in R/cv.glmreg, when type="loss" and family="binomial", it meant for loglikelihood loss function, thus, we seek maximum value, unlike for type="error", we seek minimum value. Modified the code accordingly
+  
+               CHANGES in `mpath' VERSION 0.4-2.12 (08-11-2020)
+
+  o modify cfun="ecave" and "gcave" in src/loss2, change the intercept to 0 from previous values, which are possibly < 0
+  o change ytmp to y in R/coreg when calling Fortran subroutine coreg_ad and coreg_fortran, and change y to ytmp in src/coreg_onelambda when calling src/glmreg_fit_fortran. The reason is that in coreg_ad and coreg_fortran, the repsonse variable is +1/-1 when dfun=5, and in glmreg_fit_fortran, the response variable is 1/0 when family=2 (binomial)
+  
+               CHANGES in `mpath' VERSION 0.4-2.13 (08-17-2020)
+
+  o Fix a bug with standardize=TRUE, which doesn't generate meaningful coef for R/coreg when dfun=5. For instrance, when s is large, the coef should be similar to glmreg when family="binomial", but it is not. The reason is that coreg calls for glmreg_fit_fortran, with input start, this may lead to saturated binomial model fitting. This would be the same if calling R/glmreg. Thus, glmreg_fit_fortran doesn't call updated start if dfun=5
+  o add argument standardize in src/coreg_onelambda, and pass this argument to src/glmreg_fit_fortran. Previously, it was set as 0 in the latter
+  o add argument rescale in R/coreg and subsequentially related src/coreg_ad, src/coreg_fortran, src/coreg_onelambda
+  o fix a bug in src/glmreg_fit_fortran: input maxit was changed. This has unexpected sequence since this subroutine is repeated in a loop. Modify src/glmreg_fit_fortran to maintain the old x values if standardize=TRUE and family=1
+  o consequently, make changes in R/nclreg which uses src/glmreg_fit_fortran, following R/coreg regarding argument standardize
+  
+               CHANGES in `mpath' VERSION 0.4-2.14 (08-24-2020)
+
+  o change R/co to R/coglm by adding dfun="poisson", "negbin"
+  o add dfun="poisson", "negbin" in R/coreg and make changes accordingly: src/coreg_ad, src/coreg_fortran
+  o add src/loss3 and src/compute_wt3 for dfun="poisson" and "negbin"
+  o modify R/coglm.R such that weights_update is initialized as in version 0.4-2.13 for dfun=1,4,5, not equal weights
+  
+               CHANGES in `mpath' VERSION 0.4-2.15 (08-27-2020)
+
+  o TODO: work in progress on R/coglm on general glm and minor changes on R/coreg
+  o fix src/coreg_onelambda when calling update_wt, where fk_old should be replaced with etastart, as in R/coreg - typeA
+  
+               CHANGES in `mpath' VERSION 0.4-2.16 (10-14-2020)
+
+  o change function names from coglm to ccglm, coreg to ccglmreg, cosvm to ccsvm, etc.
+  o move ccglmExample.Rmd, ccsvmExample.Rmd and german.Rmd out of vignettes folder (mpath_vignettes) to avoid some errors in some systems on CRAN/rhub for unknown reasons. Set up static link in vignettes instead
+  o How to build mpath:
+    R CMD build --compact-vignettes="both" mpath

@@ -80,7 +80,7 @@ compute.2d <- function(y, f, s, family=c("clossR", "closs", "gloss", "qloss")){
         sqrt(2/pi)*u/s^3*exp(-u^2/(2*s^2))
 }
 
-nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, reltol=1e-5, penalty=c("enet","mnet","snet"), nlambda=100, lambda=NULL, type.path=c("active", "nonactive", "onestep"), decreasing=FALSE, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, intercept=TRUE, penalty.factor = NULL, maxit=1000, type.init=c("bst", "ncl", "heu"), mstop.init=10, nu.init=0.1, eps=.Machine$double.eps, epscycle=10, thresh=1e-6, trace=FALSE){
+nclreg_fit <- function(x,y, weights, offset, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, reltol=1e-5, penalty=c("enet","mnet","snet"), nlambda=100, lambda=NULL, type.path=c("active", "nonactive", "onestep"), decreasing=FALSE, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, standardize=TRUE, intercept=TRUE, penalty.factor = NULL, maxit=1000, type.init=c("bst", "ncl", "heu"), mstop.init=10, nu.init=0.1, eps=.Machine$double.eps, epscycle=10, thresh=1e-6, trace=FALSE){
 ### compute h value
     compute.h <- function(rfamily, y, fk_old, s, B){
         if(rfamily=="clossR")
@@ -126,8 +126,10 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
     if( !is.null(weights) && any(weights < 0) ){
         stop("negative weights not allowed")
     }
-    if (is.null(offset))
-	                        offset <- rep.int(0, nobs)
+    if (is.null(offset)){
+         is.offset <- FALSE
+         offset <- rep.int(0, nobs)
+     }else is.offset <- TRUE
     pentype <- switch(penalty,
                       "enet"=1,
                       "mnet"=2,
@@ -140,21 +142,6 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
         penalty.factor <- rep(1, nvars)
     }
     xold <- x
-
-    if(standardize){
-        tmp <- stan(x, weights)
-        x <- tmp$x
-        meanx <- tmp$meanx
-        normx <- tmp$normx
-                                        #    wt <- weights/sum(weights)
-                                        #xx <- x
-                                        #meanx <- drop(wt %*% x)
-                                        #x <- scale(x, meanx, FALSE) # centers x
-                                        #x <- sqrt(wt) * x
-                                        #one <- rep(1, length(y))
-                                        #normx <- sqrt(drop(one %*% (x^2)))
-                                        #x <- scale(xx, meanx, normx)
-    }
     if(is.null(s)){
         warning("missing nonconvex loss tuning parameter s value, and a default value is provided\n")
         s <- switch(rfamily,       
@@ -213,12 +200,13 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
         RET <- NULL
         RET$fitted.values <- fk
     }
-    los <- loss(y, f=RET$fitted.values, cost, family = rfamily, s=s, fk=RET$fitted.values)
+    cost <- 0.5 # the optimization problem doesn't use cost argument, but loss function is from bst package
+    los <- 2*loss(y, f=RET$fitted.values, cost, family = rfamily, s=s, fk=RET$fitted.values)
     if(is.null(lambda)){
         h <- RET$h                               
 ### If standardize=TRUE, x has already been standardized. Therefore, in the sequel, we don't standardize x again
 ### method A, to obtain lambda values from fitting the penalized regression. 
-        lambda <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda.min.ratio=lambda.min.ratio, nlambda=nlambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, intercept=intercept, penalty.factor = penalty.factor, maxit=1, eps=eps, family="gaussian", penalty=penalty)$lambda
+        lambda <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda.min.ratio=lambda.min.ratio, nlambda=nlambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=standardize, intercept=intercept, penalty.factor = penalty.factor, maxit=1, eps=eps, family="gaussian", penalty=penalty)$lambda
 ### with type.init, add two different lambda sequences and make lambda values flexible to have different solution paths
         #if(type.init %in% c("bst", "heu")){
             if(!decreasing)#{### solution path backward direction
@@ -293,13 +281,13 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
                     stopit <- TRUE
                     break
                 }
-		RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, intercept=intercept, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
+		RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda[i],alpha=alpha,gamma=gamma, rescale=FALSE, standardize=standardize, intercept=intercept, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
 		RET$b0 <- RET$b0/sqrt(B)
 ### for LASSO, the above two lines are equivalent to the next line
                                         #RET <- glmreg_fit(x=x, y=h, weights=weights, lambda=lambda[i]/B,alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty)
                 fk <- RET$fitted.values <- predict(RET, newx=x)
                 start <- coef(RET)
-                los[k, i] <- mean(loss(y, f=fk, cost, family = rfamily, s=s, fk=NULL))
+                los[k, i] <- 2*mean(loss(y, f=fk, cost, family = rfamily, s=s, fk=NULL))
 ###penalized loss value for beta
                 penval <- .Fortran("penGLM",
                                    start=as.double(RET$beta),
@@ -366,7 +354,7 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
 				alpha=as.double(alpha),        
 			        gam=as.double(gamma), 
 				rescale=as.integer(0),
-			       	standardize=as.integer(0),
+			       	standardize=as.integer(standardize),
 			       	intercept=as.integer(intercept),
 				penaltyfactor=as.double(penalty.factor.act),
 				thresh=as.double(thresh), 
@@ -393,7 +381,7 @@ nclreg_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", 
                 start.act <- c(RET$b0, RET$beta)
                 etastart <- RET$yhat
 		mustart <- RET$mustart
-	  	los[k, i] <- mean(loss(y, f=fk, cost, family = rfamily, s=s, fk=NULL))
+	  	los[k, i] <- 2*mean(loss(y, f=fk, cost, family = rfamily, s=s, fk=NULL))
 ###penalized loss value for beta
 if(any(is.na(RET$beta))){
                 cat('rfamily=', rfamily, 's=', s, 'B=', B, "\n")
@@ -465,7 +453,7 @@ if(any(is.na(RET$beta))){
 			    lambda=as.double(lambda), 
 			    alpha=as.double(alpha),
 		        gam=as.double(gamma), 
-			    standardize=as.integer(0), 
+			    standardize=as.integer(standardize), 
 			    intercept=as.integer(intercept), 
 			    penaltyfactor=as.double(penalty.factor),
 			    maxit=as.integer(maxit), 
@@ -478,7 +466,7 @@ if(any(is.na(RET$beta))){
 			    B=as.double(B), 
 			    s=as.double(s),
 			    thresh=as.double(thresh),
-			    cost=as.double(cost),
+			    #cost=as.double(cost),
 			    decreasing=as.integer(decreasing),
 			    beta=as.double(beta),
 		        b0=as.double(b0), 
@@ -503,7 +491,7 @@ if(any(is.na(RET$beta))){
 			    lambda=as.double(lambda), 
 			    alpha=as.double(alpha),
 		        gam=as.double(gamma), 
-			    standardize=as.integer(0), 
+			    standardize=as.integer(standardize), 
 			    intercept=as.integer(intercept), 
 			    penaltyfactor=as.double(penalty.factor),
 			    maxit=as.integer(maxit), 
@@ -516,7 +504,7 @@ if(any(is.na(RET$beta))){
 			    B=as.double(B), 
 			    s=as.double(s),
 			    thresh=as.double(thresh),
-			    cost=as.double(cost),
+			    #cost=as.double(cost),
 			    decreasing=as.integer(decreasing),
 			    active=as.integer(active),
 			    beta=as.double(beta),
@@ -541,7 +529,7 @@ if(any(is.na(RET$beta))){
 	while(d1 > reltol && k <= iter){
 	    fk_old <- fk
             h <- compute.h(rfamily, y, fk_old, s, B)
-	    RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lam, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, intercept=intercept, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
+	    RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lam, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=standardize, intercept=intercept, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
             RET$b0 <- RET$b0/sqrt(B)
 	    fk <- predict(RET, newx=x)
             start <- coef(RET)
@@ -551,10 +539,10 @@ if(any(is.na(RET$beta))){
             k <- k + 1
         }
 ### fit a solution path    
-        RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=FALSE, intercept=intercept, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
+        RET <- glmreg_fit(x=x*sqrt(B), y=h*sqrt(B), weights=weights, offset=offset, lambda=lambda, alpha=alpha,gamma=gamma, rescale=FALSE, standardize=standardize, intercept=intercept, penalty.factor = penalty.factor, maxit=maxit, eps=eps, family="gaussian", penalty=penalty, start=start)
         RET$b0 <- RET$b0/sqrt(B)
         for(i in 1:nlambda){
-            los[i] <- weighted.mean(loss(y, f=RET$fitted.values[,i], cost, family = rfamily, s=s, fk=NULL), w=w)
+            los[i] <- 2*weighted.mean(loss(y, f=RET$fitted.values[,i], cost, family = rfamily, s=s, fk=NULL), w=w)
 ###penalized loss value for beta
             penval <- .Fortran("penGLM",
                                start=as.double(RET$beta),
@@ -583,10 +571,6 @@ if(any(is.na(RET$beta))){
     b0 <- tmp$b0
     RET <- tmp$RET
     RET$risk <- tmp$risk
-    if(standardize) {
-        beta <- beta/normx
-        b0 <- b0 - crossprod(meanx, beta)
-    }
     if(is.null(colnames(x))) varnames <- paste("V", 1:ncol(x), sep="")
     else varnames <- colnames(x)
     dimnames(beta) <- list(varnames, round(lambda, digits=4))
@@ -595,7 +579,6 @@ if(any(is.na(RET$beta))){
     RET$x <- xold
     RET$y <- y
     RET$call <- call
-    RET$cost <- cost
     RET$lambda <- lambda
     RET$nlambda <- nlambda
     RET$penalty <- penalty
@@ -609,11 +592,12 @@ if(any(is.na(RET$beta))){
     RET$nu.init <- nu.init
     RET$decreasing <- decreasing
     RET$type.path <- type.path
+    RET$is.offset <- is.offset
     class(RET) <- "nclreg"
     RET
 }
 
-predict.nclreg <- function(object, newdata=NULL, newy=NULL, which=1:object$nlambda, type=c("response","class","loss", "error", "coefficients", "nonzero"), na.action=na.pass, ...){
+predict.nclreg <- function(object, newdata=NULL, newy=NULL, newoffset=NULL, which=1:object$nlambda, type=c("response","class","loss", "error", "coefficients", "nonzero"), na.action=na.pass, ...){
     type=match.arg(type)
     if(is.null(newdata)){
         if(!match(type,c("coefficients", "nonzero"),FALSE))stop("You need to supply a value for 'newdata'")
@@ -632,7 +616,7 @@ predict.nclreg <- function(object, newdata=NULL, newy=NULL, which=1:object$nlamb
     if(type=="coefficients") return(coef.glmreg(object)[,which])
     if(type=="nonzero"){
         nbeta <- object$beta[,which]
-        if(length(which)>1) return(nonzeroCoef(nbeta[,,drop=FALSE],bystep=TRUE))
+        if(length(which)>1) return(eval(parse(text="glmnet:::nonzeroCoef(nbeta[,,drop=FALSE],bystep=TRUE)")))
         else return(which(abs(nbeta) > 0))
     }
     if(is.null(newdata))
@@ -640,7 +624,12 @@ predict.nclreg <- function(object, newdata=NULL, newy=NULL, which=1:object$nlamb
     else newx <- as.data.frame(newdata)
     if(dim(newx)[2]==dim(object$beta)[1]) ### add intercept
         newx <- cbind(1, newx)
-    res <- as.matrix(newx) %*% rbind(object$b0, object$beta)
+    if(object$is.offset)
+     if(is.null(newoffset))
+       stop("offset is used in the estimation but not provided in prediction\n")
+     else offset <- newoffset
+   else offset <- rep(0, length(ynow))
+    res <- offset + as.matrix(newx) %*% rbind(object$b0, object$beta)
     if(type=="response") return(res[, which])
     if(type %in% c("loss", "error") && is.null(ynow)) stop("response variable y missing\n")
     if(type=="loss"){

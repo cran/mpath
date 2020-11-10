@@ -8,12 +8,14 @@
   linear, logistic, Poisson and negative binomial (fixed scale parameter) regression models.
   }
 \usage{
-glmreg_fit(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, offset = rep(0, nobs), 
-nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, 
-gamma=3, rescale=TRUE, standardize=TRUE, intercept=TRUE, penalty.factor = rep(1, nvars),
-thresh=1e-6, eps.bino=1e-5, maxit=1000, eps=.Machine$double.eps, theta, 
-family=c("gaussian", "binomial", "poisson", "negbin"), penalty=c("enet","mnet","snet"), 
-convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
+glmreg_fit(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, offset = NULL, 
+           nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001), 
+           alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, intercept=TRUE, 
+           penalty.factor = rep(1, nvars), thresh=1e-6, eps.bino=1e-5, maxit=1000, 
+           eps=.Machine$double.eps, theta, 
+           family=c("gaussian", "binomial", "poisson", "negbin"),
+           penalty=c("enet","mnet","snet"), convex=FALSE, x.keep=FALSE, y.keep=TRUE,
+           trace=FALSE)
 }
 
 \arguments{
@@ -29,7 +31,7 @@ convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
   \item{mustart}{starting values for the vector of means.}
   \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting. This should be NULL or a numeric vector of length equal to the number of cases. Currently only one offset term can be included in the formula.}
   \item{nlambda}{The number of \code{lambda} values - default is 100. The sequence may be truncated before \code{nlambda} is reached if a close to saturated model is fitted. See also \code{satu}.}
-  \item{lambda}{ by default, the algorithm provides a sequence of regularization values, or a user supplied \code{lambda} sequence }
+  \item{lambda}{ by default, the algorithm provides a sequence of regularization values, or a user supplied \code{lambda} sequence. When \code{alpha=0}, the largest lambda value is not defined (infinity). Thus, the largest \code{lambda} for \code{alpha=0.001} is computed, and the sequence of \code{lambda} values is calculated afterwards. }
   \item{lambda.min.ratio}{Smallest value for \code{lambda}, as a fraction of
     \code{lambda.max}, the (data derived) entry value (i.e. the smallest
   value for which all coefficients are zero except the intercept). Note, there is no closed formula for \code{lambda.max} in general. If \code{rescale=TRUE}, \code{lambda.max} is the same for \code{penalty="mnet" or "snet"}. Otherwise, some modifications are required. For instance, for small \code{gamma} value, half of the square root (if \code{lambda.max} is too small) of the computed \code{lambda.max} can be used when \code{penalty="mnet" or "snet"}. The default of \code{lambda.min.ratio} depends on the
@@ -37,7 +39,7 @@ convex=FALSE, x.keep=FALSE, y.keep=TRUE, trace=FALSE)
   \code{nvars}. If \code{nobs > nvars}, the default is \code{0.001},
   close to zero.  If \code{nobs < nvars}, the default is \code{0.05}.}
   \item{alpha}{The \eqn{L_2} penalty mixing parameter, with
-    \eqn{0<\le alpha\le 1}. \code{alpha=1} is lasso (mcp, scad) penalty; and \code{alpha=0} the ridge penalty. However, if \code{alpha=0}, one must provide \code{lambda} values.}
+    \eqn{0 \le alpha\le 1}. \code{alpha=1} is lasso (mcp, scad) penalty; and \code{alpha=0} the ridge penalty. However, if \code{alpha=0}, one must provide \code{lambda} values.}
  \item{gamma}{The tuning parameter of the \code{snet} or \code{mnet} penalty.}
  \item{rescale}{logical value, if TRUE, adaptive rescaling of the penalty parameter for \code{penalty="mnet"} or \code{penalty="snet"} with \code{family} other than "gaussian". See reference}
  \item{standardize}{logical value for x variable standardization, prior to

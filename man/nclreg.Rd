@@ -4,11 +4,11 @@
 \alias{nclreg.matrix}
 \alias{nclreg.default}
 
-\title{fit a nonconvex loss based robust linear model with lasso (or elastic net), snet or mnet regularization}
+\title{Optimize a nonconvex loss with regularization}
 \description{
     Fit a linear model via penalized nonconvex loss function.  The
   regularization path is computed for the lasso (or elastic net penalty), scad (or snet) and mcp (or mnet penalty), at a grid
-  of values for the regularization parameter lambda. 
+  of values for the regularization parameter lambda. The name refers to \bold{N}on\bold{C}onvex \bold{L}oss with \bold{REG}ularization.
   }
 \usage{
 \method{nclreg}{formula}(formula, data, weights, offset=NULL, contrasts=NULL, ...)
@@ -31,8 +31,7 @@
 }
 \details{
   The sequence of robust models implied by \code{lambda} is fit by majorization-minimization along with coordinate
-  descent. Note that the objective function is \deqn{1/2*weights*loss + \lambda*penalty,} if \code{standardize=FALSE} and \deqn{1/2*
-  \frac{weights}{\sum(weights)}*loss + \lambda*penalty,} if \code{standardize=TRUE}. 
+  descent. Note that the objective function is \deqn{weights*loss + \lambda*penalty,} if \code{standardize=FALSE} and \deqn{\frac{weights}{\sum(weights)}*loss + \lambda*penalty,} if \code{standardize=TRUE}. 
   }
 
 \value{
@@ -51,8 +50,8 @@ An object with S3 class \code{"nclreg"} for the various types of models.
 \references{
  Zhu Wang (2019)
  \emph{MM for Penalized Estimation},
-https://arxiv.org/abs/1912.11119 
-}
+\url{https://arxiv.org/abs/1912.11119 
+}}
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 \seealso{\code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and \code{\link{plot}} methods, and the \code{\link{cv.nclreg}} function.}

@@ -10,14 +10,15 @@
 zipath_fit(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, 
            intercept = TRUE, family = c("poisson", "negbin", "geometric"), 
            link = c("logit", "probit", "cloglog", "cauchit", "log"), 
-           penalty = c("enet", "mnet",  "snet"), start = NULL, y = TRUE, x = FALSE, 
-           nlambda=100, lambda.count=NULL, lambda.zero=NULL, 
+           penalty = c("enet", "mnet",  "snet"), start = NULL, y = TRUE, 
+           x = FALSE, nlambda=100, lambda.count=NULL, lambda.zero=NULL, 
            type.path=c("active", "nonactive"), penalty.factor.count=NULL, 
            penalty.factor.zero=NULL, lambda.count.min.ratio=.0001, 
-           lambda.zero.min.ratio=.1, alpha.count=1, alpha.zero=alpha.count, gamma.count=3,
-           gamma.zero=gamma.count, rescale=FALSE, init.theta=NULL, theta.fixed=FALSE, 
-           EM=TRUE, maxit.em=200, convtype=c("count", "both"), maxit= 1000, 
-           maxit.theta =10, reltol = 1e-5, thresh=1e-6, eps.bino=1e-5, shortlist=FALSE, 
+           lambda.zero.min.ratio=.1, alpha.count=1, alpha.zero=alpha.count, 
+           gamma.count=3, gamma.zero=gamma.count, rescale=FALSE, 
+           init.theta=NULL, theta.fixed=FALSE, EM=TRUE, maxit.em=200, 
+           convtype=c("count", "both"), maxit= 1000, maxit.theta =10, 
+           reltol = 1e-5, thresh=1e-6, eps.bino=1e-5, shortlist=FALSE, 
            trace=FALSE, ...)
 }
 \arguments{
@@ -33,7 +34,8 @@ zipath_fit(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE,
    zero (FALSE)}
   \item{standardize}{Logical flag for x variable standardization, prior to
     fitting the model sequence. The coefficients are always returned on
-    the original scale. Default is \code{standardize=TRUE}.}
+    the original scale. 
+    Default is \code{standardize=TRUE}.}
   \item{family}{character specification of count model family (a log link is 
     always used).}
   \item{link}{character specification of link function in the binary
@@ -45,7 +47,8 @@ zipath_fit(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE,
   \item{lambda.count}{A user supplied \code{lambda.count} sequence. Typical usage is to have the program compute its own \code{lambda.count} and \code{lambda.zero} sequence based on
     \code{nlambda} and \code{lambda.min.ratio}.} 
   \item{lambda.zero}{A user supplied \code{lambda.zero} sequence.}
-\item{type.path}{solution path with default value \code{"active"}, which is less time computing than \code{"nonactive"}. If \code{type.path="nonactive"}, no active set for each element of the lambda sequence and cycle through all the predictor variables. If \code{type.path="active"}, then cycle through only the active set, then cycle through all the variables for the same penalty parameter. See details below.} 
+\item{type.path}{solution path with default value \code{"active"}, which is less time computing than \code{"nonactive"}. If \code{type.path="nonactive"}, no active set for each element of the lambda sequence and cycle through all the predictor variables. 
+    If \code{type.path="active"}, then cycle through only the active set, then cycle through all the variables for the same penalty parameter. See details below.} 
   \item{penalty.factor.count, penalty.factor.zero}{These are numeric vectors with the same length as predictor variables. that multiply \code{lambda.count, lambda.zero}, respectively, to allow differential shrinkage of coefficients. Can be 0 for some variables, which implies
     no shrinkage, and that variable is always included in the
     model. Default is same shrinkage for all variables.}
@@ -61,7 +64,8 @@ Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}.
   \item{gamma.zero}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the zero part of model.}
   \item{rescale}{logical value, if TRUE, adaptive rescaling}
   \item{init.theta}{The initial value of \code{theta} for \code{family="negbin"}. This is set to \code{NULL} since version 0.3-24.} 
-  \item{theta.fixed}{Logical value only used for \code{family="negbin"}. If \code{TRUE} and \code{init.theta} is provided with a numeric value > 0, then \code{init.theta} is not updated. If \code{theta.fixed=FALSE}, then \code{init.theta} will be updated. In this case, if \code{init.theta=NULL}, its initial value is computed with intercept-only zero-inflated negbin model. }
+  \item{theta.fixed}{Logical value only used for \code{family="negbin"}. If \code{TRUE} and \code{init.theta} is provided with a numeric value > 0, then \code{init.theta} is not updated. 
+      If \code{theta.fixed=FALSE}, then \code{init.theta} will be updated. In this case, if \code{init.theta=NULL}, its initial value is computed with intercept-only zero-inflated negbin model. }
 \item{EM}{Using \code{EM} algorithm. Not implemented otherwise}
 \item{convtype}{convergency type, default is for count component only for speedy computation} 
 \item{maxit.em}{Maximum number of EM algorithm}
@@ -84,15 +88,15 @@ Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}.
   If \code{type.path="active"}, the algorithm iterates for a pair (lambda_count, lambda_zero) in a loop:\cr
   Step 1: For initial coefficients start_count of the count model and start_zero of the zero model, the EM algorithm is iterated until convergence for the active set with non-zero coefficients determined from start_count and start_zero, respectively.\cr
   Step 2: EM is iterated for all the predict variables once.\cr
-  Step 3: If active set obtained from Step 2 is the same as in Step 1, stop; othwerise, repeat Step 1 and Step 2.\cr
+  Step 3: If active set obtained from Step 2 is the same as in Step 1, stop; otherwise, repeat Step 1 and Step 2.\cr
   If \code{type.path="nonactive"}, the EM algorithm iterates for a pair (lambda_count, lambda_zero) with all the predict variables until convergence. 
 
   A set of standard extractor functions for fitted model objects is available for
   objects of class \code{"zipath"}, including methods to the generic functions
   \code{\link[base]{print}}, \code{\link[stats]{coef}}, 
   \code{\link[stats]{logLik}}, \code{\link[stats]{residuals}}, 
-  \code{\link[stats]{predict}}. See \code{\link{predict.zipath}} for more details
-  on all methods.
+  \code{\link[stats]{predict}}. 
+  See \code{\link{predict.zipath}} for more details on all methods.
 
   The program may terminate with the following message:
 

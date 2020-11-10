@@ -810,8 +810,8 @@ predict.zipath <- function(object, newdata, which=1:object$nlambda, type = c("re
         nbetacount=object$coefficients$count[,which]
         nbetazero=object$coefficients$zero[,which]
         if(length(which)>1)
-            return(list(nbetacount=nonzeroCoef(nbetacount[-1,,drop=FALSE],bystep=TRUE),
-                        nbetazero=nonzeroCoef(nbetazero[-1,,drop=FALSE],bystep=TRUE)))
+            return(list(nbetacount=eval(parse(text="glmnet:::nonzeroCoef(nbetacount[-1,,drop=FALSE],bystep=TRUE)")),
+                        nbetazero=eval(parse(text="glmnet:::nonzeroCoef(nbetazero[-1,,drop=FALSE],bystep=TRUE"))))
         else return(list(nbetacount=which(abs(nbetacount[-1]) > 0), nbetazero=which(abs(nbetazero[-1]) > 0)))
     }
     predictzeroinfl1(object, newdata, which, type,

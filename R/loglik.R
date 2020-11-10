@@ -10,8 +10,6 @@ family <- object$family
 nlambda <- object$nlambda
 beta <- object$beta
 b0 <- object$b0
-if(missing(offset))
- offset <- object$offset
 famtype <- switch(family,
       "gaussian"=1,
       "binomial"=2,
@@ -26,6 +24,12 @@ famtype <- switch(family,
 }
 if(missing(weights)) weights <- rep(1, nobs)
 w <- weights
+if(object$is.offset){
+     if(is.null(offset))
+       stop("offset is used in the estimation but not provided in prediction\n")
+}else offset <- rep(0, nobs)
+#if(missing(offset))
+# offset <- object$offset
  res <- .Fortran("pred",
  n=as.integer(nobs),
  m=as.integer(nvars),

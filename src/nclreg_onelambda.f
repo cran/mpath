@@ -17,7 +17,7 @@ C     output: start_act, etastart, mustart, beta_1, b0_1, fk
 
          k = 1
          d = 10
-         call loss(n, y, yhat, 0.5D0, rfamily, s, los)
+         call loss(n, y, yhat, rfamily, s, los)
          call penGLM(beta_1, m_act, lambda_i*penaltyfactor_act,
      +        alpha, gam, penalty, penval)
          pll_old=los + penval
@@ -58,7 +58,7 @@ C                  d=d+(start_act(j+1)-beta_1(j))**2
                   start_act(j+1)=beta_1(j)
  100           continue
             endif
-         call loss(n, y, yhat, 0.5D0, rfamily, s, los)
+         call loss(n, y, yhat, rfamily, s, los)
          call penGLM(beta_1, m_act, lambda_i*penaltyfactor_act,
      +        alpha, gam, penalty, penval)
          pll=los + penval

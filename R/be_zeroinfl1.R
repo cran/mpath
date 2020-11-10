@@ -27,7 +27,7 @@ be.zeroinfl <- function(object, data, dist=c("poisson", "negbin", "geometric"), 
         if(dist!="negbin")
         count.order <- order(coef$count[-1,4], decreasing=TRUE) ### which variable has maximum p-value from count model 
         else count.order <- order(coef$count[-c(1,d),4], decreasing=TRUE) ### which variable has maximum p-value from count model 
-        zero.order <- order(coef$zero[-1,4], decreasing=TRUE) ### which variable has maximum p-value from count model 
+        zero.order <- order(coef$zero[-1,4], decreasing=TRUE) ### which variable has maximum p-value from zero model 
         rhs1 <- attr(fit$terms$count, "term.labels")
         rhs2 <- attr(fit$terms$zero, "term.labels")
 

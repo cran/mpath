@@ -8,7 +8,7 @@
 
 \usage{
 be.zeroinfl(object, data, dist=c("poisson", "negbin", "geometric"), alpha=0.05, 
-trace=FALSE)
+            trace=FALSE)
 }
 
 \arguments{

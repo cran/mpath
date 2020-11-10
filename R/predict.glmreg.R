@@ -1,4 +1,4 @@
-predict.glmreg <- function(object,newx,which=1:length(object$lambda), type=c("link","response","class","coefficients","nonzero"), newoffset=NULL, na.action=na.pass, ...){
+predict.glmreg <- function(object,newx,newoffset, which=1:length(object$lambda), type=c("link","response","class","coefficients","nonzero"), na.action=na.pass, ...){
  type=match.arg(type)
   if(missing(newx)){
     if(!match(type,c("coefficients","nonzero"),FALSE))stop("You need to supply a value for 'newx'")
@@ -7,7 +7,7 @@ predict.glmreg <- function(object,newx,which=1:length(object$lambda), type=c("li
 if(!is.null(object$terms)){
  mf <- model.frame(delete.response(object$terms), newx, na.action = na.action, xlev = object$xlevels)
  newx <- model.matrix(delete.response(object$terms), mf, contrasts = object$contrasts)
- newx <- newx[,-1] ### remove the intercept
+ newx <- newx[, -1, drop = FALSE] ### remove the intercept
 }
 }
   b0=as.matrix(object$b0)
@@ -18,7 +18,8 @@ if(!is.null(object$terms)){
   nlambda <- length(lambda)
   if(type=="coefficients")return(nbeta)
   if(type=="nonzero"){
-  if(nlambda>1) return(nonzeroCoef(nbeta[-1,,drop=FALSE],bystep=TRUE))
+  #if(nlambda>1) return(nonzeroCoef(nbeta[-1,,drop=FALSE],bystep=TRUE))
+  if(nlambda>1) return(eval(parse(text="glmnet:::nonzeroCoef(nbeta[-1,,drop=FALSE],bystep=TRUE)")))
   else return(which(abs(nbeta[-1]) > 0))
 }
   famtype <- switch(object$family,
@@ -32,10 +33,11 @@ if(!is.null(object$terms)){
       newx <- matrix(unlist(newx), ncol=m)
       #newx <- as.matrix(as.data.frame(lapply(newx, as.numeric)))
   if(dim(object$beta)[1] != m) stop("number of columns in newx should be the same as number of rows in beta\n")
-  if(is.null(newoffset))
-      offset <- object$offset
-    else
-      offset <- newoffset
+  if(object$is.offset)
+    if(is.null(newoffset))
+      stop("offset is used in the estimation but not provided in prediction\n")
+    else offset <- newoffset
+  else offset <- rep(0, n)
   res <- .Fortran("pred",
 				  n=as.integer(n),
 				  m=as.integer(m),

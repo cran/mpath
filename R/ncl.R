@@ -65,7 +65,7 @@ ncl.matrix <- function(x, y, weights, offset=NULL, ...){
     return(RET)
 }
 
-ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, reltol=1e-5, trace=FALSE){
+ncl_fit <- function(x,y, weights, offset=NULL, rfamily=c("clossR", "closs", "gloss", "qloss"), s=NULL, fk=NULL, iter=10, reltol=1e-5, trace=FALSE){
     call <- match.call()
     rfamily <- match.arg(rfamily)
     if(is.null(s)) stop("s must be a number\n")
@@ -85,6 +85,10 @@ ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "cl
     }
     if(length(weights) != length(y))
         stop("'weights' must be the same length as response variable")
+    if (is.null(offset)){
+         is.offset <- FALSE
+         offset <- rep.int(0, length(y))
+     }else is.offset <- TRUE
     famtype <- switch(rfamily,
                       "closs"="clossMM",
                       "gloss"="glossMM",
@@ -106,7 +110,9 @@ ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "cl
         RET <- NULL
         RET$fitted.values <- fk
     }
-    los <- loss(y, f=RET$fitted.values, cost, family = rfamily, s=s, fk=RET$fitted.values)
+    cost <- 0.5
+    ### the optimization problem doesn't use cost, unlike bst
+    los <- 2*loss(y, f=RET$fitted.values, cost, family = rfamily, s=s, fk=RET$fitted.values)
     d1 <- 10 
     k <- 1
     if(trace) {
@@ -130,13 +136,13 @@ ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "cl
 	fk <- RET$fitted.values
                                         #if(rfamily=="closs")
                                         #fk <- pmin(1, pmax(-1, fk)) ### truncated at -1 or 1
-	los[k] <- mean(loss(y, f=fk, cost, family = rfamily, s=s, fk=NULL))
+	los[k] <- 2*mean(loss(y, f=fk, cost, family = rfamily, s=s, fk=NULL))
 	if(trace){
         }
 #	d1 <- sum((fk_old - fk)^2)/max(1, sum(fk_old^2))
 	if(trace) cat("\niteration", k, ": relative change of fk", d1, ", robust loss value", los[k], "\n") 
 	if(k > 1){
-            d <- abs(los[k]-los[k-1]/los[k-1])
+            d1 <- abs((los[k]-los[k-1])/los[k-1])
             if(los[k] > los[k-1]){
 		      k <- iter
             }
@@ -149,12 +155,12 @@ ncl_fit <- function(x,y, weights, offset=NULL, cost=0.5, rfamily=c("clossR", "cl
     RET$y <- y
     RET$s <- s
     RET$call <- call
-    RET$cost <- cost
     RET$rfamily <- RET$family <- rfamily
+    RET$is.offset <- is.offset
     RET
 }
 
-predict.ncl=function(object, newdata=NULL, type=c("response","class","loss", "error", "coefficients"), na.action=na.pass, ...){
+predict.ncl=function(object, newdata=NULL, newoffset=NULL, type=c("response","class","loss", "error", "coefficients"), na.action=na.pass, ...){
     type=match.arg(type)
     if(is.null(newdata)){
         if(!match(type,c("coefficients"),FALSE))stop("You need to supply a value for 'newdata'")
@@ -167,11 +173,16 @@ predict.ncl=function(object, newdata=NULL, type=c("response","class","loss", "er
 	    newdata <- model.matrix(delete.response(object$terms), mf, contrasts = object$contrasts)
         }
     }
+     if(object$is.offset)
+      if(is.null(newoffset))
+        stop("offset is used in the estimation but not provided in prediction\n")
+      else offset <- newoffset
+    else offset <- rep(0, length(ynow))
     if(type=="coefficients") return(object$coef)
     if(is.null(newdata))
         res <- object$fitted.values
     else
-        res <- newdata %*% object$coef
+        res <- offset + newdata %*% object$coef
     if(type=="response") return(res)
     if(type=="loss") return(mean(loss(ynow, res, family = object$family, s=object$s)))
     if(type=="error") return(evalerr(object$family, ynow, res))

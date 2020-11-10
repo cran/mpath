@@ -7,7 +7,7 @@
 \alias{coef.cv.nclreg}
 \title{Cross-validation for nclreg}
 \description{Does k-fold cross-validation for nclreg, produces a plot,
-  and returns cross-validated log-likelihood values for \code{lambda}}
+  and returns cross-validated loss values for \code{lambda}}
 \usage{
 \method{cv.nclreg}{formula}(formula, data, weights, offset=NULL, ...)
 \method{cv.nclreg}{matrix}(x, y, weights, offset=NULL, ...)
@@ -43,9 +43,9 @@
 \value{an object of class \code{"cv.nclreg"} is returned, which is a
   list with the ingredients of the cross-validation fit.
   \item{fit}{a fitted nclreg object for the full data.}
-  \item{residmat}{matrix of log-likelihood values with row values for \code{lambda} and column values for \code{k}th cross-validation}
+  \item{residmat}{matrix of loss values with row values for \code{lambda} and column values for \code{k}th cross-validation}
   \item{bic}{matrix of BIC values with row values for \code{lambda} and column values for \code{k}th cross-validation}
-  \item{cv}{The mean cross-validated log-likelihood values - a vector of length
+  \item{cv}{The mean cross-validated loss values - a vector of length
     \code{length(lambda)}.}
   \item{cv.error}{estimate of standard error of \code{cv}.}
   \item{foldid}{an optional vector of values between 1 and \code{nfold}
@@ -58,9 +58,8 @@
 \references{
   Zhu Wang (2019)
   \emph{MM for Penalized Estimation},
- https://arxiv.org/abs/1912.11119
- }
-
+ \url{https://arxiv.org/abs/1912.11119
+ }}
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 
 \seealso{\code{\link{nclreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.nclreg"} object.}

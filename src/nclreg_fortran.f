@@ -4,7 +4,7 @@ C     repeated ones
       subroutine nclreg_fortran(x, y, weights, n,m,start, etastart,
      +     mustart, offset, iter, nlambda, lambda, alpha, gam, 
      +     standardize, intercept, penaltyfactor, maxit, eps, epscycle, 
-     +     penalty, trace, del,rfamily, B, s, thresh, cost, 
+     +     penalty, trace, del,rfamily, B, s, thresh, 
      +     decreasing, active, beta, b0, yhat, los, pll, nlambdacal)
       implicit none
       integer n,m,i,ii,j,jj,penalty,nlambda, standardize, maxit,
@@ -15,7 +15,7 @@ C     repeated ones
      +     mustart(n), offset(n), lambda(nlambda), alpha, gam, eps, 
      +     penaltyfactor(m), thresh, beta(m, nlambda), epscycle,
      +     b0(nlambda), b0_1, yhat(n), del, lambda_i, s, 
-     +     B, fk(n), los(nlambda), pll(nlambda), cost, penval
+     +     B, fk(n), los(nlambda), pll(nlambda), penval
       double precision, dimension(:, :), allocatable :: x_act
       double precision, dimension(:), allocatable :: start_act, beta_1,
      +     penaltyfactor_act
@@ -66,7 +66,7 @@ C     repeated ones
      +        intercept, penaltyfactor_act, maxit, eps, penalty, trace, 
      +        iter, del, rfamily, B, s, thresh, beta_1, b0_1, fk)
          nlambdacal=nlambdacal+1
-         call loss(n, y, fk, cost, rfamily, s, los(i))
+         call loss(n, y, fk, rfamily, s, los(i))
          call penGLM(beta_1, m_act, lambda_i*penaltyfactor_act, 
      +        alpha, gam, penalty, penval)
          if(standardize .EQ. 1)then

@@ -1,8 +1,8 @@
 "cv.folds" <-
     function(n, folds = 10)
-    {
-        split(sample(1:n), rep(1:folds, length = n))
-    }
+{
+    split(sample(1:n), rep(1:folds, length = n))
+}
 
 cv.glmreg <- function(x, ...) UseMethod("cv.glmreg", x)
 
@@ -65,83 +65,111 @@ cv.glmreg.matrix <- function(x, y, weights, offset=NULL, ...){
 }
 
 cv.glmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE, 
-                          family=c("gaussian", "binomial", "poisson", "negbin"), 
+                          family=c("gaussian", "binomial", "poisson", "negbin"), type=c("loss", "error"), 
                           nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE,  
                           ...){
     call <- match.call()
     if(missing(foldid) && nfolds < 3)
         stop("smallest nfolds should be 3\n")
     family <- match.arg(family)
+    type <- match.arg(type)
     nm <- dim(x)
     nobs <- n <- nm[1]
     nvars <- m <- nm[2]
     if(missing(weights)) weights <- rep(1, nobs)
-    if(is.null(offset)) offset <- rep(0, nobs)
+                                        #    if(is.null(offset)) offset <- rep(0, nobs)
     K <- nfolds
     glmreg.obj <- glmreg_fit(x, y, weights, offset=offset, lambda=lambda, family=family, ...)
     lambda <- glmreg.obj$lambda
     nlambda <- length(lambda)
     if(missing(foldid)){
         if(family=="binomial" && balance)  
-            all.folds <- balanced.folds(y, K)
+            invisible(capture.output(all.folds <- eval(parse(text="pamr:::balanced.folds(y, K)"))))
         else all.folds <- cv.folds(length(y), K)
     }
     else all.folds <- foldid
     if(parallel){
-    registerDoParallel(cores=n.cores)
-    i <- 1  ###needed to pass R CMD check with parallel code below
-    #residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
-    #residmat should be a list since it is possible to generate different length of loss values, thus, cbind may fail
-    residmat <- foreach(i=seq(K), .packages=c("mpath")) %dopar% {
-        omit <- all.folds[[i]]
-        fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offset[- omit], lambda=lambda, family=family, ...)
-	logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit], offset=offset[omit])
+        cl <- eval(parse(text="parallel:::makeCluster(n.cores)"))
+        registerDoParallel(cl)
+        i <- 1  ###needed to pass R CMD check with parallel code below
+                                        #residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
+                                        #residmat should be a list since it is possible to generate different length of loss values, thus, cbind may fail
+        residmat <- foreach(i=seq(K), .packages=c("mpath")) %dopar% {
+            omit <- all.folds[[i]]
+            if(!is.null(offset)){
+                offsetnow <- offset[- omit] 
+                newoffset <- offset[omit] 
+            }else offsetnow <- newoffset <- NULL 
+            fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, lambda=lambda, family=family, ...)
+            if(type=="loss") logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit], offset=newoffset)
+            else if(family=="binomial" && type=="error"){
+                tmp <- predict(fitcv, newx=x[omit,, drop=FALSE], weights=weights[omit], offset=newoffset, type="class")!=y[omit]
+                apply(tmp, 2, mean)
+            }
+        }
+        eval(parse(text="parallel:::stopCluster(cl)"))
+        residmat <- sapply(residmat, '[', seq(max(sapply(residmat, length))))
+        }
+        else{
+            residmat <- matrix(NA, nlambda, K)
+            for(i in seq(K)) {
+                if(trace)
+                    cat("\n CV Fold", i, "\n\n")
+                omit <- all.folds[[i]]
+                if(!is.null(offset)){
+                    offsetnow <- offset[- omit] 
+                    newoffset <- offset[omit] 
+                }else offsetnow <- newoffset <- NULL 
+                fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, lambda=lambda, family=family, ...)
+                if(type=="loss") residmat[1:fitcv$nlambda, i] <- logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit], offset=newoffset)
+                else if(family=="binomial" && type=="error"){
+                tmp <- predict(fitcv, newx=x[omit,, drop=FALSE], weights=weights[omit], offset=newoffset, type="class")!=y[omit]
+                residmat[1:fitcv$nlambda, i] <- apply(tmp, 2, mean)
+                }
+            }
+        }
+        cv <- apply(residmat, 1, mean)
+        cv.error <- sqrt(apply(residmat, 1, var)/K)
+        if(type=="loss") lambda.which <- which.max(cv) else
+            if(type=="error" && family=="binomial") lambda.which <- which.min(cv)
+        if(family=="binomial")
+            good <- which(!is.na(cv))
+        else
+            good <- 1:nlambda
+        obj<-list(fit=glmreg.obj, residmat=residmat[good,], lambda = lambda[good], cv = cv[good], cv.error = cv.error[good], foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which], type=type)
+        if(plot.it) plot.cv.glmreg(obj,se=se)
+        class(obj) <- "cv.glmreg"
+        obj
     }
-    stopImplicitCluster()
-    residmat <- sapply(residmat, '[', seq(max(sapply(residmat, length))))
-    }
-    else{
-     residmat <- matrix(NA, nlambda, K)
-     for(i in seq(K)) {
-       if(trace)
-         cat("\n CV Fold", i, "\n\n")
-       omit <- all.folds[[i]]
-       fitcv <- glmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offset[- omit], lambda=lambda, family=family, ...)
-       residmat[1:fitcv$nlambda, i] <- logLik(fitcv, newx=x[omit,, drop=FALSE], y[omit], weights=weights[omit], offset=offset[omit])
-     }
-    }
-    cv <- apply(residmat, 1, mean)
-    cv.error <- sqrt(apply(residmat, 1, var)/K)
-    lambda.which <- which.max(cv)
-    if(family=="binomial")
-    good <- which(!is.na(cv))
-    else
-    good <- 1:nlambda
-    obj<-list(fit=glmreg.obj, residmat=residmat[good,], lambda = lambda[good], cv = cv[good], cv.error = cv.error[good], foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
-    if(plot.it) plot.cv.glmreg(obj,se=se)
-    class(obj) <- "cv.glmreg"
-    obj
-}
 
-"plot.cv.glmreg" <-
-    function(x,se=TRUE,ylab=NULL, main=NULL, width=0.02, col="darkgrey", ...){
-        lambda <- x$lambda
-        cv <- x$cv
-        cv.error <- x$cv.error
-        if(is.null(ylab))
-            ylab <- "log-likelihood"
-        plot(log(lambda), cv, type = "b", xlab = expression(log(lambda)), ylab= ylab, ylim = range(cv, cv + cv.error, cv - cv.error), main=main)
-        if(se)
-            error.bars(log(lambda), cv + cv.error, cv - cv.error,
-                       width = width, col=col)
+    "plot.cv.glmreg" <-
+        function(x,se=TRUE,ylab=NULL, main=NULL, width=0.02, col="darkgrey", ...){
+            lambda <- x$lambda
+            cv <- x$cv
+            cv.error <- x$cv.error
+            if(is.null(ylab) && x$fit$family=="binomial" && x$type=="error")
+                ylab <- "misclassification error"
+            else if(is.null(ylab))
+                ylab <- "log-likelihood"
+            if(all(lambda > 0)){
+            plot(log(lambda), cv, type = "b", xlab = expression(log(lambda)), ylab= ylab, ylim = range(cv, cv + cv.error, cv - cv.error), main=main)
+            if(se)
+                error.bars(log(lambda), cv + cv.error, cv - cv.error,
+                           width = width, col=col)
+            }else{
+            plot(lambda, cv, type = "b", xlab = expression(lambda), ylab= ylab, ylim = range(cv, cv + cv.error, cv - cv.error), main=main)
+            if(se)
+                error.bars(lambda, cv + cv.error, cv - cv.error,
+                           width = width, col=col)
+            }
 
-        invisible()
-    }
+            invisible()
+        }
 
-predict.cv.glmreg=function(object, newx, ...){
+    predict.cv.glmreg=function(object, newx, ...){
       	predict(object$fit,newx,which=object$lambda.which,...)
-}
+    }
 
-coef.cv.glmreg=function(object,which=object$lambda.which,...){
-    coef(object$fit,which=which,...)
-}
+    coef.cv.glmreg=function(object,which=object$lambda.which,...){
+        coef(object$fit,which=which,...)
+    }

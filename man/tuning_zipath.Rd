@@ -8,10 +8,10 @@ Fit penalized zero-inflated models, generate multiple paths with varying penalty
   }
 \usage{
 tuning.zipath(formula, data, weights, subset, na.action, offset, standardize=TRUE,
-family = c("poisson", "negbin", "geometric"), penalty = c("enet", "mnet", "snet"), 
-lambdaCountRatio = .0001, lambdaZeroRatio = c(.1, .01, .001), 
-maxit.theta=1, gamma.count=3, gamma.zero=3, ...)
-
+              family = c("poisson", "negbin", "geometric"), 
+              penalty = c("enet", "mnet", "snet"), lambdaCountRatio = .0001, 
+              lambdaZeroRatio = c(.1, .01, .001), maxit.theta=1, gamma.count=3, 
+              gamma.zero=3, ...)
 }
 
 \arguments{

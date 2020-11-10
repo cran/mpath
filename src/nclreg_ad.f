@@ -5,7 +5,7 @@ C
       subroutine nclreg_ad(x, y, weights, n,m,start, etastart,
      +     mustart, offset, iter, nlambda, lambda, alpha, gam, 
      +     standardize, intercept, penaltyfactor, maxit, eps, epscycle, 
-     +     penalty, trace, del,rfamily, B, s, thresh, cost, 
+     +     penalty, trace, del,rfamily, B, s, thresh, 
      +     decreasing, beta, b0, yhat, los, pll, nlambdacal)
       implicit none
       integer n,m,i,ii,j,jj,penalty,nlambda, standardize, maxit,
@@ -17,7 +17,7 @@ C
      +     penaltyfactor(m), thresh, beta(m, nlambda), epscycle,
      +     betaall(m), b0all, b0(nlambda), b0_1, yhat(n), del, 
      +     lambda_i, s, B, fk(n), los(nlambda), 
-     +     pll(nlambda), cost, penval
+     +     pll(nlambda), penval
       double precision, dimension(:, :), allocatable :: x_act
       double precision, dimension(:), allocatable :: start_act, beta_1,
      +     penaltyfactor_act
@@ -154,7 +154,7 @@ C                  call dblepr("b0_1=", -1, b0_1, 1)
                beta(activeset(ii), i)=beta_1(ii)
             enddo
          endif
-         call loss(n, y, fk, cost, rfamily, s, los(i))
+         call loss(n, y, fk, rfamily, s, los(i))
          call penGLM(beta_1, m_act, lambda_i*penaltyfactor_act, 
      +        alpha, gam, penalty, penval)
          if(standardize .EQ. 1)then
