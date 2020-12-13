@@ -30,6 +30,7 @@
 }
 
 \examples{
+\dontrun{
 x <- matrix(rnorm(40*2), ncol=2)
 y <- c(rep(-1, 20), rep(1, 20))
 x[y==1,] <- x[y==1, ] + 1
@@ -37,6 +38,7 @@ ccsvm.opt <- cv.ccsvm(x, y, type="C-classification", s=1, kernel="linear", cfun=
 ccsvm.opt$cost
 ccsvm.opt$gamma
 ccsvm.opt$s
+}
 }
 \references{
    Zhu Wang (2020) \emph{Unified Robust Estimation via the COCO, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}

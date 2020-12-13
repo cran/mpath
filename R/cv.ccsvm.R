@@ -129,6 +129,9 @@ cv.ccsvm_fit <- function(x,y, weights, cfun="ccave", s=c(1, 5), type=NULL,
         }
     eval(parse(text="parallel:::stopCluster(cl)")) 
     kseq <- 4*(1:K)
+    dl <- length(dim(residmat))
+    if (!dl)
+        stop("no parameters are valid for SVM")
     err <- apply(residmat[,kseq], 1, mean) #average error cross K folds
     opt <- residmat[which.min(err), 1:3]
     if(kernel=="linear"){
