@@ -34,12 +34,13 @@ nrun <- 100
 penalty <- c("enet", "snet", "mnet")
 ### Smallest value for lambda, as a fraction of lambda.max, the smallest value for which all coefficients are zero except the intercept
 ratio <- 0.25
-type.path <- "active"
+type.path <- "nonactive"
 nlam <- ifelse(type.path!="onestep", 30, 100)
 ### The training data is contaminated by randomly switching response variable labels at varying pre-specified proportions
 per <- c(0, 0.05, 0.10, 0.15)
 ### what quantity is minimized for tuning parameter selection
 tuning <- "error"
+n.cores <- 5
 ### robust nonconvex loss function, rfamily type and logistic
 type <- c("closs", "gloss", "qloss", "binomial")
 ### and corresponding labels
@@ -93,18 +94,20 @@ plot.it <- TRUE
 #          dat.m1 <- nclreg(x=dtr, y=ytr, s=s[k], iter=100, rfamily = type[k], penalty=penalty[j], lambda.min.ratio=ratio, gamma=gam, mstop.init=mstop, nu.init=nu, type.path=type.path, decreasing=FALSE, type.init="bst")
 #          lambda <- dat.m1$lambda[1:nlam]
 #          set.seed(1000+ii)
-#  	cvm1 <- cv.nclreg(x=dtr, y=ytr, nfolds=5, n.cores=n.cores, s=s[k], lambda=lambda, rfamily = type[k], penalty=penalty[j], gamma=gam, type=tuning, plot.it=FALSE, type.init=dat.m1$type.init, mstop.init=dat.m1$mstop.init, nu.init=dat.m1$nu.init, type.path=type.path, decreasing=dat.m1$decreasing)
+#  	cvm1 <- cv.nclreg(x=dtr, y=ytr, nfolds=5, n.cores=n.cores, parallel=TRUE, s=s[k], lambda=lambda, rfamily = type[k], penalty=penalty[j], gamma=gam, type=tuning, plot.it=FALSE, type.init=dat.m1$type.init, mstop.init=dat.m1$mstop.init, nu.init=dat.m1$nu.init, type.path=type.path, decreasing=dat.m1$decreasing)
 #          err1 <- predict(dat.m1, newdata=dte, newy=yte, type="error")
 #        }
 #        else{
 #          dat.m1 <- glmreg(x=dtr, y=(ytr+1)/2, family = type[k], penalty=penalty[j], lambda.min.ratio=ratio, gamma=gam)
 #          set.seed(1000+ii)
-#  	cvm1 <- cv.glmreg(x=dtr, y=(ytr+1)/2, nfolds=5, n.cores=n.cores, lambda=dat.m1$lambda,
+#  	cvm1 <- cv.glmreg(x=dtr, y=(ytr+1)/2, nfolds=5, n.cores=n.cores, parallel=TRUE, lambda=dat.m1$lambda,
 #          family = type[k], penalty=penalty[j], gamma=gam, plot.it=FALSE)
 #          err1 <- apply((yte > -1)!=predict(dat.m1, newx=dte, type="class"), 2, mean)
 #        }
 #        optmstop <- cvm1$lambda.which
 #        err.m1[ii, i] <- err1[optmstop]
+#        if(ii==1) varid <- names(predict(dat.m1, which=optmstop, type="nonzero")) else
+#         varid <- intersect(varid, names(predict(dat.m1, which=optmstop, type="nonzero")))
 #        nvar.m1[ii, i] <- length(predict(dat.m1, which=optmstop, type="nonzero"))
 #        errbest.m1[ii, i] <- min(err1, na.rm=TRUE)
 #        lambest.m1[ii, i] <- which.min(err1)
@@ -120,6 +123,7 @@ plot.it <- TRUE
 #      "snet"="SCAD")
 #      cat("penalty=", pentype, "\n")
 #      if(penalty[j] %in% c("snet", "mnet")) cat("gamma=", gam, "\n")
+#      cat("common variables selected:", varid, "\n")
 #      cat("best misclassification error\n")
 #      print(round(apply(errbest.m1, 2, summary7),4))
 #      cat("which lambda has best error\n")

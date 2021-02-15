@@ -24,7 +24,7 @@ nclreg_fit(x, y, weights, offset, rfamily=c("clossR", "closs", "gloss", "qloss")
   \item{weights}{observation weights. Can be total counts if responses are proportion matrices. Default is 1 for each observation}
   \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting. This should be NULL or a numeric vector of length equal to the number of cases. Currently only one offset term can be included in the formula.}
   \item{rfamily}{Response type and relevant loss functions (see above)}
-  \item{s}{ nonconvex loss tuning parameter for robust regression and classification. }
+  \item{s}{ nonconvex loss tuning parameter for robust regression and classification. The \code{s} value is for robust nonconvex loss where smaller \code{s} value is more robust to outliers with \code{rfamily="closs"}, and larger \code{s} value more robust with \code{rfamily="clossR", "gloss", "qloss"}.}
   \item{fk}{ predicted values at an iteration in the MM algorithm }
   \item{nlambda}{The number of \code{lambda} values - default is 100. The sequence may be truncated before \code{nlambda} is reached if a close to saturated model is fitted. See also \code{satu}.}
   \item{lambda}{ by default, the algorithm provides a sequence of regularization values, or a user supplied \code{lambda} sequence }

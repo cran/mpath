@@ -53,7 +53,7 @@ cv.nclreg.formula <- function(formula, data, weights, offset=NULL, ...){
     return(RET)
 }
 cv.nclreg.matrix <- function(x, y, weights, offset=NULL, ...){
-    RET <- cv.nclreg_fit(x, y, weights,...)
+    RET <- cv.nclreg_fit(x, y, weights, offset=offset, ...)
     RET$call <- match.call()
     return(RET)
 }

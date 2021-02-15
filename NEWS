@@ -280,7 +280,7 @@
   o Fix a bug with standardize=TRUE, which doesn't generate meaningful coef for R/coreg when dfun=5. For instrance, when s is large, the coef should be similar to glmreg when family="binomial", but it is not. The reason is that coreg calls for glmreg_fit_fortran, with input start, this may lead to saturated binomial model fitting. This would be the same if calling R/glmreg. Thus, glmreg_fit_fortran doesn't call updated start if dfun=5
   o add argument standardize in src/coreg_onelambda, and pass this argument to src/glmreg_fit_fortran. Previously, it was set as 0 in the latter
   o add argument rescale in R/coreg and subsequentially related src/coreg_ad, src/coreg_fortran, src/coreg_onelambda
-  o fix a bug in src/glmreg_fit_fortran: input maxit was changed. This has unexpected sequence since this subroutine is repeated in a loop. Modify src/glmreg_fit_fortran to maintain the old x values if standardize=TRUE and family=1
+  o fix a bug in src/glmreg_fit_fortran: input maxit was changed if family=1. This has unexpected sequence since this subroutine is repeated in a loop. Modify src/glmreg_fit_fortran to maintain the old x values if standardize=TRUE and family=1
   o consequently, make changes in R/nclreg which uses src/glmreg_fit_fortran, following R/coreg regarding argument standardize
   
                CHANGES in `mpath' VERSION 0.4-2.14 (08-24-2020)
@@ -306,3 +306,13 @@
 
   o add .Rbuildignore to ignore three Rmd files in vignettes
   o dontrun the example in man/cv.ccsvm for which on CRAN r-oldrel-windows-x doesn't work and could not be reproduced on current system
+  
+               CHANGES in `mpath' VERSION 0.4-2.18 (11-10-2020)
+
+  o fix a bug in src/gfunc.f when probability is close to 0/1 in binary case
+  o add more description of s value in man/nclreg_fit.Rd
+  o pass argument offset in 
+    cv.nclreg.matrix <- function(x, y, weights, offset=NULL, ...){
+      RET <- cv.nclreg_fit(x, y, weights, offset=offset, ...)
+  o R/nclreg.R with argument standardize=TRUE generates potentially quite different prediction error and variable selection compared to standardize=FALSE for brcancer.Rnw in the vigenette folder. Largely revoke the changes to mpath version 0.3-15 with respect to standardize argument in R/nclreg.
+  o Does argument standardize have the similar impact to R/ccglmreg as R/nclreg?

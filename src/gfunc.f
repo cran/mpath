@@ -11,8 +11,10 @@ C output: eta
        else if(family==2)then
          if(1-mu(i) > epsbino .AND. mu(i) > epsbino)then
           eta(i)=dlog(mu(i)/(1-mu(i)))
-         else 
-          eta(i)=0
+         else if(mu(i) .LE. epsbino)then
+           eta(i)=dlog(epsbino/(1-epsbino))
+         else if(mu(i) .GE. 1-epsbino)then
+          eta(i)=dlog(1-epsbino/epsbino)
          endif
        else if(family==3 .OR. family==4)then
           eta(i)=dlog(mu(i))
