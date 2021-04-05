@@ -71,6 +71,7 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
     b0 <- tht <- nulldev <- resdev <- rep(NA, nlambda)                           
     convout <- twologlik <- rep(NA, nlambda)
     if(parallel){
+        warning("trace argument is ignored since parallel=TRUE")
         cl <- parallel::makeCluster(n.cores)
         registerDoParallel(cl)
         fitall <- foreach(k=1:nlambda) %dopar%{
@@ -111,8 +112,9 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
                 start <- c(fit$b0, fit$beta)
                 del <- t0 - th
                 Lm0 <- Lm
-                penval <- ifelse(standardize, n*fit$penval, fit$penval)
-                Lm <- loglik(n, th, mu, Y, w) - penval
+                #penval <- ifelse(standardize, n*fit$penval, fit$penval)
+                #Lm <- loglik(n, th, mu, Y, w) - penval
+                Lm <- loglik(n, th, mu, Y, w)
                 fit$df.residual <- n - fit$df - 1
                 d1 <- sqrt(2 * max(1, fit$df.residual))
                 converged <- abs((Lm0 - Lm)/d1) + abs(del/d2) < 1e-8
@@ -186,8 +188,9 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
                 start <- c(fit$b0, fit$beta)
                 del <- t0 - th
                 Lm0 <- Lm
-                penval <- ifelse(standardize, n*fit$penval, fit$penval)
-                Lm <- loglik(n, th, mu, Y, w) - penval
+                #penval <- ifelse(standardize, n*fit$penval, fit$penval)
+                #Lm <- loglik(n, th, mu, Y, w) - penval # is penval needed?
+                Lm <- loglik(n, th, mu, Y, w)
                 fit$df.residual <- n - fit$df - 1
                 d1 <- sqrt(2 * max(1, fit$df.residual))
                 converged <- abs((Lm0 - Lm)/d1) + abs(del/d2) < 1e-8
@@ -197,6 +200,8 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
                     message("Theta(", iter, ") =", signif(th),
                             ", 2(Ls - Lm) =", signif(Dev))
                 }
+               # if(k==5) browser()
+               # fit0 <- glmreg_fit(x=X[,-1], y=Y, weights=w, lambda=3, family="negbin", theta=th)
             }
             if(!is.null(attr(th, "warn"))) fit$th.warn <- attr(th, "warn")
             if(trace && iter > maxit.theta) {

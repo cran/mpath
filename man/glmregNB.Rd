@@ -80,7 +80,7 @@ An object with S3 class \code{"glmreg", "glmregNB"} for the various types of mod
   \item{beta}{A \code{nvars x
       length(lambda)} matrix of coefficients.}
   \item{lambda}{The actual sequence of \code{lambda} values used}
-  \item{dev}{The computed deviance. The deviance calculations incorporate weights if
+  \item{resdev}{The computed deviance. The deviance calculations incorporate weights if
   present in the model. The deviance is defined to be 2*(loglike_sat -
   loglike), where loglike_sat is the log-likelihood for the saturated
   model (a model with a free parameter per observation). }

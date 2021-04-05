@@ -148,30 +148,33 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     lambda <- rep(0, nvars)
     penalty.factor <- rep(1, nvars)
 }
-#    im <- inactive <- seq(m)
+    ### ref: McCullagh and Nelder, 2nd edition, 1989, page 121
+    ### compute intercept-only model
+    if(family!="negbin") tmpres <- glm(y~rep(1, nobs)-1, weights=weights, offset=offset, family=family)
+    else tmpres <- glm(y~rep(1, nobs)-1, weights=weights, offset=offset, family=negative.binomial(theta))
+    eta0 <- predict(tmpres, type="link")
+    mu0 <- predict(tmpres, type="response")
+    nulldev <- .Fortran("deveval",
+                        n=as.integer(n),
+                        y=as.double(y),
+                        mu=as.double(rep(mu0, n)),
+                        theta=as.double(theta),
+                        weights=as.double(weights),
+                        family=as.integer(famtype),
+                        dev=as.double(0),
+                        PACKAGE="mpath")$dev
 ### compute the pathwise coordinate descent, cf: section 2.5 in Friedman et al., JSS 2010, 33(1)
     if(is.null(weights)) weights <- rep(1, n)
     wt <- weights/sum(weights)
     if(is.null(mustart) || is.null(etastart) || is.null(lambda)){
-        #tmp <- init(wt, y, offset, family=family)
-        #mu <- tmp$mu
-        #eta <- tmp$eta
-    if(family!="negbin") tmpres <- glm(y~rep(1, nobs)-1, weights=weights, offset=offset, family=family)
-    else tmpres <- glm(y~rep(1, nobs)-1, weights=weights, offset=offset, family=negative.binomial(theta))
-    eta <- predict(tmpres, type="link")
-    mu <- predict(tmpres, type="response")
+     eta <- eta0
+     mu <- mu0
     }
     else{
         mu <- mustart
         eta <- etastart
     }
     if(is.null(lambda)){
-        #tmp <- init(wt, y, offset, family=family)
-        #mu <- tmp$mu
-        #eta <- tmp$eta
-        #tmpres <- glm(y~rep(1, nobs)-1, weights=wt, offset=offset, family=family)
-        #eta <- predict(tmpres, type="link")
-        #mu <- predict(tmpres, type="response")
         w <- .Fortran("glmlink",
                       n=as.integer(1),
                       mu=as.double(mu),
@@ -196,18 +199,6 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
         lambda <- exp(lpath)
     }
     else nlambda <- length(lambda)
-    ### ref: McCullagh and Nelder, 2nd edition, 1989, page 121
-    if(length(mu) != n)
-        mu <- rep(mu, n)
-    nulldev <- .Fortran("deveval",
-                        n=as.integer(n),
-                        y=as.double(y),
-                        mu=as.double(mu),
-                        theta=as.double(theta),
-                        weights=as.double(weights),
-                        family=as.integer(famtype),
-                        dev=as.double(0),
-                        PACKAGE="mpath")$dev
     beta <- matrix(0, ncol=nlambda, nrow=m)
     b0 <- rep(0, nlambda)
     if(is.null(start))

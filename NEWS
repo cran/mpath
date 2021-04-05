@@ -316,3 +316,7 @@
       RET <- cv.nclreg_fit(x, y, weights, offset=offset, ...)
   o R/nclreg.R with argument standardize=TRUE generates potentially quite different prediction error and variable selection compared to standardize=FALSE for brcancer.Rnw in the vigenette folder. Largely revoke the changes to mpath version 0.3-15 with respect to standardize argument in R/nclreg.
   o Does argument standardize have the similar impact to R/ccglmreg as R/nclreg?
+  
+               CHANGES in `mpath' VERSION 0.4-2.19 (04-04-2021)
+
+  o fix a bug in R/glmreg.R when computing nulldev. 

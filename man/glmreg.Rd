@@ -58,7 +58,7 @@ An object with S3 class \code{"glmreg"} for the various types of models.
       length(lambda)} matrix of coefficients.}
   \item{lambda}{The actual sequence of \code{lambda} values used}
   \item{offset}{the offset vector used.}
-  \item{dev}{The computed deviance (for \code{"gaussian"}, this
+  \item{resdev}{The computed deviance (for \code{"gaussian"}, this
       is the R-square). The deviance calculations incorporate weights if
   present in the model. The deviance is defined to be 2*(loglike_sat -
   loglike), where loglike_sat is the log-likelihood for the saturated
