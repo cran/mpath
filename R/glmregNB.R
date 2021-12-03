@@ -200,8 +200,6 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
                     message("Theta(", iter, ") =", signif(th),
                             ", 2(Ls - Lm) =", signif(Dev))
                 }
-               # if(k==5) browser()
-               # fit0 <- glmreg_fit(x=X[,-1], y=Y, weights=w, lambda=3, family="negbin", theta=th)
             }
             if(!is.null(attr(th, "warn"))) fit$th.warn <- attr(th, "warn")
             if(trace && iter > maxit.theta) {

@@ -320,3 +320,8 @@
                CHANGES in `mpath' VERSION 0.4-2.19 (04-04-2021)
 
   o fix a bug in R/glmreg.R when computing nulldev. 
+  
+               CHANGES in `mpath' VERSION 0.4-2.20 (12-03-2021)
+
+  o zipath calculated residuals = sqrt(weights)*(Y - Yhat), where weights were sum to 1. This has been recalculated such that weights are sum to n, where n is the sample size.
+

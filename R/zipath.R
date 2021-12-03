@@ -675,7 +675,8 @@ zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, int
     mu <- exp(Xold %*% coefc + offsetx)
     phi <- linkinv(Zold %*% coefz + offsetz)
     Yhat <- (1-phi) * mu
-    res <- sqrt(weights) * (Y - Yhat)
+    #res <- sqrt(weights) * (Y - Yhat)
+    res <- sqrt(weights*sumw) * (Y - Yhat)
     ## effective observations
     nobs <- sum(weights > 0) ## = n - sum(weights == 0)
     dfc <- apply(abs(coefc) > 0, 2, sum) 

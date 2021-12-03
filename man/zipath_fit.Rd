@@ -58,8 +58,8 @@ zipath_fit(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE,
   value for which all coefficients are zero except the intercepts).
 Note, there is a closed formula for \code{lambda.max} for \code{penalty="enet"}. If \code{rescale=TRUE}, \code{lambda.max} is the same for \code{penalty="mnet" or "snet"}. Otherwise, some modifications are required. In the current implementation, for small \code{gamma} value, the square root of the computed \code{lambda.zero[1]} is used when \code{penalty="mnet" or "snet"}. 
 }
-  \item{alpha.count}{The elastic net mixing parameter for the count part of model.}  
-  \item{alpha.zero}{The elastic net mixing parameter for the zero part of model.}  
+  \item{alpha.count}{The elastic net mixing parameter for the count part of model. The default value 1 implies no L_2 penalty, as in LASSO.}  
+  \item{alpha.zero}{The elastic net mixing parameter for the zero part of model. The default value 1 implies no L_2 penalty, as in LASSO.}  
   \item{gamma.count}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the count part of model.}
   \item{gamma.zero}{The tuning parameter of the \code{snet} or \code{mnet} penalty for the zero part of model.}
   \item{rescale}{logical value, if TRUE, adaptive rescaling}

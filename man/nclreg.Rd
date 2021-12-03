@@ -48,10 +48,11 @@ An object with S3 class \code{"nclreg"} for the various types of models.
 }
 
 \references{
- Zhu Wang (2019)
- \emph{MM for Penalized Estimation},
-\url{https://arxiv.org/abs/1912.11119 
-}}
+  Zhu Wang (2021),
+   \emph{MM for Penalized Estimation},
+   \emph{TEST},
+   \doi{10.1007/s11749-021-00770-2}
+}
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 \seealso{\code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and \code{\link{plot}} methods, and the \code{\link{cv.nclreg}} function.}

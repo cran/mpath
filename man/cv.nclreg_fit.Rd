@@ -55,10 +55,11 @@ cv.nclreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE,
   \item{lambda.optim}{value of \code{lambda} that gives minimum \code{cv} value.}
 }
 \references{
-  Zhu Wang (2019)
-  \emph{MM for Penalized Estimation},
- \url{https://arxiv.org/abs/1912.11119
- }}
+  Zhu Wang (2021), 
+  \emph{MM for Penalized Estimation}, 
+  \emph{TEST},
+  \doi{10.1007/s11749-021-00770-2}
+ }
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 \seealso{\code{\link{nclreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.nclreg"} object.}

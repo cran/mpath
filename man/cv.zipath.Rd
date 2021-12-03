@@ -49,6 +49,8 @@
 The method for \code{\link[stats]{coef}} by default
   return a single vector of coefficients, i.e., all coefficients are concatenated. By setting the \code{model}
   argument, the estimates for the corresponding model components can be extracted.
+
+When \code{family="negbin"}, it can be slow because there is a repeated search for the \code{theta} values by default. One may change the default values from \code{init.theta=NULL, theta.fixed=FALSE} to \code{init.theta=MLE, theta.fixed=TRUE}, where MLE is a number from glm.nb in the R package MASS or something desired. 
 }
 \value{an object of class \code{"cv.zipath"} is returned, which is a
   list with the components of the cross-validation fit.
