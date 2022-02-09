@@ -1,7 +1,7 @@
 useDynLib(mpath)
 
-export(glmreg, glmregNB, zipath, llfun, predictzeroinfl1, cv.folds, cv.glmreg, cv.glmreg_fit, cv.glmregNB, cv.zipath, tuning.zipath, pval.zipath, conv2glmreg, conv2zipath, estfunReg, sandwichReg, breadReg, meatReg, hessianReg, se, be.zeroinfl, rzi, ncl, nclreg, ncl_fit, nclreg_fit, cv.nclreg, cv.nclreg_fit, stan, zipath_fit, ccglm, ccglmreg, ccglmreg_fit, ccsvm, ccsvm_fit, cv.ccsvm, cv.ccsvm_fit, loss2, loss2_ccsvm, loss3, cv.ccglmreg, cv.ccglmreg_fit, compute_wt, update_wt,
-compute_g, gfunc)
+export(glmreg, glmregNB, zipath, llfun, predictzeroinfl1, cv.folds, cv.glmreg, cv.glmreg_fit, cv.glmregNB, cv.zipath, tuning.zipath, pval.zipath, conv2glmreg, conv2zipath, estfunReg, sandwichReg, breadReg, meatReg, hessianReg, se, be.zeroinfl, rzi, ncl, nclreg, ncl_fit, nclreg_fit, cv.nclreg, cv.nclreg_fit, stan, zipath_fit, ccglm, ccglmreg, ccglmreg_fit, ccsvm, ccsvm_fit, cv.ccsvm, cv.ccsvm_fit, loss2, loss2_ccsvm, loss3, cv.ccglmreg, cv.ccglmreg_fit, compute_wt, update_wt, compute_g,
+gfunc, cfun2num, y2num, y2num4glm, check_s)
 
 import("methods")
 import("stats")

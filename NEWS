@@ -324,4 +324,8 @@
                CHANGES in `mpath' VERSION 0.4-2.20 (12-03-2021)
 
   o zipath calculated residuals = sqrt(weights)*(Y - Yhat), where weights were sum to 1. This has been recalculated such that weights are sum to n, where n is the sample size.
-
+  
+               CHANGES in `mpath' VERSION 0.4-2.21 (01-18-2022)
+  
+  o change R/compute_wt.R and R/compute_g.R, where z values must be non-negative in the past versions. This restriction is removed since z can be negative when the loss function is negative loglikelihood function in the exponential family, for instance, the gamma distribution
+  o export functions cfun2num, y2num, y2num4glm, check_s, used in R package ccboost 

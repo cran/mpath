@@ -7,6 +7,10 @@
 \alias{llfun}
 \alias{pen_sum}
 \alias{predictzeroinfl1}
+\alias{cfun2num}
+\alias{y2num}
+\alias{y2num4glm}
+\alias{check_s}
 \description{Internal mpath functions}
 \author{Zhu Wang and author of ncvreg (see COPYRIGHTS)}
 \details{These are not intended for use by users. \code{findlam} is to compute the maximum value of \code{lambda} so that the coefficient estimation is zero. \code{g} is to compute a link function (not used at this moment), \code{init} is to compute eta, which is the estimated beta_0 in the intercept-only model. \code{pen_sum} is to compute the total penalty value from the estimated coefficients, \code{llfun} to compute the log-likelihood function. \code{convexMin} (from ncvreg) calculates the

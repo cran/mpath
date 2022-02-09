@@ -45,10 +45,8 @@
   accumulated, and the average value and standard deviation over the
   folds is computed. Note that \code{cv.zipath} can be used to search for
   values for \code{count.alpha} or \code{zero.alpha}: it is required to call \code{cv.zipath} with a fixed vector \code{foldid} for different values of \code{count.alpha} or \code{zero.alpha}.
-
-The method for \code{\link[stats]{coef}} by default
-  return a single vector of coefficients, i.e., all coefficients are concatenated. By setting the \code{model}
-  argument, the estimates for the corresponding model components can be extracted.
+  
+The methods for \code{\link[stats]{coef}} and \code{\link{predict}} were deprecated since version 0.3-25. In fact, the \code{fit} object was removed in the output of cv.zipath so that predict an object of cv.zipath is not feasible, and should be via zipath. See examples below. The reason for such a change is that cv.zipath can take both formula and matrix, hence \code{predict} on cv. zipath object can easily lead to problems in codes.
 
 When \code{family="negbin"}, it can be slow because there is a repeated search for the \code{theta} values by default. One may change the default values from \code{init.theta=NULL, theta.fixed=FALSE} to \code{init.theta=MLE, theta.fixed=TRUE}, where MLE is a number from glm.nb in the R package MASS or something desired. 
 }
@@ -76,7 +74,7 @@ Zhu Wang, Shuangge Ma and Ching-Yun Wang (2015) \emph{Variable selection for zer
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 
-\seealso{\code{\link{zipath}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.zipath"} object.}
+\seealso{\code{\link{zipath}} and \code{\link{plot}}, \code{\link{predict}}, methods for \code{"cv.zipath"} object.}
 \examples{
 \dontrun{
 data("bioChemists", package = "pscl")
