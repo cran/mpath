@@ -1,13 +1,11 @@
-\name{ccglmreg_fit}
-\alias{ccglmreg_fit}
-\title{Internal function for penalized CC-estimators}
+\name{irglmreg_fit}
+\alias{irglmreg_fit}
+\title{Internal function for robust penalized generalized linear models}
 \description{
-    Fit a linear model in penalized CC-family.  The
-  regularization path is computed for the lasso (or elastic net penalty), scad (or snet) and mcp (or mnet penalty), at a grid
-  of values for the regularization parameter lambda.
+    Fit a robust penalized GLM where the loss function is a composite function \code{cfun}o\code{dfun} + penalty. This does computing for \code{irglmreg}.
   }
 \usage{
-ccglmreg_fit(x, y, weights, offset, cfun="ccave", dfun="gaussian", s=NULL, 
+irglmreg_fit(x, y, weights, offset, cfun="ccave", dfun="gaussian", s=NULL, 
              delta=0.1, fk=NULL, iter=10, reltol=1e-5, 
              penalty=c("enet","mnet","snet"), nlambda=100, lambda=NULL, 
              type.path=c("active", "nonactive"), decreasing=TRUE, 
@@ -48,7 +46,7 @@ ccglmreg_fit(x, y, weights, offset, cfun="ccave", dfun="gaussian", s=NULL,
     }
 \item{s}{ tuning parameter of \code{cfun}. \code{s > 0} and can be equal    to 0 for \code{cfun="tcave"}. If \code{s} is too close to 0 for               \code{cfun="acave", "bcave", "ccave"}, the calculated weights can become 0    for all observations, thus crash the program.}
   \item{delta}{a small positive number provided by user only if                \code{cfun="gcave"} and \code{0 < s <1}}
-  \item{fk}{ predicted values at an iteration in the COCO algorithm }
+  \item{fk}{ predicted values at an iteration in the IRCO algorithm }
   \item{nlambda}{The number of \code{lambda} values - default is 100. The sequence may be truncated before \code{nlambda} is reached if a close to saturated model is fitted. See also \code{satu}.}
   \item{lambda}{ by default, the algorithm provides a sequence of regularization values, or a user supplied \code{lambda} sequence }
   \item{type.path}{solution path for \code{parallel=FALSE}. If \code{type.path="active"}, then cycle through only the active set in the next increasing \code{lambda} sequence. If \code{type.path="nonactive"}, no active set for each element of the lambda sequence and cycle through all the predictor variables.} 
@@ -70,14 +68,14 @@ ccglmreg_fit(x, y, weights, offset, cfun="ccave", dfun="gaussian", s=NULL,
     differential shrinkage of coefficients. Can be 0 for some variables, which implies
     no shrinkage, and that variable is always included in the
     model. Default is same shrinkage for all variables.}
- \item{type.init}{a method to determine the initial values. If \code{type.init="ncl"}, an intercept-only model as initial parameter and run \code{ccglmreg} regularization path forward from lambda_max to lambda_min. If \code{type.init="heu"}, heuristic initial parameters and run \code{ccglmreg} path backward or forward depending on \code{decreasing}, between lambda_min and lambda_max. If \code{type.init="bst"}, run a boosting model with \code{bst} in package bst, depending on \code{mstop.init, nu.init} and run \code{ccglmreg} backward or forward depending on \code{decreasing}.}
+ \item{type.init}{a method to determine the initial values. If \code{type.init="ncl"}, an intercept-only model as initial parameter and run \code{irglmreg} regularization path forward from lambda_max to lambda_min. If \code{type.init="heu"}, heuristic initial parameters and run \code{irglmreg} path backward or forward depending on \code{decreasing}, between lambda_min and lambda_max. If \code{type.init="bst"}, run a boosting model with \code{bst} in package bst, depending on \code{mstop.init, nu.init} and run \code{irglmreg} backward or forward depending on \code{decreasing}.}
  \item{init.family}{ character value for initial family, one of "clossR",     "closs","gloss","qloss", which can be used to derive an initial estimator, if   the selection is different from the default value }
  \item{mstop.init}{ an integer giving the number of boosting iterations when \code{type.init="bst"} }
  \item{nu.init}{ a small number (between 0 and 1) defining the step size or shrinkage parameter when \code{type.init="bst"}. }
  \item{decreasing}{ only used if \code{lambda=NULL}, a logical value used to determine regularization path direction either from lambda_max to a potentially modified lambda_min or vice versa if \code{type.init="bst", "heu"}. Since this is a nonconvex optimization, it is possible to generate different estimates for the same \code{lambda} depending on \code{decreasing}. The choice of \code{decreasing} picks different starting values.}
- \item{iter}{number of iteration in the COCO algorithm}
- \item{maxit}{Within each COCO algorithm iteration, maximum number of coordinate descent iterations for each \code{lambda} value; default is 1000.}
- \item{reltol}{convergency criteria in the COCO algorithm} 
+ \item{iter}{number of iteration in the IRCO algorithm}
+ \item{maxit}{Within each IRCO algorithm iteration, maximum number of coordinate descent iterations for each \code{lambda} value; default is 1000.}
+ \item{reltol}{convergency criteria in the IRCO algorithm} 
  \item{eps}{If a coefficient is less than \code{eps} in magnitude, then it is reported to be 0}
  \item{epscycle}{ If \code{nlambda} > 1 and the relative loss values from two consecutive \code{lambda} values change > \code{epscycle}, then re-estimate parameters in an effort to avoid trap of local optimization.}
  \item{thresh}{Convergence threshold for coordinate descent. Defaults value is \code{1e-6}.}
@@ -88,29 +86,29 @@ ccglmreg_fit(x, y, weights, offset, cfun="ccave", dfun="gaussian", s=NULL,
 }
 
 \details{
-A case weighted penalized least squares or logistic regression is fit by the COCO algorithm, where the loss function is a composite function of \code{cfun}o\code{type}.
-  The sequence of robust models implied by \code{lambda} is fit by COCO along with coordinate
+A case weighted penalized least squares or GLM is fit by the iteratively reweighted convex optimization (IRCO), where the loss function is a composite function \code{cfun}o\code{dfun} + penalty. Here convex is the loss function     induced by \code{dfun}, not the penalty function.
+  The sequence of robust models implied by \code{lambda} is fit by IRCO along with coordinate
   descent. Note that the objective function is \deqn{weights*loss + \lambda*penalty,} if \code{standardize=FALSE} and \deqn{
   \frac{weights}{\sum(weights)}*loss + \lambda*penalty,} if \code{standardize=TRUE}. 
   }
 \value{
-An object with S3 class \code{"ccglmreg"} for the various types of models.
+An object with S3 class \code{"irglmreg"} for the various types of models.
   \item{call}{the call that produced the model fit}
   \item{b0}{Intercept sequence of length \code{length(lambda)}}
   \item{beta}{A \code{nvars x length(lambda)} matrix of coefficients.}
   \item{lambda}{The actual sequence of \code{lambda} values used}
-  \item{weights_update}{A \code{nobs x length(lambda)} matrix of weights computed by the COCO algorithm. The entry of i-th row and j-th column is the weight for the i-th observation and j-th \code{lambda} value.}
+  \item{weights_update}{A \code{nobs x length(lambda)} matrix of weights computed by the IRCO algorithm. The entry of i-th row and j-th column is the weight for the i-th observation and j-th \code{lambda} value.}
   \item{decreasing}{ if \code{lambda} is an increasing sequence or not, used to determine regularization path direction either from lambda_max to a potentially modified lambda_min or vice versa if \code{type.init="bst", "heu"}. }
 }
 
 \references{
    Zhu Wang (2020)
-   \emph{Unified Robust Estimation via the COCO, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
+   \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
   }
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
 
-\seealso{\code{\link{ccglmreg}}}
+\seealso{\code{\link{irglmreg}}}
 \keyword{models}
 \keyword{regression}
 

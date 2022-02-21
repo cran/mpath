@@ -1,19 +1,17 @@
-\name{ccglmreg}
-\alias{ccglmreg}
-\alias{ccglmreg.formula}
-\alias{ccglmreg.matrix}
-\alias{ccglmreg.default}
+\name{irglmreg}
+\alias{irglmreg}
+\alias{irglmreg.formula}
+\alias{irglmreg.matrix}
+\alias{irglmreg.default}
 
-\title{Fit a penalized CC-estimator}
+\title{Fit a robust penalized generalized linear models}
 \description{
-    Fit a linear model in penalized CC-family.  The
-  regularization path is computed for the lasso (or elastic net penalty), scad (or snet) and mcp (or mnet penalty), at a grid
-  of values for the regularization parameter lambda. 
+    Fit a robust penalized GLM where the loss function is a composite function \code{cfun}o\code{dfun} + penalty. This is the wrapper function of \code{irglmreg_fit} 
   }
 \usage{
-\method{ccglmreg}{formula}(formula, data, weights, offset=NULL, contrasts=NULL, ...)
-\method{ccglmreg}{matrix}(x, y, weights, offset=NULL, ...)
-\method{ccglmreg}{default}(x,  ...)
+\method{irglmreg}{formula}(formula, data, weights, offset=NULL, contrasts=NULL, ...)
+\method{irglmreg}{matrix}(x, y, weights, offset=NULL, ...)
+\method{irglmreg}{default}(x,  ...)
 }
 
 \arguments{
@@ -27,16 +25,18 @@
   \item{offset}{Not implemented yet}
   \item{contrasts}{the contrasts corresponding to \code{levels} from the
     respective models}
-  \item{...}{Other arguments passing to \code{ccglmreg_fit}}
+  \item{...}{Other arguments passing to \code{irglmreg_fit}}
 }
 \details{
-  The sequence of robust models implied by \code{lambda} is fit by COCO along with coordinate
+    The computing is done by the iteratively reweighted penalized GLM, an application of the iteratively reweighted convex optimization (IRCO). Here convex is the loss function induced by \code{dfun}, not the penalty function. The output \code{weights_update} is a useful diagnostic to the outlier status of     the observations.
+The regularization path is computed for the lasso (or elastic net penalty), scad (or snet) and mcp (or mnet penalty), at a grid of values for the regularization parameter lambda. 
+  The sequence of robust models implied by \code{lambda} is fit by the IRCO along with coordinate
   descent. Note that the objective function is \deqn{weights*loss + \lambda*penalty,} if \code{standardize=FALSE} and \deqn{
   \frac{weights}{\sum(weights)}*loss + \lambda*penalty,} if \code{standardize=TRUE}. 
   }
 
 \value{
-An object with S3 class \code{"ccglmreg"} for the various types of models.
+An object with S3 class \code{"irglmreg"} for the various types of models.
   \item{call}{the call that produced this object}
   \item{b0}{Intercept sequence of length \code{length(lambda)}}
   \item{beta}{A \code{nvars x
@@ -50,35 +50,35 @@ An object with S3 class \code{"ccglmreg"} for the various types of models.
 
 \references{
    Zhu Wang (2020)
-   \emph{Unified Robust Estimation via the COCO, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
+   \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
   }
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
-\seealso{\code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and \code{\link{plot}} methods, and the \code{\link{cv.ccglmreg}} function.}
+\seealso{\code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and \code{\link{plot}} methods, and the \code{\link{cv.irglmreg}} function.}
 \examples{
 #binomial
 x=matrix(rnorm(100*20),100,20)
 g2=sample(c(-1,1),100,replace=TRUE)
-fit1=ccglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
+fit1=irglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
               decreasing=TRUE,type.init="bst")
 #fit1$risk
 \dontrun{
 ### different solution paths via a combination of type.path, decreasing and type.init
-fit1=ccglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
+fit1=irglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
            decreasing=TRUE,type.init="bst")
-fit2=ccglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
+fit2=irglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
            decreasing=FALSE,type.init="bst")
-fit3=ccglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="nonactive",
+fit3=irglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="nonactive",
            decreasing=TRUE,type.init="bst")
-fit4=ccglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="nonactive",
+fit4=irglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="nonactive",
            decreasing=FALSE,type.init="bst")
-fit5=ccglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
+fit5=irglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
            decreasing=TRUE,type.init="co")
-fit6=ccglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
+fit6=irglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="active",
            decreasing=FALSE,type.init="co")
-fit7=ccglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="nonactive",
+fit7=irglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="nonactive",
            decreasing=TRUE,type.init="co")
-fit8=ccglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="nonactive",
+fit8=irglmreg(x,g2,s=1,cfun="ccave",dfun="gaussian",type.path="nonactive",
            decreasing=FALSE,type.init="co")
 }
 }

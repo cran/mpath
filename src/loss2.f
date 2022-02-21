@@ -1,4 +1,4 @@
-C loss value in subroutine ccglmreg, cf: loss.f
+C loss value in subroutine irglmreg, cf: loss.f
 C dfun=1,4,5
 C input: f is linear predictors, not probability if dfun=5
 C output: los is the average loss

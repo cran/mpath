@@ -1,8 +1,8 @@
-C     used in ccglmreg_fortran subroutine for one single lambda penalty
+C     used in irglmreg_fortran subroutine for one single lambda penalty
 C     parameter (adapted from nclreg_onelambda.f)
 C     input: start_act, etastart, mustart
 C     output: start_act, etastart, mustart, beta_1, b0_1, fk
-      subroutine ccglmreg_onelambda(x_act,y,weights,n,m_act,start_act, 
+      subroutine irglmreg_onelambda(x_act,y,weights,n,m_act,start_act, 
      +     etastart, mustart, yhat, offset, lambda_i,alpha,gam,rescale,
      +     standardize,intercept,penaltyfactor_act,maxit,eps,theta,
      +   penalty,trace,iter,del,cfun,dfun,s,thresh,beta_1,b0_1,fk,delta,
@@ -34,7 +34,7 @@ C     output: start_act, etastart, mustart, beta_1, b0_1, fk
  10         continue
  500     if(d .GT. del .AND. k .LE. iter)then
             if(trace .EQ. 1)then
-               call intpr("  ccglmreg_onelambda iteration k=", -1, k, 1)
+               call intpr("  irglmreg_onelambda iteration k=", -1, k, 1)
                call dblepr("     start_act", -1, start_act, m_act+1)
             endif
             call dcopy(n, yhat, 1, fk_old, 1)
@@ -56,7 +56,7 @@ C     check if h has NAN value, can be useful to debug
 C            if(trace .EQ. 1)then
 C            do 30 ii=1, n
 C               if(h(ii) .NE. h(ii))then
-C                  call intpr("  ccglmreg_onelambda iteration k=",-1,k,1)
+C                  call intpr("  irglmreg_onelambda iteration k=",-1,k,1)
 C                  call intpr("    ii=", -1, ii, 1)
 C                  call dblepr("     h(ii)", -1, h(ii), 1)
 C                  call dblepr("     fk_old(ii)", -1, fk_old(ii), 1)

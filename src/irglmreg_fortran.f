@@ -1,7 +1,7 @@
-C     used in ccglmreg.R ((adpated from nclreg_fortran.f)
+C     used in irglmreg.R ((adpated from nclreg_fortran.f)
 C     output: nlambdacal: number of lambda actually computed including
 C     repeated ones
-      subroutine ccglmreg_fortran(x, y, weights, n,m,start, etastart,
+      subroutine irglmreg_fortran(x, y, weights, n,m,start, etastart,
      +     mustart, offset, iter, nlambda, lambda, alpha, gam, rescale, 
      +     standardize, intercept, penaltyfactor, maxit, eps, theta, 
      +     penalty, trace,del,cfun, dfun, s,thresh,decreasing, 
@@ -71,7 +71,7 @@ C     repeated ones
             i = cutpoint + 1
          endif
          if(trace .EQ. 1)then
-            call intpr("ccglmreg_fortran lambda iteration", -1, i, 1)
+            call intpr("irglmreg_fortran lambda iteration", -1, i, 1)
             if(uturn==1)then
                call intpr("uturn=1", -1, 1, 1)
             endif
@@ -81,7 +81,7 @@ C unlike in nclreg_fortran, no need B: lambda_i=lambda(i)/B
              call intpr("i=", -1, i, 1)
          endif
          lambda_i=lambda(i)
-         call ccglmreg_onelambda(x_act, y,weights, n,m_act,start_act,
+         call irglmreg_onelambda(x_act, y,weights, n,m_act,start_act,
      +        etastart, mustart, yhat, offset, lambda_i, alpha, gam, 
      +        rescale, standardize, intercept, penaltyfactor_act, 
      +        maxit, eps, theta, penalty, trace, iter, del, cfun, dfun,

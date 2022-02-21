@@ -1,4 +1,4 @@
-C used in ccglmreg_onelambda, step 3 in the COCO Algorithm
+C used in irglmreg_onelambda, step 3 in the IRCO Algorithm
 C input dfun, if dfun=1-3, for regression; otherwise, if dfun=4-7 for
 C classification, if dfun=8 or 9, Poisson or negative binomial
 C output u

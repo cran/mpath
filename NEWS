@@ -329,3 +329,8 @@
   
   o change R/compute_wt.R and R/compute_g.R, where z values must be non-negative in the past versions. This restriction is removed since z can be negative when the loss function is negative loglikelihood function in the exponential family, for instance, the gamma distribution
   o export functions cfun2num, y2num, y2num4glm, check_s, used in R package ccboost 
+  
+               CHANGES in `mpath' VERSION 0.4-2.22 (02-14-2022)
+  
+  o change COCO to IRCO which best describes the algorithm and is easier to understand
+  o change ccglm to irglm, ccsvm to irsvm in files in folders R/src/man/vignettes, NAMESPACE, .Rbuildignore

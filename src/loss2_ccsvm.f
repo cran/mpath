@@ -1,4 +1,4 @@
-C loss value in subroutine ccglmreg, cf: loss.f
+C loss value in subroutine irglmreg, cf: loss.f
 C cost: Not implemented in the optimization problem!
 C output: los is the average loss
 C compare to loss2 subroutine, there is additional input eps for dfun= 2

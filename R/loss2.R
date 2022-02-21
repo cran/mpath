@@ -28,7 +28,7 @@ loss2 <- function(y, f, weights, cfun, dfun, s, delta=0.0001){
                                     PACKAGE="mpath")$los
 }
 
-loss2_ccsvm <- function(y, f, weights, cfun, dfun, s, eps, delta=0.0001){
+loss2_irsvm <- function(y, f, weights, cfun, dfun, s, eps, delta=0.0001){
     check_s(cfun, s)
     cfun <- cfun2num(cfun)
     if(!cfun %in% 1:8) stop("cfun is not implemented")
@@ -37,7 +37,7 @@ loss2_ccsvm <- function(y, f, weights, cfun, dfun, s, eps, delta=0.0001){
                     "nu-regression"=2,
                     "C-classification"=6,
                     "nu-classification"=6)
-    if(!dfun %in% c(2, 6)) stop("dfun is not intended for loss2_ccsvm")
+    if(!dfun %in% c(2, 6)) stop("dfun is not intended for loss2_irsvm")
     if(dfun==2 && eps < 0) stop("eps should be >= 0 for dfun=2 (eps-regression)")
     n <- length(y)
     if(n!=length(f)) stop("y and f should have comparable length\n")

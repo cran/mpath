@@ -1,9 +1,9 @@
-\name{cv.ccsvm_fit}
-\alias{cv.ccsvm_fit}
-\title{Internal function of cross-validation for ccsvm}
-\description{Internal function to conduct k-fold cross-validation for ccsvm}
+\name{cv.irsvm_fit}
+\alias{cv.irsvm_fit}
+\title{Internal function of cross-validation for irsvm}
+\description{Internal function to conduct k-fold cross-validation for irsvm}
 \usage{
-cv.ccsvm_fit(x, y, weights, cfun="ccave", s=c(1, 5), type=NULL, 
+cv.irsvm_fit(x, y, weights, cfun="ccave", s=c(1, 5), type=NULL, 
              kernel="radial", gamma=2^(-4:10), cost=2^(-4:4), 
              epsilon=0.1, balance=TRUE, nfolds=10, foldid, 
              trim_ratio=0.9, n.cores=2, ...)
@@ -33,7 +33,7 @@ cv.ccsvm_fit(x, y, weights, cfun="ccave", s=c(1, 5), type=NULL,
       }
     }
 \item{s}{ tuning parameter of \code{cfun}. \code{s > 0} and can be equal       to  0 for \code{cfun="tcave"}. If \code{s} is too close to 0 for                \code{cfun="acave", "bcave", "ccave"}, the calculated weights can become 0 for  all observations, thus crash the program.}
-    \item{type}{\code{ccsvm} can be used as a classification
+    \item{type}{\code{irsvm} can be used as a classification
      machine, or as a regression machine.
      Depending of whether \code{y} is
      a factor or not, the default setting for \code{type} is \code{C-classification} or \code{eps-regression}, respectively, but may be overwritten  by setting an explicit value.\cr
@@ -56,7 +56,7 @@ cv.ccsvm_fit(x, y, weights, cfun="ccave", s=c(1, 5), type=NULL,
       }
    }
    \item{cost}{cost of constraints violation (default: 1)---it is the
-      \sQuote{C}-constant of the regularization term in the Lagrange formulation. This is proportional to the inverse of \code{lambda} in \code{ccglmreg}.}
+      \sQuote{C}-constant of the regularization term in the Lagrange formulation. This is proportional to the inverse of \code{lambda} in \code{irglmreg}.}
    \item{epsilon}{epsilon in the insensitive-loss function (default: 0.1)}
    \item{balance}{for \code{type="C-classification", "nu-classification"} only}
   \item{nfolds}{number of folds >=3, default is 10}
@@ -66,26 +66,26 @@ cv.ccsvm_fit(x, y, weights, cfun="ccave", s=c(1, 5), type=NULL,
  \item{trim_ratio}{a number between 0 and 1 for trimmed least squares, useful if \code{type="eps-regression"} or \code{"nu-regression"}.} 
  \item{n.cores}{The number of CPU cores to use. The cross-validation loop
     will attempt to send different CV folds off to different cores.}
-  \item{\dots}{Other arguments that can be passed to \code{ccsvm}.}
+  \item{\dots}{Other arguments that can be passed to \code{irsvm}.}
 }
 \details{
-This function is the driving force behind \code{cv.ccsvm}. Does a K-fold cross-validation to determine optimal tuning parameters  in SVM: \code{cost} and \code{gamma} if \code{kernel} is nonlinear. It can also choose \code{s} used in \code{cfun}.    
+This function is the driving force behind \code{cv.irsvm}. Does a K-fold cross-validation to determine optimal tuning parameters  in SVM: \code{cost} and \code{gamma} if \code{kernel} is nonlinear. It can also choose \code{s} used in \code{cfun}.    
 }
 
-\value{an object of class \code{"cv.ccsvm"} is returned, which is a
+\value{an object of class \code{"cv.irsvm"} is returned, which is a
   list with the ingredients of the cross-validation fit.
 \item{residmat}{matrix with row values for \code{kernel="linear"} are       \code{s, cost, error, k}, where \code{k} is the number of cross-validation fold. For nonlinear kernels, row values are \code{s, gamma, cost, error, k}. }
-   \item{cost}{a value of \code{cost} that gives minimum cross-validated value in \code{ccsvm}.}
-   \item{gamma}{a value of \code{gamma} that gives minimum cross-validated value in \code{ccsvm}}
-   \item{s}{value of \code{s} for \code{cfun} that gives minimum cross-validated value in \code{ccsvm}.}
+   \item{cost}{a value of \code{cost} that gives minimum cross-validated value in \code{irsvm}.}
+   \item{gamma}{a value of \code{gamma} that gives minimum cross-validated value in \code{irsvm}}
+   \item{s}{value of \code{s} for \code{cfun} that gives minimum cross-validated value in \code{irsvm}.}
 }
 \references{
    Zhu Wang (2020)
-   \emph{Unified Robust Estimation via the COCO, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
+   \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
   }
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
-\seealso{\code{\link{cv.ccsvm}} and \code{\link{ccsvm}}}
+\seealso{\code{\link{cv.irsvm}} and \code{\link{irsvm}}}
 \keyword{models}
 \keyword{regression}
 

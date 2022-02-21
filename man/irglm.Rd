@@ -1,13 +1,13 @@
-\name{ccglm}
-\alias{ccglm}
-\alias{ccglm.formula}
+\name{irglm}
+\alias{irglm}
+\alias{irglm.formula}
 
-\title{fit a CC-estimator for robust generalized linear models}
+\title{fit a robust generalized linear models}
 \description{
-    Fit a CC-estimator for robust generalized linear models
+    Fit a robust GLM where the loss function is a composite function \code{cfun}o\code{dfun}.
   }
 \usage{
-\method{ccglm}{formula}(formula, data, weights, offset=NULL, contrasts=NULL,
+\method{irglm}{formula}(formula, data, weights, offset=NULL, contrasts=NULL,
  cfun="ccave", dfun=gaussian(), s=NULL, delta=0.1, fk=NULL, init.family=NULL,
  iter=10, reltol=1e-5, theta, x.keep=FALSE, y.keep=TRUE, trace=FALSE, ...)
 }
@@ -47,32 +47,32 @@
    \item{init.family}{ character value for initial family, one of "clossR","closs","gloss","qloss", which can be used to derive an initial estimator, if the selection is different from the default value }
   \item{s}{ tuning parameter of \code{cfun}. \code{s > 0} and can be equal to 0 for \code{cfun="tcave"}. If \code{s} is too close to 0 for  \code{cfun="acave", "bcave", "ccave"}, the calculated weights can become 0 for all observations, thus crash the program.} 
  \item{delta}{a small positive number provided by user only if \code{cfun="gcave"} and \code{0 < s <1}}
-  \item{fk}{ predicted values at an iteration in the COCO algorithm }
- \item{iter}{number of iteration in the COCO algorithm}
- \item{reltol}{convergency criteria in the COCO algorithm}
+  \item{fk}{ predicted values at an iteration in the IRGLM algorithm }
+ \item{iter}{number of iteration in the IRGLM algorithm}
+ \item{reltol}{convergency criteria in the IRGLM algorithm}
 \item{theta}{ an overdispersion scaling parameter for \code{family=negbin()}} 
   \item{x.keep, y.keep}{ logical values indicating whether the response
           vector and model matrix used in the fitting process should be
           returned as components of the returned value, x is a design matrix of dimension n * p,
           and x is a vector of observations of length n.}
  \item{trace}{if \code{TRUE}, fitting progress is reported}
-  \item{...}{other arguments passing to \code{ccglm}}
+  \item{...}{other arguments passing to \code{irglm}}
 }
 \details{
-  A robust linear, logistic or Poisson regression model is fit by the COCO algorithm, where the loss function is a composite function of \code{cfun}o\code{dfun}.
+  A robust linear, logistic or Poisson regression model is fit by the iteratively reweighted GLM (IRGLM). The output \code{weights_update} is a useful diagnostic to the outlier status of the observations.
   }
 \value{
-An object with S3 class \code{"ccglm", "glm"} for various types of models.
+An object with S3 class \code{"irglm", "glm"} for various types of models.
   \item{call}{the call that produced the model fit}
   \item{weights}{original weights used in the model}
-  \item{weights_update}{weights in the final iteration of the COCO algorithm}
+  \item{weights_update}{weights in the final iteration of the IRGLM algorithm}
   \item{cfun, s, dfun}{original input arguments}
   \item{is.offset}{is offset used?}
 }
 
 \references{
   Zhu Wang (2020)
-  \emph{Unified Robust Estimation via the COCO, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
+  \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
  }
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
@@ -80,7 +80,7 @@ An object with S3 class \code{"ccglm", "glm"} for various types of models.
 \examples{
 x=matrix(rnorm(100*20),100,20)
 g2=sample(c(-1,1),100,replace=TRUE)
-fit=ccglm(g2~x,data=data.frame(cbind(x, g2)), s=1, cfun="ccave", dfun=gaussian())
+fit=irglm(g2~x,data=data.frame(cbind(x, g2)), s=1, cfun="ccave", dfun=gaussian())
 fit$weights_update
 }
  

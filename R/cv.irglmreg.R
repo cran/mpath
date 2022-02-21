@@ -1,13 +1,13 @@
-cv.ccglmreg <- function(x, ...) UseMethod("cv.ccglmreg", x)
+cv.irglmreg <- function(x, ...) UseMethod("cv.irglmreg", x)
 
-cv.ccglmreg.default <- function(x, ...) {
+cv.irglmreg.default <- function(x, ...) {
     if (extends(class(x), "Matrix"))
-        return(cv.ccglmreg.matrix(x = x, ...))
+        return(cv.irglmreg.matrix(x = x, ...))
     stop("no method for objects of class ", sQuote(class(x)),
          " implemented")
 }
 
-cv.ccglmreg.formula <- function(formula, data, weights, offset=NULL, ...){
+cv.irglmreg.formula <- function(formula, data, weights, offset=NULL, ...){
     ## extract x, y, etc from the model formula and frame
     if(!attr(terms(formula, data=data), "intercept"))
         stop("non-intercept model is not implemented with model formula, try model matrix instead")
@@ -48,17 +48,17 @@ cv.ccglmreg.formula <- function(formula, data, weights, offset=NULL, ...){
     }
 ### End of addition 08/07/2012 
 
-    RET <- cv.ccglmreg_fit(X[,-1], Y, weights,...)
+    RET <- cv.irglmreg_fit(X[,-1], Y, weights,...)
     RET$call <- match.call()
     return(RET)
 }
-cv.ccglmreg.matrix <- function(x, y, weights, offset=NULL, ...){
-    RET <- cv.ccglmreg_fit(x, y, weights,...)
+cv.irglmreg.matrix <- function(x, y, weights, offset=NULL, ...){
+    RET <- cv.irglmreg_fit(x, y, weights,...)
     RET$call <- match.call()
     return(RET)
 }
 
-cv.ccglmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE, 
+cv.irglmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE, 
                           cfun=4, dfun=1, s=1.5,  
                           nfolds=10, foldid, type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE,  
                           ...){
@@ -75,8 +75,8 @@ cv.ccglmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
     dfun <- dfun2num(dfun)
     if(dfun %in% 4:5) y <- y2num(y)
     K <- nfolds
-    ccglmreg.obj <- ccglmreg_fit(x, y, weights, offset, lambda=lambda, cfun=cfun, dfun=dfun, s=s, ...)
-    lambda <- ccglmreg.obj$lambda
+    irglmreg.obj <- irglmreg_fit(x, y, weights, offset, lambda=lambda, cfun=cfun, dfun=dfun, s=s, ...)
+    lambda <- irglmreg.obj$lambda
     nlambda <- length(lambda)
     if(missing(foldid)){
         if(dfun %in% c(4, 5, 6) && balance)  
@@ -94,7 +94,7 @@ cv.ccglmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
          offsetnow <- offset[- omit]
          newoffset <- offset[omit]
          }else offsetnow <- newoffset <- NULL
-        fitcv <- ccglmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, s=s, lambda=lambda, cfun=cfun, dfun=dfun, ...)
+        fitcv <- irglmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, s=s, lambda=lambda, cfun=cfun, dfun=dfun, ...)
 	predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], newoffset=newoffset, type=type)
     }
     eval(parse(text="parallel:::stopCluster(cl)"))
@@ -109,20 +109,20 @@ cv.ccglmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
          offsetnow <- offset[- omit]
          newoffset <- offset[omit]
          }else offsetnow <- newoffset <- NULL
-         fitcv <- ccglmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, s=s, lambda=lambda, cfun=cfun, dfun=dfun, ...)
+         fitcv <- irglmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, s=s, lambda=lambda, cfun=cfun, dfun=dfun, ...)
          residmat[,i] <- predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], newoffset=newoffset, type=type)
         }
     }
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.min(cv)
-    obj<-list(fit=ccglmreg.obj, residmat=residmat, lambda=lambda, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
-    if(plot.it) plot.cv.ccglmreg(obj,se=se, ylab=type)
-    class(obj) <- "cv.ccglmreg"
+    obj<-list(fit=irglmreg.obj, residmat=residmat, lambda=lambda, cv = cv, cv.error = cv.error, foldid=all.folds, lambda.which= lambda.which, lambda.optim = lambda[lambda.which])
+    if(plot.it) plot.cv.irglmreg(obj,se=se, ylab=type)
+    class(obj) <- "cv.irglmreg"
     obj
 }
 
-"plot.cv.ccglmreg" <-
+"plot.cv.irglmreg" <-
     function(x,se=TRUE,ylab=NULL, main=NULL, width=0.02, col="darkgrey", ...){
         lambda <- x$lambda
 	cv <- x$cv
@@ -135,6 +135,6 @@ cv.ccglmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
         invisible()
     }
 
-coef.cv.ccglmreg=function(object,which=object$lambda.which,...){
+coef.cv.irglmreg=function(object,which=object$lambda.which,...){
     coef(object$fit,which=which,...)
 }

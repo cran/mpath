@@ -1,18 +1,18 @@
 ### SVM based on composite operator
-cv.ccsvm <- function(x, ...) UseMethod("cv.ccsvm")
+cv.irsvm <- function(x, ...) UseMethod("cv.irsvm")
 
-cv.ccsvm.default <- function(x, ...) {
+cv.irsvm.default <- function(x, ...) {
     if (extends(class(x), "Matrix"))
-        return(cv.ccsvm.matrix(x = x, ...))
+        return(cv.irsvm.matrix(x = x, ...))
     if (class(x)=="data.frame")
-        return(cv.ccsvm.matrix(x = x, ...))
+        return(cv.irsvm.matrix(x = x, ...))
     if (class(x)=="numeric" && is.null(dim(x)))
-        return(cv.ccsvm.matrix(x = as.matrix(x), ...))
+        return(cv.irsvm.matrix(x = as.matrix(x), ...))
     stop("no method for objects of class ", sQuote(class(x)),
          " implemented")
 }
 
-cv.ccsvm.formula <- function(formula, data, weights, contrasts=NULL, ...){
+cv.irsvm.formula <- function(formula, data, weights, contrasts=NULL, ...){
     ## extract x, y, etc from the model formula and frame
     if(!attr(terms(formula, data=data), "intercept"))
         stop("non-intercept model is not implemented with model formula, try model matrix instead")
@@ -43,20 +43,20 @@ cv.ccsvm.formula <- function(formula, data, weights, contrasts=NULL, ...){
         stop("'weights' must be a numeric vector")
     if(length(weights) != length(Y))
         stop("'weights' must be the same length as response variable")	 
-    RET <- cv.ccsvm_fit(X[,-1], Y, weights,...)
+    RET <- cv.irsvm_fit(X[,-1], Y, weights,...)
     RET$call <- match.call()
     RET <- c(RET, list(formula=formula, terms = mt, data=data,
                        contrasts = attr(X, "contrasts"),
                        xlevels = .getXlevels(mt, mf)))
     RET
 }
-cv.ccsvm.matrix <- function(x, y, weights, ...){
-    RET <- cv.ccsvm_fit(x, y, weights,...)
+cv.irsvm.matrix <- function(x, y, weights, ...){
+    RET <- cv.irsvm_fit(x, y, weights,...)
     RET$call <- match.call()
     return(RET)
 }
 
-cv.ccsvm_fit <- function(x,y, weights, cfun="ccave", s=c(1, 5), type=NULL, 
+cv.irsvm_fit <- function(x,y, weights, cfun="ccave", s=c(1, 5), type=NULL, 
                          kernel      = "radial",
                                         #degree      = 3,
                          gamma       = 2^(-4:10),
@@ -113,7 +113,7 @@ cv.ccsvm_fit <- function(x,y, weights, cfun="ccave", s=c(1, 5), type=NULL,
         foreach(jj=costseq, .combine='rbind', .packages="mpath")   %dopar%{
     #residmat <- NULL; for(i in seq(K)) for(l in sval) for(ii in gammaseq) for(jj in costseq){
             omit <- all.folds[[i]]
-            m <- try(ccsvm(x[-omit,,drop=FALSE], y[-omit], weights=weights[-omit], cfun=cfun, cost=jj, gamma=ii, s=l, type=type, ...), silent=TRUE)
+            m <- try(irsvm(x[-omit,,drop=FALSE], y[-omit], weights=weights[-omit], cfun=cfun, cost=jj, gamma=ii, s=l, type=type, ...), silent=TRUE)
             if(!inherits(m, "try-error")){
                 new <- predict(m, x[omit,,drop=FALSE], weights=weights[omit])
                 if(type%in%c("C-classification", "nu-classification")) errorTU <- mean(new!=y[omit])

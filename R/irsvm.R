@@ -1,18 +1,18 @@
 ### SVM based on composite operator
-ccsvm <- function(x, ...) UseMethod("ccsvm")
+irsvm <- function(x, ...) UseMethod("irsvm")
 
-ccsvm.default <- function(x, ...) {
+irsvm.default <- function(x, ...) {
     if (extends(class(x), "Matrix"))
-        return(ccsvm.matrix(x = x, ...))
+        return(irsvm.matrix(x = x, ...))
     if (class(x)=="data.frame")
-        return(ccsvm.matrix(x = x, ...))
+        return(irsvm.matrix(x = x, ...))
     if (class(x)=="numeric" && is.null(dim(x)))
-        return(ccsvm.matrix(x = as.matrix(x), ...))
+        return(irsvm.matrix(x = as.matrix(x), ...))
     stop("no method for objects of class ", sQuote(class(x)),
          " implemented")
 }
 
-ccsvm.formula <- function(formula, data, weights, contrasts=NULL, ...){
+irsvm.formula <- function(formula, data, weights, contrasts=NULL, ...){
     ## extract x, y, etc from the model formula and frame
     if(missing(data)) data <- environment(formula)
     mf <- match.call(expand.dots = FALSE)
@@ -41,7 +41,7 @@ ccsvm.formula <- function(formula, data, weights, contrasts=NULL, ...){
         stop("'weights' must be a numeric vector")
     if(length(weights) != length(Y))
         stop("'weights' must be the same length as response variable")	 
-    RET <- ccsvm_fit(X, Y, weights,...)
+    RET <- irsvm_fit(X, Y, weights,...)
     RET$call <- match.call()
     RET <- c(RET, list(formula=formula, terms = mt, data=data,
                        contrasts = attr(X, "contrasts"),
@@ -49,13 +49,13 @@ ccsvm.formula <- function(formula, data, weights, contrasts=NULL, ...){
     class(RET) <- "wsvm"
     RET
 }
-ccsvm.matrix <- function(x, y, weights, ...){
-    RET <- ccsvm_fit(x, y, weights,...)
+irsvm.matrix <- function(x, y, weights, ...){
+    RET <- irsvm_fit(x, y, weights,...)
     RET$call <- match.call()
     return(RET)
 }
 
-ccsvm_fit <- function(x,y, weights, cfun="ccave", s=NULL, delta=0.0001, type=NULL, 
+irsvm_fit <- function(x,y, weights, cfun="ccave", s=NULL, delta=0.0001, type=NULL, 
                kernel      = "radial",
                #degree      = 3,
                #gamma       = if (is.vector(x)) 1 else 1 / ncol(x),

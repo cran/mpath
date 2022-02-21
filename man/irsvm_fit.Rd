@@ -1,11 +1,11 @@
-\name{ccsvm_fit}
-\alias{ccsvm_fit}
-\title{Fit iteratively re-weighted support vector machines for robust loss functions}
+\name{irsvm_fit}
+\alias{irsvm_fit}
+\title{Fit iteratively reweighted support vector machines for robust loss functions}
 \description{
-\code{ccsvm} is used to train a subject weighted support vector machine where the weights are provided iteratively from robust loss function with COCO algorithm. It can be used to carry out robust regression and binary classification.
+\code{irsvm_fit} is used to train a subject weighted support vector machine where the weights are provided iteratively from robust loss function with the iteratively reweighted convex optimization (IRCO). It can be used to carry out robust regression and binary classification. This does computing for the wrapper function \code{irsvm}.
 }
 \usage{
-ccsvm_fit(x, y, weights, cfun="ccave", s=NULL, delta=0.0001, type = NULL, 
+irsvm_fit(x, y, weights, cfun="ccave", s=NULL, delta=0.0001, type = NULL, 
           kernel="radial", cost=1, epsilon = 0.1, iter=10, reltol=1e-5, 
           trace=FALSE, ...)
 }
@@ -35,7 +35,7 @@ ccsvm_fit(x, y, weights, cfun="ccave", s=NULL, delta=0.0001, type = NULL,
    }
  \item{s}{ tuning parameter of \code{cfun}. \code{s > 0} and can be equal    to  0 for \code{cfun="tcave"}. If \code{s} is too close to 0 for \code{cfun="acave", "bcave", "ccave"}, the calculated weights can become 0 for all observations, thus crash the program.}
    \item{delta}{a small positive number provided by user only if                 \code{cfun="gcave"} and \code{0 < s <1}}
-   \item{type}{\code{ccsvm} can be used as a classification
+   \item{type}{\code{irsvm_fit} can be used as a classification
     machine, or as a regression machine.
     Depending of whether \code{y} is
     a factor or not, the default setting for \code{type} is \code{C-classification} or \code{eps-regression}, respectively, but may be overwritten by setting an explicit value.\cr
@@ -58,10 +58,10 @@ ccsvm_fit(x, y, weights, cfun="ccave", s=NULL, delta=0.0001, type = NULL,
        }
      }
   \item{cost}{cost of constraints violation (default: 1)---it is the
-     \sQuote{C}-constant of the regularization term in the Lagrange formulation. This is proportional to the inverse of \code{lambda} in \code{ccglmreg}.} 
+     \sQuote{C}-constant of the regularization term in the Lagrange formulation. This is proportional to the inverse of \code{lambda} in \code{irglmreg}.} 
   \item{epsilon}{epsilon in the insensitive-loss function (default: 0.1)}
-\item{iter}{number of iteration in the COCO algorithm}
-  \item{reltol}{convergency criteria in the COCO algorithm}
+\item{iter}{number of iteration in the IRCO algorithm}
+  \item{reltol}{convergency criteria in the IRCO algorithm}
   \item{trace}{If \code{TRUE}, fitting progress is reported}
 \item{\dots}{additional parameters for function \code{wsvm} in package \pkg{WeightSVM}}
 }
@@ -82,28 +82,28 @@ ccsvm_fit(x, y, weights, cfun="ccave", s=NULL, delta=0.0001, type = NULL,
     the decision values of the binary classifiers (1 / (1 + exp(a x + b))).}
 }
 \details{
-    A case weighted SVM is fit by the COCO algorithm, where the loss function is a composite function of \code{cfun}o\code{type}, plus a \eqn{L\_2} penalty.
+    A case weighted SVM is fit by the IRCO algorithm, where the loss function is a composite function of \code{cfun}o\code{type}, plus a \eqn{L\_2} penalty.
  Additional arguments include \code{degree, gamma, coef0}, 
  \code{class.weights, cachesize, tolerance, shrinking, propbability, fitted}, the same as \code{"wsvm"} in package \pkg{WeightSVM}.
 }
 \references{
    Zhu Wang (2020)
-   \emph{Unified Robust Estimation via the COCO, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
+   \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
   }
 \author{
   Zhu Wang \email{wangz1@uthscsa.edu}
 }
-\seealso{\code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and     \code{\link{plot}}.}
+\seealso{\code{\link{irsvm}}, \code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and     \code{\link{plot}}.}
 \examples{
 data(iris)
  iris <- subset(iris, Species \%in\% c("setosa", "versicolor"))
  # default with factor response:
-  model <- ccsvm(Species ~ ., data = iris, kernel="linear", trace=TRUE)
-  model <- ccsvm(Species ~ ., data = iris)
+  model <- irsvm(Species ~ ., data = iris, kernel="linear", trace=TRUE)
+  model <- irsvm(Species ~ ., data = iris)
  # alternatively the traditional interface:
   x <- subset(iris, select = -Species)
   y <- iris$Species
-model <- ccsvm(x, y)
+model <- irsvm(x, y)
   # test with train data
   pred <- predict(model, x)
   # (same as:)
@@ -127,7 +127,7 @@ model <- ccsvm(x, y)
   y <- log(x) + rnorm(x, sd = 0.2)
  
   # estimate model and predict input values
-  m   <- ccsvm(x, y)
+  m   <- irsvm(x, y)
   new <- predict(m, x)
  
   # visualize

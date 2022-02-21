@@ -1,7 +1,7 @@
 ### composite optimization based glm
-ccglm <- function(x, ...) UseMethod("ccglm")
+irglm <- function(x, ...) UseMethod("irglm")
 
-ccglm.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL, 
+irglm.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL, 
 cfun="ccave", dfun=gaussian(), s=NULL, delta=0.1, fk=NULL, init.family=NULL, iter=10, reltol=1e-5, theta, x.keep=FALSE, y.keep=TRUE, trace=FALSE, ...){
     if(missing(data)) data <- environment(formula)
     mf <- match.call(expand.dots = FALSE)
@@ -166,11 +166,11 @@ cfun="ccave", dfun=gaussian(), s=NULL, delta=0.1, fk=NULL, init.family=NULL, ite
                        xlevels = .getXlevels(mt, mf)))
     if(x.keep) RET$x <- data[,colnames(data)%in%attr(mt, "term.labels")]
     if(y.keep) RET$y <- Y
-    class(RET) <- c("ccglm", "glm")
+    class(RET) <- c("irglm", "glm")
     RET
 }
 
-predict.ccglm=function(object, newdata=NULL, weights=NULL, newoffset=NULL, type=c("link","response","class","loss", "error", "coefficients"), na.action=na.pass, ...){
+predict.irglm=function(object, newdata=NULL, weights=NULL, newoffset=NULL, type=c("link","response","class","loss", "error", "coefficients"), na.action=na.pass, ...){
     type=match.arg(type)
     if(is.null(newdata)){
         if(!match(type,c("coefficients"),FALSE))stop("You need to supply a value for 'newdata'")

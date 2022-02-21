@@ -1,5 +1,5 @@
-C compute z=s(u), step 3 in the COCO Algorithm
-C used in ccglmreg_onelambda, 
+C compute z=s(u), step 3 in the IRCO Algorithm
+C used in irglmreg_onelambda, 
 C input dfun, n, u(n), s -- no changes
 C       1: u^2/2
 C output z(n)

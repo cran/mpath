@@ -1,14 +1,14 @@
 ### penalized optimization for regression and classification
-ccglmreg <- function(x, ...) UseMethod("ccglmreg")
+irglmreg <- function(x, ...) UseMethod("irglmreg")
 
-ccglmreg.default <- function(x, ...) {
+irglmreg.default <- function(x, ...) {
     if (extends(class(x), "Matrix"))
-        return(ccglmreg.matrix(x = x, ...))
+        return(irglmreg.matrix(x = x, ...))
     stop("no method for objects of class ", sQuote(class(x)),
          " implemented")
 }
 
-ccglmreg.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL, ...){
+irglmreg.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL, ...){
     ## extract x, y, etc from the model formula and frame
     if(!attr(terms(formula, data=data), "intercept"))
         stop("non-intercept model is not implemented")
@@ -47,21 +47,21 @@ ccglmreg.formula <- function(formula, data, weights, offset=NULL, contrasts=NULL
             stop(gettextf("number of offsets is %d should equal %d (number of observations)", length(offset), NROW(Y)), domain = NA)
     }
 
-    RET <- ccglmreg_fit(X[,-1], Y, weights=weights, offset=offset, ...)
+    RET <- irglmreg_fit(X[,-1], Y, weights=weights, offset=offset, ...)
     RET$call <- match.call()
     RET <- c(RET, list(formula=formula, terms = mt, data=data,
                        contrasts = attr(X, "contrasts"),
                        xlevels = .getXlevels(mt, mf)))
-    class(RET) <- "ccglmreg"
+    class(RET) <- "irglmreg"
     RET
 }
-ccglmreg.matrix <- function(x, y, weights, offset=NULL, ...){
-    RET <- ccglmreg_fit(x, y, weights, offset=offset, ...)
+irglmreg.matrix <- function(x, y, weights, offset=NULL, ...){
+    RET <- irglmreg_fit(x, y, weights, offset=offset, ...)
     RET$call <- match.call()
     return(RET)
 }
 
-ccglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian", 
+irglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian", 
                       s=NULL, delta=0.1, fk=NULL, iter=10, reltol=1e-5, penalty=c("enet","mnet","snet"), nlambda=100, lambda=NULL, type.path=c("active", "nonactive"), decreasing=TRUE, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, intercept=TRUE, penalty.factor = NULL, maxit=1000, type.init=c("bst", "co", "heu"), init.family=NULL, mstop.init=10, nu.init=0.1, eps=.Machine$double.eps, epscycle=10, thresh=1e-6, parallel=FALSE, n.cores=2, theta, trace=FALSE, tracelevel=1){
 ### compute h value
     compute.h <- function(rfamily, y, fk_old, s, B){
@@ -162,7 +162,7 @@ ccglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
     start <- NULL
     if(is.null(fk) || is.null(lambda)){
         if(type.init %in% c("co", "heu")){ ### use co function to generate intercept-only model
-            RET <- ccglm(y~1, data=data.frame(cbind(y, rep(1, n))), iter=10000, reltol=1e-20, weights=weights, s=s, cfun=cfun, dfun=dfunold2, init.family=init.family, trace=FALSE)
+            RET <- irglm(y~1, data=data.frame(cbind(y, rep(1, n))), iter=10000, reltol=1e-20, weights=weights, s=s, cfun=cfun, dfun=dfunold2, init.family=init.family, trace=FALSE)
             if(type.init=="co") start <- c(coef(RET), rep(0, nvars))
 ### end of intercept computing
             else if(type.init=="heu"){ ### heuristic for choosing starting values
@@ -245,7 +245,7 @@ ccglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
     cl <- parallel::makeCluster(n.cores, outfile="")
          registerDoParallel(cl)
          fitall <- foreach(i=1:nlambda, .packages=c("mpath")) %dopar%{
-            RET <- .Fortran("ccglmreg_onelambda",
+            RET <- .Fortran("irglmreg_onelambda",
                             x_act=as.double(x), 
                             y=as.double(y), 
                             weights=as.double(weights),
@@ -305,7 +305,7 @@ ccglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
         while(i <= nlambda){
             if(trace) message("\nloop in lambda:", i, ", lambda=", lambda[i], "\n")
              if(trace) {
-                 cat(" COCO iterations ...\n")
+                 cat(" IRCO iterations ...\n")
              }
             k <- 1
             d1 <- 10
@@ -410,7 +410,7 @@ ccglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
     typeBB <- function(beta, b0){
         if(trace && tracelevel==2) tracel <- 1 else tracel <- 0
         if(type.path=="active" && decreasing)
-            RET <- .Fortran("ccglmreg_ad",
+            RET <- .Fortran("irglmreg_ad",
 			    x=as.double(x), 
 			    y=as.double(y),
 			    weights=as.double(weights),
@@ -452,7 +452,7 @@ ccglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
 			    weights_cc=as.double(matrix(0, nrow=n, ncol=nlambda)),
 			    PACKAGE="mpath")
         else
-	    RET <- .Fortran("ccglmreg_fortran",
+	    RET <- .Fortran("irglmreg_fortran",
 			    x=as.double(x), 
 			    y=as.double(y),
 			    weights=as.double(weights),
@@ -534,7 +534,7 @@ ccglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
     RET$is.offset <- is.offset
     RET$fitted.values <- fitted
 
-    class(RET) <- "ccglmreg"
+    class(RET) <- "irglmreg"
     RET
 }
 
@@ -546,7 +546,7 @@ co_evalerr <- function(dfun, y, yhat){
         (mean(y != sign(yhat)))
 }
 
-predict.ccglmreg <- function(object, newdata=NULL, weights=NULL, newy=NULL, newoffset=NULL, which=1:object$nlambda, type=c("link", "response","class","loss", "error", "coefficients", "nonzero"), na.action=na.pass, ...){
+predict.irglmreg <- function(object, newdata=NULL, weights=NULL, newy=NULL, newoffset=NULL, which=1:object$nlambda, type=c("link", "response","class","loss", "error", "coefficients", "nonzero"), na.action=na.pass, ...){
     type=match.arg(type)
     if(is.null(newdata)){
         if(!match(type,c("coefficients", "nonzero"),FALSE))stop("You need to supply a value for 'newdata'")
@@ -621,6 +621,6 @@ predict.ccglmreg <- function(object, newdata=NULL, weights=NULL, newy=NULL, newo
 }
 
 
-coef.ccglmreg <- function(object, ...)
+coef.irglmreg <- function(object, ...)
     coef.glmreg(object)
 

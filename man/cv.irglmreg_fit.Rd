@@ -1,20 +1,20 @@
-\name{cv.ccglmreg_fit}
-\alias{cv.ccglmreg_fit}
-\title{Internal function of cross-validation for ccglmreg}
-\description{Internal function to conduct k-fold cross-validation for ccglmreg, produces a plot,
+\name{cv.irglmreg_fit}
+\alias{cv.irglmreg_fit}
+\title{Internal function of cross-validation for irglmreg}
+\description{Internal function to conduct k-fold cross-validation for irglmreg, produces a plot,
   and returns cross-validated loss values for \code{lambda}}
 \usage{
-cv.ccglmreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE, cfun=4, dfun=1, 
+cv.irglmreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE, cfun=4, dfun=1, 
                 s=1.5, nfolds=10, foldid, type = c("loss", "error"), plot.it=TRUE,
                 se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, ...)
 }
 \arguments{
-  \item{x}{\code{x} matrix as in \code{ccglmreg}.}
-  \item{y}{response \code{y} as in \code{ccglmreg}.}
+  \item{x}{\code{x} matrix as in \code{irglmreg}.}
+  \item{y}{response \code{y} as in \code{irglmreg}.}
   \item{weights}{Observation weights; defaults to 1 per observation}
   \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting. This should be NULL or a numeric vector of length equal to the number of cases. Currently only one offset term can be included in the formula.}
   \item{lambda}{Optional user-supplied lambda sequence; default is
-    \code{NULL}, and \code{ccglmreg} chooses its own sequence}
+    \code{NULL}, and \code{irglmreg} chooses its own sequence}
   \item{balance}{for \code{dfun=4, 5, 6} only}
   \item{cfun}{ a number from 1 to 7, type of convex cap (concave) function }
   \item{dfun}{ a number from 1, 4-7, type of convex downward function}
@@ -30,19 +30,19 @@ cv.ccglmreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE, cfun=4, dfun=1
     will attempt to send different CV folds off to different cores.}
   \item{trace}{ a logical value, print progress of cross validation or not}
   \item{parallel}{ a logical value, parallel computing or not}
-  \item{\dots}{Other arguments that can be passed to \code{ccglmreg}.}
+  \item{\dots}{Other arguments that can be passed to \code{irglmreg}.}
 }
-\details{The function runs \code{ccglmreg} \code{nfolds}+1 times; the
+\details{The function runs \code{irglmreg} \code{nfolds}+1 times; the
   first to compute the \code{lambda} sequence, and then to
   compute the fit with each of the folds omitted. The error or the log-likelihood value is
   accumulated, and the average value and standard deviation over the
-  folds is computed. Note that \code{cv.ccglmreg} can be used to search for
-  values for \code{alpha}: it is required to call \code{cv.ccglmreg} with a fixed vector \code{foldid} for different values of \code{alpha}.
+  folds is computed. Note that \code{cv.irglmreg} can be used to search for
+  values for \code{alpha}: it is required to call \code{cv.irglmreg} with a fixed vector \code{foldid} for different values of \code{alpha}.
 }
 
-\value{an object of class \code{"cv.ccglmreg"} is returned, which is a
+\value{an object of class \code{"cv.irglmreg"} is returned, which is a
   list with the ingredients of the cross-validation fit.
-  \item{fit}{a fitted ccglmreg object for the full data.}
+  \item{fit}{a fitted irglmreg object for the full data.}
   \item{residmat}{matrix of loss values or errors with row values for \code{lambda} and column values for \code{k}th cross-validation}
   \item{cv}{The mean cross-validated loss values or errors - a vector of length
     \code{length(lambda)}.}
@@ -59,7 +59,7 @@ cv.ccglmreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE, cfun=4, dfun=1
   }
 
 \author{Zhu Wang <wangz1@uthscsa.edu>}
-\seealso{\code{\link{ccglmreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.ccglmreg"} object.}
+\seealso{\code{\link{irglmreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.irglmreg"} object.}
 \keyword{models}
 \keyword{regression}
 

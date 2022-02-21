@@ -1,5 +1,5 @@
 C ###compute composite loss values for dfun=poisson and negbin
-C input: family=3,4. May work for 1 but not for 2 since y in ccglmreg is +1/-1 not
+C input: family=3,4. May work for 1 but not for 2 since y in irglmreg is +1/-1 not
 C 1/0)
 C ### output: z is maximum log-likelihood value, i.e., s(u) value 
 C ### output: los is the sum of g(s(u)) values

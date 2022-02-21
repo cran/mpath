@@ -1,8 +1,8 @@
-C     used in ccglmreg.R (adapted from nclreg_ad) for active=TRUE and decreasing=TRUE
+C     used in irglmreg.R (adapted from nclreg_ad) for active=TRUE and decreasing=TRUE
 C     output: nlambdacal: number of lambda actually computed including
 C     repeated ones
 C     
-      subroutine ccglmreg_ad(x, y, weights, n,m,start, etastart,
+      subroutine irglmreg_ad(x, y, weights, n,m,start, etastart,
      +     mustart, offset, iter, nlambda, lambda, alpha, gam,rescale, 
      +     standardize, intercept, penaltyfactor, maxit, eps, theta, 
      +     epscycle, penalty, trace, del, cfun, dfun, s, thresh, 
@@ -85,7 +85,7 @@ C
       cutpoint=1
  10   if(i .LE. nlambda)then
          if(trace .EQ. 1)then
-            call intpr("ccglmreg_ad lambda iteration i=", -1, i, 1)
+            call intpr("irglmreg_ad lambda iteration i=", -1, i, 1)
          endif
 C unlike in nclreg_ad, no need B: lambda_i=lambda(i)/B
          lambda_i=lambda(i)
@@ -94,9 +94,9 @@ C unlike in nclreg_ad, no need B: lambda_i=lambda(i)/B
          conv=0
 13000    if(j <= nact .AND. conv==0)then
             if(trace .EQ. 1)then
-               call intpr("begin activeset ccglmreg_onelambda",-1,1,1)
+               call intpr("begin activeset irglmreg_onelambda",-1,1,1)
             endif
-            call ccglmreg_onelambda(x_act, y,weights, n,m_act,start_act,
+            call irglmreg_onelambda(x_act, y,weights, n,m_act,start_act,
      +           etastart, mustart, yhat, offset, lambda_i, alpha, gam, 
      +           rescale, standardize, intercept, penaltyfactor_act, 
      +           maxit, eps, theta, penalty,trace, iter,del, cfun, dfun,
@@ -109,10 +109,10 @@ C unlike in nclreg_ad, no need B: lambda_i=lambda(i)/B
                if(trace .EQ. 1)then
 C                  call dblepr("b0_1=", -1, b0_1, 1)
                   call dblepr("beta_1=", -1, beta_1, m_act)
-                  call intpr("begin fullset ccglmreg_onelambda",1,1,1)
+                  call intpr("begin fullset irglmreg_onelambda",1,1,1)
                   call dblepr("start=", -1, start, m+1)
                endif
-               call ccglmreg_onelambda(x,y,weights,n,m,start, etastart,
+               call irglmreg_onelambda(x,y,weights,n,m,start, etastart,
      +              mustart, yhat, offset, lambda_i, alpha, gam, 
      +              rescale, standardize, intercept, penaltyfactor, 
      +              maxit, eps, theta, penalty, trace, 1, del, cfun, 
