@@ -60,7 +60,7 @@ cv.glmregNB(formula, data, weights, offset=NULL, lambda=NULL, nfolds=10,
 Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Prasad Devarajan (2014)
 \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print] 
 }
-\author{Zhu Wang <wangz1@uthscsa.edu>}
+\author{Zhu Wang <zwang145@uthsc.edu>}
 \seealso{\code{\link{glmregNB}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.glmregNB"} object.}
 \examples{
 \dontrun{

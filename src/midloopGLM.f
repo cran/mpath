@@ -288,13 +288,16 @@ C     dev
      +           (y(i)+theta)*dlog((y(i)+theta)/(mu(i) + theta)))) 
          endif
          if(cisnan(dev).NE.0) then
-             call intpr("dev is NA in Fortran src/deveval, check if some
-     + columns of x have the same values", -1, 1, 1)
+             call intpr("dev is NA in Fortran src/deveval, check (1)if s
+     +ome columns of x have the same values;(2)y is large, hence linear 
+     +predictor estimate eta is large, then mu=exp(eta) as output of lin
+     +kinv call is Inf if family=3 (poisson) or 4 (negbin)", -1, 1, 1)
             call intpr("i=", -1, i, 1)
             call dblepr("y(i)=", -1, y(i), 1)
             call dblepr("mu(i)=", -1, mu(i), 1)
             call dblepr("theta=", -1, theta, 1)
             call dblepr("dev=", -1, dev, 1)
+            call rexit("TODO: set upper limit of mu in linkinv")
             exit
          endif
  10   continue

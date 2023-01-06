@@ -104,7 +104,7 @@ Zhu Wang, Shuangge Ma, Michael Zappitelli, Chirag Parikh, Ching-Yun Wang and Pra
 \emph{Penalized Count Data Regression with Application to Hospital Stay after Pediatric Cardiac Surgery}, \emph{Statistical Methods in Medical Research}. 2014 Apr 17. [Epub ahead of print]
 }
 
-\author{Zhu Wang <wangz1@uthscsa.edu>}
+\author{Zhu Wang <zwang145@uthsc.edu>}
 
 \seealso{\code{\link{glmreg}}}
 \keyword{models}

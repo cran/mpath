@@ -163,7 +163,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
                         family=as.integer(famtype),
                         dev=as.double(0),
                         PACKAGE="mpath")$dev
-### compute the pathwise coordinate descent, cf: section 2.5 in Friedman et al., JSS 2010, 33(1)
+    ### compute the pathwise coordinate descent, cf: section 2.5 in Friedman et al., JSS 2010, 33(1)
     if(is.null(weights)) weights <- rep(1, n)
     wt <- weights/sum(weights)
     if(is.null(mustart) || is.null(etastart) || is.null(lambda)){
@@ -486,7 +486,7 @@ deviance.glmreg <- function(object, newx, y, weights, na.action=na.pass, ...){
 ### convert glm object to class glmreg, thus can be used to predict newdata
 conv2glmreg <- function(object, family=c("poisson", "negbin")){
     family <- match.arg(family)
-    if(class(object)=="glm") class(object) <- "glmreg"
+    if(inherits(object, "glm")) class(object) <- "glmreg"
     object$family <- family
     object$nlambda <- 1
     namecount <- names(object$coefficients)

@@ -48,7 +48,7 @@ An object with S3 class \code{"wsvm"} for various types of models.
    \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
   }
 
-\author{Zhu Wang <wangz1@uthscsa.edu>}
+\author{Zhu Wang <zwang145@uthsc.edu>}
 \seealso{\code{\link{irsvm_fit}}, \code{\link{print}}, \code{\link{predict}}, \code{\link{coef}}.}
 \examples{
 #binomial

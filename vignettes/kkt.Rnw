@@ -18,8 +18,8 @@
 }
 
 \author{Zhu Wang \\ 
-  UT Health San Antonio\\
-  wangz1@uthscsa.edu}
+  University of Tennessee Health Science Center\\
+  zwang145@uthsc.edu}
 \title{kKT Conditions for Zero-Inflated Regression}
 \begin{document}
 

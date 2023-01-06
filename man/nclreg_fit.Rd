@@ -79,7 +79,7 @@ An object with S3 class \code{"nclreg"} for the various types of models.
    \doi{10.1007/s11749-021-00770-2}
  }
 
-\author{Zhu Wang <wangz1@uthscsa.edu>}
+\author{Zhu Wang <zwang145@uthsc.edu>}
 
 \seealso{\code{\link{nclreg}}}
 \keyword{models}

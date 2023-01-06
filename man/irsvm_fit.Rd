@@ -91,7 +91,7 @@ irsvm_fit(x, y, weights, cfun="ccave", s=NULL, delta=0.0001, type = NULL,
    \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
   }
 \author{
-  Zhu Wang \email{wangz1@uthscsa.edu}
+  Zhu Wang \email{zwang145@uthsc.edu}
 }
 \seealso{\code{\link{irsvm}}, \code{\link{print}}, \code{\link{predict}}, \code{\link{coef}} and     \code{\link{plot}}.}
 \examples{

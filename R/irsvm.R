@@ -4,9 +4,9 @@ irsvm <- function(x, ...) UseMethod("irsvm")
 irsvm.default <- function(x, ...) {
     if (extends(class(x), "Matrix"))
         return(irsvm.matrix(x = x, ...))
-    if (class(x)=="data.frame")
+    if (inherits(x, "data.frame"))
         return(irsvm.matrix(x = x, ...))
-    if (class(x)=="numeric" && is.null(dim(x)))
+    if (inherits(x, "numeric") && is.null(dim(x)))
         return(irsvm.matrix(x = as.matrix(x), ...))
     stop("no method for objects of class ", sQuote(class(x)),
          " implemented")

@@ -983,7 +983,7 @@ pen2_eval <- function(theta, lone, ltwo, gamma,
 ### convert zeroinfl object to class zipath, thus can be used to predict newdata
 conv2zipath <- function(object, family=c("poisson", "negbin", "geometric")){
     family <- match.arg(family)
-    if(class(object)=="zeroinfl") class(object) <- "zipath"
+    if(inherits(object, "zeroinfl")) class(object) <- "zipath"
     object$family <- family
     object$nlambda <- 1
     object$fitted.values <- matrix(object$fitted.values, ncol=1)

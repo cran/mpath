@@ -61,7 +61,7 @@ cv.nclreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE,
   \doi{10.1007/s11749-021-00770-2}
  }
 
-\author{Zhu Wang <wangz1@uthscsa.edu>}
+\author{Zhu Wang <zwang145@uthsc.edu>}
 \seealso{\code{\link{nclreg}} and \code{\link{plot}}, \code{\link{predict}}, and \code{\link{coef}} methods for \code{"cv.nclreg"} object.}
 \keyword{models}
 \keyword{regression}

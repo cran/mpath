@@ -1,6 +1,6 @@
 ### backward elimination for zeroinfl function
 be.zeroinfl <- function(object, data, dist=c("poisson", "negbin", "geometric"), alpha=0.05, trace=FALSE){
-    if(class(object)!="zeroinfl") stop("object must be zeroinfl\n")
+    if(!inherits(object, "zeroinfl")) stop("object must be zeroinfl\n")
     dist <- match.arg(dist)
     fit <- object
     rhs1 <- attr(fit$terms$count, "term.labels")

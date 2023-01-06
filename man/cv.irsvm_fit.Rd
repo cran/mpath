@@ -84,7 +84,7 @@ This function is the driving force behind \code{cv.irsvm}. Does a K-fold cross-v
    \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
   }
 
-\author{Zhu Wang <wangz1@uthscsa.edu>}
+\author{Zhu Wang <zwang145@uthsc.edu>}
 \seealso{\code{\link{cv.irsvm}} and \code{\link{irsvm}}}
 \keyword{models}
 \keyword{regression}
