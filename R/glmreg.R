@@ -337,17 +337,20 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
     if(standardize)
         RET$pllres <- RET$twologlik/2 - n*penval
     else RET$pllres <- RET$twologlik/2 - penval
-    if(intercept) npar <- 1+RET$df else npar <- RET$df
+    #if(intercept) npar <- 1+RET$df else npar <- RET$df
     if(nlambda == 1){
         RET$df <- sum(abs(beta) > 0) ### df= number of nonzero coefficients (intercept excluded)
-        RET$aic <- -RET$twologlik + 2*npar
-        RET$bic <- -RET$twologlik + log(n)*npar
+        #RET$aic <- -RET$twologlik + 2*npar
+        #RET$bic <- -RET$twologlik + log(n)*npar
     }
     else{
         RET$df <- apply(abs(beta) > 0, 2, sum) ##number of nonzero coefficients for each lambda
-        RET$aic <- -RET$twologlik + 2*npar
-        RET$bic <- -RET$twologlik + log(n)*npar
+        #RET$aic <- -RET$twologlik + 2*npar
+        #RET$bic <- -RET$twologlik + log(n)*npar
     }
+    if(intercept) npar <- 1+RET$df else npar <- RET$df
+    RET$aic <- -RET$twologlik + 2*npar
+    RET$bic <- -RET$twologlik + log(n)*npar
     RET  
 }
 

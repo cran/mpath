@@ -140,7 +140,7 @@ irglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
         penalty.factor <- rep(1, nvars)
     }
     xold <- x
-    if(is.null(s) || is.na(s)) s <- assign_s(cfun, y) else check_s(cfun, s)
+    if(is.null(s) || is.na(s)) s <- assign_s(cfun, y) else check_s(cfun, dfunold, s)
     if(cfun==6)
         if(s > 1) delta <- (s-1)/2 else
                                        if(s==1) delta <- 0 else{
@@ -509,6 +509,13 @@ irglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
         beta <- beta/normx
         b0 <- b0 - crossprod(meanx, beta)
       }
+    if(nlambda == 1){
+         RET$df <- sum(abs(beta) > 0) ### df= number of nonzero coefficients     (intercept excluded)
+     }
+    else{
+         RET$df <- apply(abs(beta) > 0, 2, sum) ##number of nonzero              coefficients for each lambda
+     }
+    if(intercept) npar <- 1+RET$df else npar <- RET$df
     if(is.null(colnames(x))) varnames <- paste("V", 1:ncol(x), sep="")
     else varnames <- colnames(x)
     dimnames(beta) <- list(varnames, round(lambda, digits=4))
@@ -533,7 +540,10 @@ irglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
     RET$type.path <- type.path
     RET$is.offset <- is.offset
     RET$fitted.values <- fitted
-
+    RET$family <- dfunold
+    RET$twologlik <- 2*logLik.glmreg(RET, newx=x, y=y, weights=weights_update, offset=offset)
+    RET$aic <- -RET$twologlik + 2*npar
+    RET$bic <- -RET$twologlik + log(n)*npar
     class(RET) <- "irglmreg"
     RET
 }

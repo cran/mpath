@@ -6,7 +6,7 @@ opts_chunk$set(dev=c('pdf','postscript'), fig.path='cancerfigure/')
 
 ## ----message=FALSE, eval=FALSE----------------------------
 #  #The data files below were downloaded on June 1, 2016
-#  require("gdata")
+#  require("openxlsx")
 #  library("mpath")
 #  bc <- t(read.delim("GSE20194_series_matrix.txt.gz",sep="",header=FALSE,skip=80))
 #  colnames(bc) <- bc[1,]
@@ -14,7 +14,7 @@ opts_chunk$set(dev=c('pdf','postscript'), fig.path='cancerfigure/')
 #  ###The last column is empty with variable name !series_matrix_table_end, thus omitted
 #  bc <- bc[, -22284]
 #  mode(bc) <- "numeric" ### convert character to numeric
-#  dat1 <- read.xls("GSE20194_MDACC_Sample_Info.xls", sheet=1, header=TRUE)
+#  dat1 <- openxlsx::openxlsx("GSE20194_MDACC_Sample_Info.xls", sheet=1, header=TRUE)
 #  y <- dat1$characteristics..ER_status
 #  y <- ifelse(y=="P", 1, -1)
 #  table(y)

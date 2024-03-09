@@ -735,12 +735,6 @@ zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, standardize=TRUE, int
     return(rval)
 }
 
-zipath.control <- function(method = "BFGS", maxit.em=50, maxit = 10000, trace = FALSE, EM = TRUE, start = NULL, ...) {
-    rval <- list(method = method, maxit.em = maxit.em, maxit = maxit, trace = trace, EM = EM, start = start)
-    rval <- c(rval, list(...))
-    rval
-}
-
 coef.zipath <- function(object, which=1:object$nlambda, model = c("full", "count", "zero"), ...) {
     model <- match.arg(model)
     rval <- object$coefficients

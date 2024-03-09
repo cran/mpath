@@ -99,7 +99,7 @@ irsvm_fit <- function(x,y, weights, cfun="ccave", s=NULL, delta=0.0001, type=NUL
         y[y==2] <- 1
         } 
     }
-    if(is.null(s)) s <- assign_s(cfun, y) else check_s(cfun, s)
+    if(is.null(s)) s <- assign_s(cfun, y) else check_s(cfun, dfun=6, s)
     if(cfun==6)
            if(s > 1) delta <- (s-1)/2 else
            if(s==1) delta <- 0 else{

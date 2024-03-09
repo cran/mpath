@@ -41,8 +41,9 @@
 }
 \details{The function runs \code{zipath} \code{nfolds}+1 times; the
   first to compute the \code{(lambda.count, lambda.zero)} sequence, and then to
-  compute the fit with each of the folds omitted. The log-likelihood value is
-  accumulated, and the average value and standard deviation over the
+  compute the fit with each of the folds omitted. 
+  The model is fitted to the training data and then given the fitted model the log-likelihood is evaluated at the observations left out, i.e., the test data.
+  The average value of log-likelihood and standard deviation over the
   folds is computed. Note that \code{cv.zipath} can be used to search for
   values for \code{count.alpha} or \code{zero.alpha}: it is required to call \code{cv.zipath} with a fixed vector \code{foldid} for different values of \code{count.alpha} or \code{zero.alpha}.
   

@@ -55,9 +55,11 @@ C     derx1(k)=0
                   endif
                   derz(j)=derz(j)-weights(i)*p*G(i,j)
  20            enddo
-               derz(j)=dabs(derz(j))
-               penfac_zero(j)=penaltyfactor_zero(j)/sumz*kz
-               derz(j)=derz(j)/(penfac_zero(j)*alpha_zero)
+C               if(penaltyfactor_zero(j) > 0.0d0)then
+                 derz(j)=dabs(derz(j))
+                 penfac_zero(j)=penaltyfactor_zero(j)/sumz*kz
+                 derz(j)=derz(j)/(penfac_zero(j)*alpha_zero)
+C               endif
  10         enddo
          endif
          if(kx > 1)then
@@ -70,9 +72,11 @@ C     derx1(k)=0
      +                    -mu*B(i,j))
                   endif
  40            enddo
-               derx(j)=dabs(derx(j))
-               penfac_count(j)=penaltyfactor_count(j)/sumx*kx
-               derx(j)=derx(j)/(penfac_count(j)*alpha_count)
+C               if(penaltyfactor_count(j) > 0.0d0)then
+                derx(j)=dabs(derx(j))
+                penfac_count(j)=penaltyfactor_count(j)/sumx*kx
+                derx(j)=derx(j)/(penfac_count(j)*alpha_count)
+C               endif
  30         enddo
          endif
       else if(family==4)then
@@ -96,9 +100,11 @@ C     derivative of p
                   endif
 C     derz1(j)=derz1(j)+weights(i)*(z(i)*G(i,j)-p*G(i,j))
  120           enddo
-               derz(j)=dabs(derz(j))
-               penfac_zero(j)=penaltyfactor_zero(j)/sumz*kz
-               derz(j)=derz(j)/(penfac_zero(j)*alpha_zero)
+C               if(penaltyfactor_zero(j) > 0.0d0)then
+                derz(j)=dabs(derz(j))
+                penfac_zero(j)=penaltyfactor_zero(j)/sumz*kz
+                derz(j)=derz(j)/(penfac_zero(j)*alpha_zero)
+C               endif
                
 C     derz1(j)=dabs(derz1(j))
 C     derz1(j)=derz1(j)/(penfac_zero(j)*alpha_zero)
@@ -119,9 +125,11 @@ C     derivative of mu
 C     derx1(j)=derx1(j)+weights(i)*(1-z(i))*derip*
 C     +       (y(i)/mu-(y(i)+theta)/(mu+theta))
  140           enddo
-               derx(j)=dabs(derx(j))
-               penfac_count(j)=penaltyfactor_count(j)/sumx*kx
-               derx(j)=derx(j)/(penfac_count(j)*alpha_count)
+C               if(penaltyfactor_count(j) > 0.0d0)then
+                derx(j)=dabs(derx(j))
+                penfac_count(j)=penaltyfactor_count(j)/sumx*kx
+                derx(j)=derx(j)/(penfac_count(j)*alpha_count)
+C               endif
 C     derx1(j)=dabs(derx1(j))
 C     derx1(j)=derx1(j)/(penfac_count(j)*alpha_count)
  130        enddo

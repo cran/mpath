@@ -52,7 +52,7 @@ cfun="ccave", dfun=gaussian(), s=NULL, delta=0.1, fk=NULL, init.family=NULL, ite
     if(dfunold%in%c("gaussian","gaussianC","binomial","poisson","negbin")) dfunold <- dfun2num(dfunold)
                                         #if(dfun==7 && !is.null(offset))
                                         #    warning("dfun=", dfun, ", offset not implmented\n")
-    if(is.null(s) || is.na(s)) s <- assign_s(cfun, y) else check_s(cfun, s)
+    if(is.null(s) || is.na(s)) s <- assign_s(cfun, y) else check_s(cfun, dfunold, s)
     if(cfun==6)
         if(s > 1) delta <- (s-1)/2 else
                                        if(s==1) delta <- 0 else{
@@ -225,9 +225,11 @@ predict.irglm=function(object, newdata=NULL, weights=NULL, newoffset=NULL, type=
         return(ynow!=(predict(object, data.frame(newdata), offset=offset, type="response") > 0))
 }
 
-check_s <- function(cfun, s){
+check_s <- function(cfun, dfun, s){
     if(cfun %in% c(1:6,8) && s <= 0) stop("s must > 0 for cfun=", cfun, "\n")
     else if(cfun==7 && s < 0) stop("s must be nonnegative for cfun=", cfun, "\n")
+    else if(cfun==7 && s < 1 && dfun %in%c("gaussianC", "binomial", "hinge")) stop("s must > or = 1 for cfun=tcave and dfun=gaussianC, binomial, hinge")
+    else if(cfun==7 && s < 1 && dfun %in%c(4, 5, 6)) stop("s must > or = 1 for cfun=tcave and dfun=gaussianC, binomial, hinge")
     if(cfun %in% c(2, 3) && s < 1) warnings("The program can crash if s value is too close to 0 for cfun=", cfun, "\n")
 }
 
@@ -304,6 +306,7 @@ y2num4glm <- function(y){
 ###compute composite loss values for dfun=poisson and negbin
 ### output: z is a vector of maximum log-likelihood value, i.e., s(u) values 
 ### output: tmp is a vector of g(s(u)) values
+### There is a ../src/loss3.f function, which is different from the same named function for different purposes: the Fortran code is used to check convergency
 loss3 <- function(y,mu,theta,weights,cfun,family,s,delta){
     n <- length(y)
     z <- tmp <- rep(NA, n)

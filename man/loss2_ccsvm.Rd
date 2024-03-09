@@ -25,8 +25,8 @@ loss2_irsvm(y, f, weights, cfun, dfun, s, eps, delta=0.0001)
     \code{\link{loss2}}
 }
 \references{
-   Zhu Wang (2020)
-   \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
+      Zhu Wang (2024)
+    \emph{Unified Robust Estimation}, \emph{Australian & New Zealand Journal of      Statistics}. 66(1):77-102.
   }
 \author{Zhu Wang <zwang145@uthsc.edu>}
 

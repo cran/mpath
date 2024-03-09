@@ -25,8 +25,9 @@ plot(z, res, ylab="Weight", type="l", lwd=2,
      main=expression(paste("hcave", "   (", sigma, "=1)", )))
 }
 \references{
-   Zhu Wang (2020) \emph{Unified Robust Estimation, arXiv e-prints}, \url{https://arxiv.org/abs/2010.02848}
-  }
+Zhu Wang (2024)
+      \emph{Unified Robust Estimation}, \emph{Australian & New Zealand           Journal         of      Statistics}. 66(1):77-102.
+}
 \author{Zhu Wang <zwang145@uthsc.edu>}
 
 \keyword{regression}
