@@ -100,7 +100,7 @@ cv.irsvm_fit <- function(x,y, weights, cfun="ccave", s=c(1, 5), type=NULL,
     K <- nfolds
     if(missing(foldid)){
         if(type %in% c("C-classification", "nu-classification") && balance)
-         invisible(capture.output(all.folds <- eval(parse(text="pamr:::balanced.folds(y, K)"))))
+         invisible(capture.output(all.folds <- eval(parse(text="balanced.folds(y, K)"))))
         else all.folds <- cv.folds(n, K)
     }
     else all.folds <- foldid

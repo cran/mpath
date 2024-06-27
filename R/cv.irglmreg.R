@@ -80,7 +80,7 @@ cv.irglmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
     nlambda <- length(lambda)
     if(missing(foldid)){
         if(dfun %in% c(4, 5, 6) && balance)  
-            invisible(capture.output(all.folds <- eval(parse(text="pamr:::balanced.folds(y, K)"))))
+            invisible(capture.output(all.folds <- eval(parse(text="balanced.folds(y, K)"))))
         else all.folds <- cv.folds(n, K)
     }
     else all.folds <- foldid

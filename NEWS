@@ -342,5 +342,5 @@
                CHANGES in `mpath' VERSION 0.4-2.25 (08-03-2023)
   o modify function R/check_s to add argument dfun such that s (robust parameter sigma in the paper Unified Robust Estimation) value >=1 for classification; previously s >=0. Such a change is needed to essure that g(s(0))=1. check_s is used in functions irglm and irglmreg 
   
- 
-
+               CHANGES in `mpath' VERSION 0.4-2.26 (06-27-2024)
+  o modify call on pamr:::balanced.folds 

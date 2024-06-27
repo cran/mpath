@@ -28,3 +28,7 @@ nonzeroCoef and plotCoef are from glmnet_3.0-0 which doesn't export     nonzeron
            person("Junyang", "Qian", role=c("ctb")))
 License GPL-2
 
+balanced.folds is from the now orphaned R package pamr, version 1.56.2
+Author: T. Hastie, R. Tibshirani, Balasubramanian Narasimhan, Gil Chu
+License: GPL-2
+

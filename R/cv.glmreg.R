@@ -84,7 +84,7 @@ cv.glmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
     nlambda <- length(lambda)
     if(missing(foldid)){
         if(family=="binomial" && balance)  
-            invisible(capture.output(all.folds <- eval(parse(text="pamr:::balanced.folds(y, K)"))))
+            invisible(capture.output(all.folds <- eval(parse(text="balanced.folds(y, K)"))))
         else all.folds <- cv.folds(length(y), K)
     }
     else all.folds <- foldid
