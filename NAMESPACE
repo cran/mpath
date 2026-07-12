@@ -1,6 +1,6 @@
 useDynLib(mpath)
 
-export(glmreg, glmregNB, zipath, llfun, predictzeroinfl1, cv.folds, cv.glmreg, cv.glmreg_fit, cv.glmregNB, cv.zipath, tuning.zipath, pval.zipath, conv2glmreg, conv2zipath, estfunReg, sandwichReg, breadReg, meatReg, hessianReg, se, be.zeroinfl, rzi, ncl, nclreg, ncl_fit, nclreg_fit, cv.nclreg, cv.nclreg_fit, stan, zipath_fit, irglm, irglmreg, irglmreg_fit, irsvm, irsvm_fit, cv.irsvm, cv.irsvm_fit, loss2, loss2_irsvm, loss3, cv.irglmreg, cv.irglmreg_fit, compute_wt, update_wt, compute_g,
+export(glmreg, glmreg_fit, glmregNB, zipath, llfun, predictzeroinfl1, cv.folds, cv.glmreg, cv.glmreg_fit, cv.glmregNB, cv.zipath, tuning.zipath, pval.zipath, conv2glmreg, conv2zipath, estfunReg, sandwichReg, breadReg, meatReg, hessianReg, se, be.zeroinfl, rzi, ncl, nclreg, ncl_fit, nclreg_fit, cv.nclreg, cv.nclreg_fit, stan, zipath_fit, irglm, irglmreg, irglmreg_fit, irsvm, irsvm_fit, cv.irsvm, cv.irsvm_fit, loss2, loss2_irsvm, loss3, cv.irglmreg, cv.irglmreg_fit, compute_wt, update_wt, compute_g,
 gfunc, cfun2num, y2num, y2num4glm, check_s)
 
 import("methods")

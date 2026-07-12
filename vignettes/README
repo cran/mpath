@@ -1,0 +1,5 @@
+How to genereate brcancer.pdf from brcancer.Rnw?
+
+Go to directory Zwang/topics/qmanc/code
+R CMD Sweave --pdf brcancer.Rnw
+

@@ -12,9 +12,9 @@ irsvm_fit(x, y, weights, cfun="ccave", s=NULL, delta=0.0001, type = NULL,
 \arguments{
   \item{x}{a data matrix, a vector, or a sparse '\emph{design} matrix' (object of class
     \code{\link[Matrix]{Matrix}} provided by the \pkg{Matrix} package,
-    or of class \code{\link[SparseM]{matrix.csr}}
+    or of class \code{matrix.csr}
     provided by the \pkg{SparseM} package, or of class
-    \code{\link[slam]{simple_triplet_matrix}} provided by the \pkg{slam}
+    \code{simple_triplet_matrix} provided by the \pkg{slam}
     package).}
   \item{y}{a response vector with one label for each row/component of
     \code{x}. Can be either a factor (for classification tasks)

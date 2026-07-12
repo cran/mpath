@@ -11,9 +11,9 @@ cv.irsvm_fit(x, y, weights, cfun="ccave", s=c(1, 5), type=NULL,
 \arguments{
  \item{x}{a data matrix, a vector, or a sparse '\emph{design} matrix' (object  of class
      \code{\link[Matrix]{Matrix}} provided by the \pkg{Matrix} package,
-     or of class \code{\link[SparseM]{matrix.csr}}
+     or of class \code{matrix.csr}
      provided by the \pkg{SparseM} package, or of class
-     \code{\link[slam]{simple_triplet_matrix}} provided by the \pkg{slam}
+     \code{simple_triplet_matrix} provided by the \pkg{slam}
      package).}
    \item{y}{a response vector with one label for each row/component of
      \code{x}. Can be either a factor (for classification tasks)
@@ -88,4 +88,3 @@ This function is the driving force behind \code{cv.irsvm}. Does a K-fold cross-v
 \seealso{\code{\link{cv.irsvm}} and \code{\link{irsvm}}}
 \keyword{models}
 \keyword{regression}
-

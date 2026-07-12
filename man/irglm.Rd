@@ -23,7 +23,7 @@
   \item{contrasts}{the contrasts corresponding to \code{levels} from the
     respective models}
   \item{offset}{this can be used to specify an a priori known component to be included in the linear predictor during fitting. This should be NULL or a numeric vector of length equal to the number of cases. Currently only one offset term can be included in the formula.}
-   \item{cfun}{ character, type of convex cap (concave) function.\cr
+   \item{cfun}{ character, type of concave function, which has a cap shape.\cr
    Valid options are:
    \itemize{
        \item \code{"hcave"}
@@ -36,7 +36,7 @@
        \item \code{"tcave"}
    }
    }
-   \item{dfun}{ character, type of convex component. \cr
+   \item{dfun}{ character, type of convex component. Convex is often referred to as convex down: if you connect any two points on the curve by a line segment then the segment is always below the curve. \cr
    Valid options are:
    \itemize{
        \item \code{gaussian()}
