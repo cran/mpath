@@ -60,7 +60,7 @@ cv.irglmreg.matrix <- function(x, y, weights, offset=NULL, ...){
 
 cv.irglmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE, 
                           cfun=4, dfun=1, s=1.5,  
-                          nfolds=10, foldid, type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE,  
+                          nfolds=10, foldid, type = c("loss", "error"), plot.it=TRUE, se=TRUE, n.cores=NULL, trace=FALSE, parallel=FALSE,  
                           ...){
     call <- match.call()
     type <- match.arg(type)
@@ -84,34 +84,54 @@ cv.irglmreg_fit <- function(x, y, weights, offset, lambda=NULL, balance=TRUE,
         else all.folds <- cv.folds(n, K)
     }
     else all.folds <- foldid
+    foldenv <- list2env(list(x=x, y=y, weights=weights, offset=offset,
+                             lambda=lambda, cfun=cfun, dfun=dfun, s=s,
+                             type=type, all.folds=all.folds,
+                             dots=list(...)),
+                        parent=asNamespace("mpath"))
+    foldwork <- function(i) {
+        omit <- all.folds[[i]]
+        if(!is.null(offset)){
+            offsetnow <- offset[-omit]
+            newoffset <- offset[omit]
+        }else offsetnow <- newoffset <- NULL
+        fitcv <- do.call(irglmreg_fit, c(list(x=x[-omit,,drop=FALSE],
+                                              y=y[-omit],
+                                              weights=weights[-omit],
+                                              offset=offsetnow, s=s,
+                                              lambda=lambda, cfun=cfun,
+                                              dfun=dfun), dots))
+        predict(fitcv, newdata=x[omit,,drop=FALSE], newy=y[omit],
+                weights=weights[omit], newoffset=newoffset, type=type)
+    }
+    environment(foldwork) <- foldenv
+
     if(parallel){
-    cl <- eval(parse(text="parallel:::makeCluster(n.cores)"))
-    registerDoParallel(cores=cl)
-    i <- 1  ###needed to pass R CMD check with parallel code below
-    residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
-        omit <- all.folds[[i]]
-        if(!is.null(offset)){
-         offsetnow <- offset[- omit]
-         newoffset <- offset[omit]
-         }else offsetnow <- newoffset <- NULL
-        fitcv <- irglmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, s=s, lambda=lambda, cfun=cfun, dfun=dfun, ...)
-	predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], newoffset=newoffset, type=type)
-    }
-    eval(parse(text="parallel:::stopCluster(cl)"))
-    }
-    else{
-        residmat <- matrix(NA, nlambda, K)
-        for(i in seq(K)){
-        if(trace)
-          cat("\n CV Fold", i, "\n\n")
-        omit <- all.folds[[i]]
-        if(!is.null(offset)){
-         offsetnow <- offset[- omit]
-         newoffset <- offset[omit]
-         }else offsetnow <- newoffset <- NULL
-         fitcv <- irglmreg_fit(x[ - omit,,drop=FALSE ], y[ -omit], weights=weights[- omit], offset=offsetnow, s=s, lambda=lambda, cfun=cfun, dfun=dfun, ...)
-         residmat[,i] <- predict(fitcv, newdata = x[omit,  ,drop=FALSE], newy=y[omit], weights=weights[omit], newoffset=newoffset, type=type)
+        dc <- parallel::detectCores(logical=TRUE)
+        if(is.na(dc)) dc <- 1L
+        if(is.null(n.cores)) n.cores <- dc
+        n.cores <- max(1L, min(as.integer(n.cores), K, dc))
+        if(.Platform$OS.type == "unix"){
+            fold.results <- parallel::mclapply(seq_len(K), foldwork,
+                                               mc.cores=n.cores)
+            err <- sapply(fold.results, inherits, "try-error")
+            if(any(err)) stop(fold.results[[which(err)[1]]])
+        } else {
+            cl <- parallel::makeCluster(n.cores)
+            on.exit(parallel::stopCluster(cl), add=TRUE)
+            fold.results <- parallel::parLapply(cl, seq_len(K), foldwork)
         }
+    } else {
+        fold.results <- vector("list", K)
+        for(i in seq_len(K)) {
+            if(trace) cat("\n CV Fold", i, "\n\n")
+            fold.results[[i]] <- foldwork(i)
+        }
+    }
+    residmat <- matrix(NA_real_, nlambda, K)
+    for(i in seq_len(K)) {
+        res <- fold.results[[i]]
+        if(!is.null(res)) residmat[seq_along(res), i] <- res
     }
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)

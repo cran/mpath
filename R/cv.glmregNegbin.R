@@ -1,5 +1,5 @@
 cv.glmregNB <- function(formula, data, weights, offset=NULL, 
-lambda=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, 
+lambda=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=NULL, trace=FALSE, parallel=FALSE, 
 ...){
     call <- match.call()
  mf <- Call <- match.call()
@@ -20,49 +20,69 @@ lambda=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, p
  if(!length(weights)) weights <- rep(1, nrow(mf))
   if(any(weights < 0)) stop("negative weights not allowed")
 
+  if(missing(foldid) && nfolds < 3)
+    stop("smallest nfolds should be 3\n")
   K <- nfolds
-      glmregNB.obj <- do.call("glmregNB", list(formula, data, weights, offset=offset, lambda=lambda, ...))
-    lambda <- glmregNB.obj$lambda
-    nlambda <- length(lambda)
-    if(is.null(offset)) offset <- rep(0, nobs)
-    if(missing(foldid))
-    all.folds <- cv.folds(n, K)
-    else all.folds <- foldid
-    if(parallel){
-    cl <- eval(parse(text="parallel:::makeCluster(n.cores)"))
-    registerDoParallel(cl)
-    i <- 1  ###needed to pass R CMD check with parallel code below
-    residmat <- foreach(i=seq(K), .combine=cbind) %dopar% {
-      omit <- all.folds[[i]]
-### changed 5/20/2013 fixed theta
-      if(!is.null(offset)){
-         offsetnow <- offset[- omit]
-         newoffset <- offset[omit]
-         }else offsetnow <- newoffset <- NULL
-      fitcv <- do.call("glmregNB", list(formula, data[-omit,], weights[-omit], offset=offsetnow, nlambda=nlambda, lambda=lambda, theta.est=FALSE, theta0=glmregNB.obj$theta, ...))
-### remove the first column, which is for intercept
-      fitcv$terms <- NULL ### logLik requires data frame if terms is not NULL
-      logLik(fitcv, newx=X[omit,-1, drop=FALSE], Y[omit], weights=weights[omit], offset=newoffset)
-   }
-   eval(parse(text="parallel:::stopCluster(cl)"))
+  glmregNB.obj <- do.call("glmregNB", list(formula, data, weights,
+                                              offset=offset, lambda=lambda,
+                                              parallel=FALSE, ...))
+  lambda <- glmregNB.obj$lambda
+  nlambda <- length(lambda)
+  theta0 <- glmregNB.obj$theta
+  if(is.null(offset)) offset <- rep(0, nobs)
+  if(missing(foldid)) all.folds <- cv.folds(n, K)
+  else all.folds <- foldid
+
+  foldenv <- list2env(list(formula=formula, data=data, X=X, Y=Y,
+                           weights=weights, offset=offset, lambda=lambda,
+                           nlambda=nlambda, theta0=theta0,
+                           all.folds=all.folds, dots=list(...), trace=trace),
+                      parent=asNamespace("mpath"))
+  foldwork <- function(i) {
+    omit <- all.folds[[i]]
+    if(!is.null(offset)){
+      offsetnow <- offset[-omit]
+      newoffset <- offset[omit]
+    }else offsetnow <- newoffset <- NULL
+    fitcv <- do.call("glmregNB", c(list(formula, data[-omit,], weights[-omit],
+                                         offset=offsetnow, nlambda=nlambda,
+                                         lambda=lambda, theta.est=FALSE,
+                                         theta0=theta0, parallel=FALSE,
+                                         trace=trace), dots))
+    fitcv$terms <- NULL
+    logLik(fitcv, newx=X[omit,-1, drop=FALSE], Y[omit],
+           weights=weights[omit], offset=newoffset)
+  }
+  environment(foldwork) <- foldenv
+
+  if(parallel){
+    dc <- parallel::detectCores(logical=TRUE)
+    if(is.na(dc)) dc <- 1L
+    if(is.null(n.cores)) n.cores <- dc
+    n.cores <- max(1L, min(as.integer(n.cores), K, dc))
+    if(.Platform$OS.type == "unix"){
+      fold.results <- parallel::mclapply(seq_len(K), foldwork,
+                                         mc.cores=n.cores)
+      err <- sapply(fold.results, inherits, "try-error")
+      if(any(err)) stop(fold.results[[which(err)[1]]])
+    } else {
+      cl <- parallel::makeCluster(n.cores)
+      on.exit(parallel::stopCluster(cl), add=TRUE)
+      fold.results <- parallel::parLapply(cl, seq_len(K), foldwork)
     }
-    else{
-          residmat <- matrix(NA, nlambda, K)
-     for(i in seq(K)) {
-       if(trace)
-         cat("\n CV Fold", i, "\n\n")
-       omit <- all.folds[[i]]
- ### changed 5/20/2013 fixed theta
-      if(!is.null(offset)){
-         offsetnow <- offset[- omit]
-         newoffset <- offset[omit]
-         }else offsetnow <- newoffset <- NULL
-       fitcv <- do.call("glmregNB", list(formula, data[-omit,], weights[-omit], offset=offsetnow, nlambda=nlambda,  lambda=lambda, theta.est=FALSE, theta0=glmregNB.obj$theta, trace=trace, ...))
- ### remove the first column, which is for intercept
-       fitcv$terms <- NULL ### logLik requires data frame if terms is not NULL
-       residmat[, i] <- logLik(fitcv, newx=X[omit,-1, drop=FALSE], Y[omit], weights=weights[omit], offset=newoffset)
-     }
+  } else {
+    fold.results <- vector("list", K)
+    for(i in seq_len(K)) {
+      if(trace) cat("\n CV Fold", i, "\n\n")
+      fold.results[[i]] <- foldwork(i)
     }
+  }
+  nresid <- max(c(nlambda, lengths(fold.results)))
+  residmat <- matrix(NA_real_, nresid, K)
+  for(i in seq_len(K)) {
+    res <- fold.results[[i]]
+    if(!is.null(res)) residmat[seq_along(res), i] <- res
+  }
    cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)
     lambda.which <- which.max(cv)

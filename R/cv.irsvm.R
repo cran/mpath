@@ -72,7 +72,7 @@ cv.irsvm_fit <- function(x,y, weights, cfun="ccave", s=c(1, 5), type=NULL,
                                         #subset,
                                         #na.action,
                          balance=TRUE,
-                         nfolds=10, foldid, trim_ratio=0.9, n.cores=2,
+                         nfolds=10, foldid, trim_ratio=0.9, n.cores=NULL,
                          ...){
     call <- match.call()
     ## determine model type
@@ -104,35 +104,64 @@ cv.irsvm_fit <- function(x,y, weights, cfun="ccave", s=c(1, 5), type=NULL,
         else all.folds <- cv.folds(n, K)
     }
     else all.folds <- foldid
-    cl <- eval(parse(text="parallel:::makeCluster(n.cores)")) 
-    registerDoParallel(cl)
-    i <- ii <- jj <- l <- 1
-    residmat <- foreach(i=seq(K), .combine=cbind)%:% 
-        foreach(l=sval, .combine='rbind')%:%
-        foreach(ii=gammaseq, .combine='rbind')%:%
-        foreach(jj=costseq, .combine='rbind', .packages="mpath")   %dopar%{
-    #residmat <- NULL; for(i in seq(K)) for(l in sval) for(ii in gammaseq) for(jj in costseq){
-            omit <- all.folds[[i]]
-            m <- try(irsvm(x[-omit,,drop=FALSE], y[-omit], weights=weights[-omit], cfun=cfun, cost=jj, gamma=ii, s=l, type=type, ...), silent=TRUE)
-            if(!inherits(m, "try-error")){
-                new <- predict(m, x[omit,,drop=FALSE], weights=weights[omit])
-                if(type%in%c("C-classification", "nu-classification")) errorTU <- mean(new!=y[omit])
-                else {
-                    mloss <- (y[omit]-new)^2
-                    mloss1 <- order(mloss, decreasing=FALSE)
-                    mloss2 <- mloss1[1:(length(omit)*trim_ratio)]
-                    errorTU <- mean(mloss[mloss2]) #trimmed MSE
-                }
-                c(l, ii, jj, errorTU)
-                #residmat <- rbind(residmat, c(l, ii, jj, errorTU))
-            }
+    param.grid <- expand.grid(cost=costseq, gamma=gammaseq, s=sval)
+    param.grid <- param.grid[c("s", "gamma", "cost")]
+    ngrid <- nrow(param.grid)
+    if(!ngrid) stop("no parameters are valid for SVM")
+    foldenv <- list2env(list(x=x, y=y, weights=weights, cfun=cfun,
+                             type=type, trim_ratio=trim_ratio,
+                             all.folds=all.folds, param.grid=param.grid,
+                             ngrid=ngrid, dots=list(...)),
+                        parent=asNamespace("mpath"))
+    foldwork <- function(job) {
+        i <- (job - 1L) %/% ngrid + 1L
+        grid.i <- (job - 1L) %% ngrid + 1L
+        omit <- all.folds[[i]]
+        params <- param.grid[grid.i,]
+        fitcv <- try(do.call(irsvm, c(list(
+            x=x[-omit,,drop=FALSE], y=y[-omit],
+            weights=weights[-omit], cfun=cfun,
+            cost=params$cost, gamma=params$gamma, s=params$s,
+            type=type), dots)), silent=TRUE)
+        if(inherits(fitcv, "try-error")) return(rep(NA_real_, 4L))
+        pred <- predict(fitcv, x[omit,,drop=FALSE], weights=weights[omit])
+        if(type %in% c("C-classification", "nu-classification")) {
+            error <- mean(pred != y[omit])
+        } else {
+            loss <- (y[omit] - pred)^2
+            loss.order <- order(loss, decreasing=FALSE)
+            trimmed <- loss.order[1:(length(omit) * trim_ratio)]
+            error <- mean(loss[trimmed])
         }
-    eval(parse(text="parallel:::stopCluster(cl)")) 
+        c(params$s, params$gamma, params$cost, error)
+    }
+    environment(foldwork) <- foldenv
+
+    jobs <- seq_len(K * ngrid)
+    dc <- parallel::detectCores(logical=TRUE)
+    if(is.na(dc)) dc <- 1L
+    if(is.null(n.cores)) n.cores <- dc
+    n.cores <- max(1L, min(as.integer(n.cores), K, dc))
+    if(.Platform$OS.type == "unix"){
+        fold.results <- parallel::mclapply(jobs, foldwork,
+                                           mc.cores=n.cores)
+        err <- sapply(fold.results, inherits, "try-error")
+        if(any(err)) stop(fold.results[[which(err)[1]]])
+    } else {
+        cl <- parallel::makeCluster(n.cores)
+        on.exit(parallel::stopCluster(cl), add=TRUE)
+        fold.results <- parallel::parLapply(cl, jobs, foldwork)
+    }
+    residmat <- do.call(cbind, lapply(seq_len(K), function(i) {
+        first <- (i - 1L) * ngrid + 1L
+        last <- i * ngrid
+        do.call(rbind, fold.results[first:last])
+    }))
     kseq <- 4*(1:K)
-    dl <- length(dim(residmat))
-    if (!dl)
-        stop("no parameters are valid for SVM")
-    err <- apply(residmat[,kseq], 1, mean) #average error cross K folds
+    valid <- rowSums(!is.na(residmat[, kseq, drop=FALSE])) == K
+    if(!any(valid)) stop("no parameters are valid for SVM")
+    residmat <- residmat[valid,,drop=FALSE]
+    err <- apply(residmat[,kseq,drop=FALSE], 1, mean) #average error cross K folds
     opt <- residmat[which.min(err), 1:3]
     if(kernel=="linear"){
         residmat <- residmat[, -2*(1:K)]

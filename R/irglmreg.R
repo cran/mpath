@@ -62,7 +62,7 @@ irglmreg.matrix <- function(x, y, weights, offset=NULL, ...){
 }
 
 irglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian", 
-                      s=NULL, delta=0.1, fk=NULL, iter=10, reltol=1e-5, penalty=c("enet","mnet","snet"), nlambda=100, lambda=NULL, type.path=c("active", "nonactive"), decreasing=TRUE, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, intercept=TRUE, penalty.factor = NULL, maxit=1000, type.init=c("bst", "co", "heu"), init.family=NULL, mstop.init=10, nu.init=0.1, eps=.Machine$double.eps, epscycle=10, thresh=1e-6, parallel=FALSE, n.cores=2, theta, trace=FALSE, tracelevel=1){
+                      s=NULL, delta=0.1, fk=NULL, iter=10, reltol=1e-5, penalty=c("enet","mnet","snet"), nlambda=100, lambda=NULL, type.path=c("active", "nonactive"), decreasing=TRUE, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, intercept=TRUE, penalty.factor = NULL, maxit=1000, type.init=c("bst", "co", "heu"), init.family=NULL, mstop.init=10, nu.init=0.1, eps=.Machine$double.eps, epscycle=10, thresh=1e-6, parallel=FALSE, n.cores=NULL, theta, trace=FALSE, tracelevel=1){
 ### compute h value
     compute.h <- function(rfamily, y, fk_old, s, B){
         if(rfamily=="clossR")
@@ -241,57 +241,80 @@ irglmreg_fit <- function(x,y, weights, offset, cfun="ccave", dfun="gaussian",
     ### create a function for parallel computing can lead to object-not-found problem
     #typeP <- function(x, y, weights, start, etastart, mustart, offset,lambda,alpha,gamma,intercept,penalty.factor,maxit,eps, pentype, trace, iter, reltol, cfun, dfun, s, thresh, delta, m){
     if(isTRUE(parallel)){
-    i <- 1
-    cl <- parallel::makeCluster(n.cores, outfile="")
-         registerDoParallel(cl)
-         fitall <- foreach(i=1:nlambda, .packages=c("mpath")) %dopar%{
+        fit_lambda <- function(i){
             RET <- .Fortran("irglmreg_onelambda",
-                            x_act=as.double(x), 
-                            y=as.double(y), 
+                            x_act=as.double(x),
+                            y=as.double(y),
                             weights=as.double(weights),
                             n=as.integer(n),
-                            m_act=as.integer(m),	
-                            start_act=as.double(start), 
+                            m_act=as.integer(m),
+                            start_act=as.double(start),
                             etastart=as.double(etastart),
                             mustart=as.double(mustart),
                             yhat=as.double(rep(0, n)),
                             offset=as.double(offset),
-                            lambda_i=as.double(lambda[i]), 
-                            alpha=as.double(alpha),        
-                            gam=as.double(gamma), 
-			                rescale=as.integer(rescale),
+                            lambda_i=as.double(lambda[i]),
+                            alpha=as.double(alpha),
+                            gam=as.double(gamma),
+                            rescale=as.integer(rescale),
                             #standardize=as.integer(0),
                             standardize=as.integer(standardize),
                             intercept=as.integer(intercept),
                             penaltyfactor_act=as.double(penalty.factor),
                             maxit=as.integer(maxit),
-                            eps=as.double(eps), 
+                            eps=as.double(eps),
                             theta=as.double(theta),
-                            penalty=as.integer(pentype), 
+                            penalty=as.integer(pentype),
                             trace=as.integer(trace),
                             iter=as.integer(iter),
                             del=as.double(reltol),
                             cfun=as.integer(cfun),
                             dfun=as.integer(dfun),
                             s=as.double(s),
-                            thresh=as.double(thresh), 
+                            thresh=as.double(thresh),
                             beta_1=as.double(rep(0, m)),
                             b0_1=as.double(0),
                             fk=as.double(rep(0, n)),
                             delta=as.double(delta),
                             weights_update=as.double(rep(0, n)),
                             PACKAGE="mpath")
-            list(beta=RET$beta, b0=RET$b0, yhat=RET$yhat, weights_update=RET$weights_update)   
+            list(beta=RET$beta, b0=RET$b0, yhat=RET$yhat,
+                 weights_update=RET$weights_update)
         }
-    parallel::stopCluster(cl)
-    RET <- fitall[[nlambda]]    
-    for(k in 1:nlambda){
-             beta[,k] <- fitall[[k]]$beta
-             b0[k] <- fitall[[k]]$b0
-             fitted[,k] <- fitall[[k]]$yhat
-             weights_cc[,k] <- fitall[[k]]$weights_update
-         }
-        tmp <- list(beta=beta, b0=b0, RET=RET, fitted=fitted, weights_cc=weights_cc)
+        worker_env <- list2env(list(
+            x=x, y=y, weights=weights, n=n, m=m, start=start,
+            etastart=etastart, mustart=mustart, offset=offset,
+            lambda=lambda, alpha=alpha, gamma=gamma, rescale=rescale,
+            standardize=standardize, intercept=intercept,
+            penalty.factor=penalty.factor, maxit=maxit, eps=eps,
+            theta=theta, pentype=pentype, trace=trace, iter=iter,
+            reltol=reltol, cfun=cfun, dfun=dfun, s=s, thresh=thresh,
+            delta=delta), parent=asNamespace("mpath"))
+        environment(fit_lambda) <- worker_env
+        dc <- parallel::detectCores(logical=TRUE)
+        if(is.na(dc)) dc <- 1L
+        if(is.null(n.cores)) n.cores <- dc
+        n.cores <- max(1L, min(as.integer(n.cores), nlambda, dc))
+        if(.Platform$OS.type == "unix"){
+            fitall <- parallel::mclapply(seq_len(nlambda), fit_lambda,
+                                         mc.cores=n.cores)
+            err <- sapply(fitall, inherits, "try-error")
+            if(any(err)) stop(fitall[[which(err)[1]]])
+        } else {
+            cl <- parallel::makeCluster(n.cores, outfile="")
+            on.exit(parallel::stopCluster(cl), add=TRUE)
+            parallel::clusterEvalQ(cl, loadNamespace("mpath"))
+            fitall <- parallel::parLapply(cl, seq_len(nlambda), fit_lambda)
+        }
+        RET <- fitall[[nlambda]]
+        for(k in 1:nlambda){
+            beta[,k] <- fitall[[k]]$beta
+            b0[k] <- fitall[[k]]$b0
+            fitted[,k] <- fitall[[k]]$yhat
+            weights_cc[,k] <- fitall[[k]]$weights_update
+        }
+        tmp <- list(beta=beta, b0=b0, RET=RET, fitted=fitted,
+                    weights_cc=weights_cc)
     }
     typeA <- function(beta, b0){
         if(dfun %in% c(1, 4)) dfuntmp <- 1 else if(dfun==5) dfuntmp <- 2

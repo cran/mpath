@@ -82,7 +82,7 @@ cv.zipath.matrix <- function(X, Z, Y, weights, offsetx=NULL, offsetz=NULL, ...){
  }
 
 cv.zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, nlambda=100, lambda.count=NULL, 
-		      lambda.zero=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=2, 
+		      lambda.zero=NULL, nfolds=10, foldid, plot.it=TRUE, se=TRUE, n.cores=NULL, 
               trace=FALSE, parallel=FALSE, ...){
     call <- match.call()
     if(missing(foldid) && nfolds < 3)
@@ -105,28 +105,52 @@ cv.zipath_fit <- function(X, Z, Y, weights, offsetx, offsetz, nlambda=100, lambd
         K <- nfolds <- length(foldid)
     }
     bic <- matrix(NA, nlambda, K)
-    if(parallel){
-    cl <- eval(parse(text="parallel:::makeCluster(n.cores)"))
-    registerDoParallel(cl)
-    i <- 1  ###needed to pass R CMD check with parallel code below
-    residmat <- foreach(i=seq(K), .combine=cbind, .packages='mpath') %dopar% {
+    foldenv <- list2env(list(X=X, Z=Z, Y=Y, weights=weights,
+                             offsetx=offsetx, offsetz=offsetz,
+                             nlambda=nlambda, lambda.count=lambda.count,
+                             lambda.zero=lambda.zero,
+                             all.folds=all.folds, dots=list(...)),
+                        parent=asNamespace("mpath"))
+    foldwork <- function(i) {
         omit <- all.folds[[i]]
-    #	fitcv <- do.call("zipath", list(formula, data[-omit,], weights[-omit], lambda.count=lambda.count, lambda.zero=lambda.zero, nlambda=nlambda, ...))
-        fitcv <- zipath_fit(X[-omit,,drop=FALSE], Z[-omit,,drop=FALSE], Y[-omit], weights[-omit], offsetx[-omit], offsetz[-omit], nlambda=nlambda, lambda.count=lambda.count, lambda.zero=lambda.zero, ...)
-        logLik(fitcv, X=X[omit,, drop=FALSE], Z=Z[omit,, drop=FALSE], y=Y[omit], weights=weights[omit], offsetx=offsetx[omit], offsetz=offsetz[omit])
+        fitcv <- do.call(zipath_fit, c(list(
+            X=X[-omit,,drop=FALSE], Z=Z[-omit,,drop=FALSE],
+            Y=Y[-omit], weights=weights[-omit],
+            offsetx=offsetx[-omit], offsetz=offsetz[-omit],
+            nlambda=nlambda, lambda.count=lambda.count,
+            lambda.zero=lambda.zero), dots))
+        logLik(fitcv, X=X[omit,,drop=FALSE], Z=Z[omit,,drop=FALSE],
+               y=Y[omit], weights=weights[omit],
+               offsetx=offsetx[omit], offsetz=offsetz[omit])
     }
-    eval(parse(text="parallel:::stopCluster(cl)"))
+    environment(foldwork) <- foldenv
+
+    if(parallel){
+        dc <- parallel::detectCores(logical=TRUE)
+        if(is.na(dc)) dc <- 1L
+        if(is.null(n.cores)) n.cores <- dc
+        n.cores <- max(1L, min(as.integer(n.cores), K, dc))
+        if(.Platform$OS.type == "unix"){
+            fold.results <- parallel::mclapply(seq_len(K), foldwork,
+                                               mc.cores=n.cores)
+            err <- sapply(fold.results, inherits, "try-error")
+            if(any(err)) stop(fold.results[[which(err)[1]]])
+        } else {
+            cl <- parallel::makeCluster(n.cores)
+            on.exit(parallel::stopCluster(cl), add=TRUE)
+            fold.results <- parallel::parLapply(cl, seq_len(K), foldwork)
+        }
+    } else {
+        fold.results <- vector("list", K)
+        for(i in seq_len(K)) {
+            if(trace) cat("\n CV Fold", i, "\n\n")
+            fold.results[[i]] <- foldwork(i)
+        }
     }
-    else{
-     residmat <- matrix(NA, nlambda, K)
-     for(i in seq(K)) {
-       if(trace)
-         cat("\n CV Fold", i, "\n\n")
-       omit <- all.folds[[i]]
-       fitcv <- zipath_fit(X[-omit,,drop=FALSE], Z[-omit,,drop=FALSE], Y[-omit], weights[-omit], offsetx[-omit], offsetz[-omit], nlambda=nlambda, lambda.count=lambda.count, lambda.zero=lambda.zero, ...)
-       #fitcv <- do.call("zipath", list(formula, data[-omit,], weights[-omit], lambda.count=lambda.count, lambda.zero=lambda.zero, nlambda=nlambda, ...))
-       residmat[, i] <- logLik(fitcv, X=X[omit,, drop=FALSE], Z=Z[omit,, drop=FALSE], y=Y[omit], weights=weights[omit], offsetx=offsetx[omit], offsetz=offsetz[omit])
-     }
+    residmat <- matrix(NA_real_, nlambda, K)
+    for(i in seq_len(K)) {
+        res <- fold.results[[i]]
+        if(!is.null(res)) residmat[seq_along(res), i] <- res
     }
     cv <- apply(residmat, 1, mean)
     cv.error <- sqrt(apply(residmat, 1, var)/K)

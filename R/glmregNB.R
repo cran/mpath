@@ -1,6 +1,8 @@
 ###Adapted from file MASS/R/negbin.R
-glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars), thresh=1e-3, maxit.theta=10, maxit=1000, eps=.Machine$double.eps, trace=FALSE, start = NULL, etastart = NULL, mustart = NULL, theta.fixed=FALSE, theta0=NULL, init.theta=NULL, link=log, penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, parallel=TRUE, n.cores=2, ...)
+glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NULL, lambda.min.ratio=ifelse(nobs<nvars,.05, .001),alpha=1, gamma=3, rescale=TRUE, standardize=TRUE, penalty.factor = rep(1, nvars), thresh=1e-3, maxit.theta=10, maxit=1000, eps=.Machine$double.eps, trace=FALSE, start = NULL, etastart = NULL, mustart = NULL, theta.fixed=FALSE, theta0=NULL, init.theta=NULL, link=log, penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, parallel=TRUE, n.cores=NULL, ...)
 {
+    init.theta.missing <- missing(init.theta)
+    method.missing <- missing(method)
     if(!theta.fixed) init.theta <- theta0[1]
     if(theta.fixed)
         if(length(theta0)!=nlambda)
@@ -72,10 +74,8 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
     convout <- twologlik <- rep(NA, nlambda)
     if(parallel){
         warning("trace argument is ignored since parallel=TRUE")
-        cl <- parallel::makeCluster(n.cores)
-        registerDoParallel(cl)
-        fitall <- foreach(k=1:nlambda) %dopar%{
-            if(!missing(method)) {
+        fit_lambda <- function(k){
+            if(!method.missing) {
                 if(!exists(method, mode = "function"))
                     stop("unimplemented method: ", sQuote(method))
                 glm.fitter <- get(method)
@@ -83,7 +83,7 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
                 method <- "glm.fit"
                 glm.fitter <- stats::glm.fit
             }
-            if(is.null(mustart) || missing(init.theta)){
+            if(is.null(mustart) || init.theta.missing){
                 fit <- glm.nb(Y ~ 1, weights=weights)
                 mu <- fit$fitted.values
                 th <- fit$theta
@@ -125,8 +125,33 @@ glmregNB <- function(formula, data, weights, offset=NULL, nlambda=100, lambda=NU
             fit$th <- th
             fit
         }
-                                        #stopImplicitCluster()
-        parallel::stopCluster(cl)
+        worker_env <- list2env(list(
+            Y=Y, weights=weights, w=w, n=n, maxit.theta=maxit.theta,
+            theta.fixed=theta.fixed, theta0=theta0, mustart=mustart,
+            init.theta=init.theta, init.theta.missing=init.theta.missing,
+            method=method, method.missing=method.missing, start=start, X=X,
+            offset=offset, lambda=lambda, alpha=alpha, gamma=gamma,
+            rescale=rescale, standardize=standardize,
+            penalty.factor=penalty.factor, thresh=thresh, maxit=maxit,
+            eps=eps, trace=trace, penalty=penalty, loglik=loglik),
+            parent=asNamespace("mpath"))
+        environment(worker_env$loglik) <- worker_env
+        environment(fit_lambda) <- worker_env
+        dc <- parallel::detectCores(logical=TRUE)
+        if(is.na(dc)) dc <- 1L
+        if(is.null(n.cores)) n.cores <- dc
+        n.cores <- max(1L, min(as.integer(n.cores), nlambda, dc))
+        if(.Platform$OS.type == "unix"){
+            fitall <- parallel::mclapply(seq_len(nlambda), fit_lambda,
+                                         mc.cores=n.cores)
+            err <- sapply(fitall, inherits, "try-error")
+            if(any(err)) stop(fitall[[which(err)[1]]])
+        } else {
+            cl <- parallel::makeCluster(n.cores)
+            on.exit(parallel::stopCluster(cl), add=TRUE)
+            parallel::clusterEvalQ(cl, loadNamespace("mpath"))
+            fitall <- parallel::parLapply(cl, seq_len(nlambda), fit_lambda)
+        }
         for(k in 1:nlambda){
             tht[k] <- fitall[[k]]$th
             beta[,k] <- fitall[[k]]$beta

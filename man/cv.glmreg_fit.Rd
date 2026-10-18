@@ -7,7 +7,7 @@
 cv.glmreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE, 
               family=c("gaussian", "binomial", "poisson", "negbin"), 
               type=c("loss", "error"), nfolds=10, foldid, plot.it=TRUE,
-              se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, ...)
+              se=TRUE, n.cores=NULL, trace=FALSE, parallel=FALSE, ...)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{glmreg}.}
@@ -25,7 +25,7 @@ cv.glmreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE,
     \code{nfold} can be missing and will be ignored.}
  \item{plot.it}{ a logical value, to plot the estimated log-likelihood values if \code{TRUE}. }
   \item{se}{ a logical value, to plot with standard errors. }
-\item{parallel, n.cores}{a logical value, parallel computing or not with the number of CPU cores to use. The cross-validation loop will attempt to send different CV folds off to different cores.}
+\item{parallel, n.cores}{a logical value, parallel computing or not with the number of CPU cores to use. The cross-validation loop will attempt to send different CV folds off to different cores. The default \code{n.cores=NULL} uses all available cores, capped by \code{nfolds}. On Unix/macOS, fork-based parallelization is used (minimal startup overhead); on other platforms a PSOCK cluster is created and stopped automatically, also if an error occurs.}
  \item{trace}{ a logical value, print progress of cross validation or not} 
 \item{\dots}{Other arguments that can be passed to \code{glmreg}.}
 }

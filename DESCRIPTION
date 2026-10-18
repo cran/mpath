@@ -1,7 +1,7 @@
 Package: mpath
 Title: Regularized Linear Models
-Version: 0.4-2.27
-Date: 2026-07-12
+Version: 0.4-2.28
+Date: 2026-10-15
 Authors@R: c(
       person(given = "Zhu", family = "Wang", role = c("aut", "cre"), email = "zwang145@uthsc.edu"),
       person(given = "Achim", family = "Zeileis", role = "aut"),
@@ -16,13 +16,14 @@ Description: Algorithms compute robust estimators for loss functions in the conc
       Wang (2021) <doi:10.1007/s11749-021-00770-2>,
       Wang (2024) <doi:10.1111/anzs.12409>.
 Depends: R (>= 3.5.0), methods, glmnet
-Imports: MASS, pscl, numDeriv, foreach, doParallel, bst, WeightSVM
+Imports: MASS, pscl, numDeriv, foreach, doParallel, parallel, bst,
+        WeightSVM
 Suggests: R.rsp
 VignetteBuilder: R.rsp
 License: GPL-2
 URL: https://github.com/zhuwang46/mpath
 BugReports: https://github.com/zhuwang46/mpath/issues
-Packaged: 2026-07-12 20:40:57 UTC; zwang145
+Packaged: 2026-10-18 16:26:26 UTC; zwang145
 NeedsCompilation: yes
 RoxygenNote: 7.1.1
 Author: Zhu Wang [aut, cre],
@@ -31,4 +32,4 @@ Author: Zhu Wang [aut, cre],
   Brian Ripley [aut],
   Patrick Breheny [aut]
 Repository: CRAN
-Date/Publication: 2026-07-12 21:50:02 UTC
+Date/Publication: 2026-10-18 17:10:02 UTC

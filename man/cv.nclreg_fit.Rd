@@ -7,7 +7,7 @@
 cv.nclreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE, 
               rfamily=c("clossR", "closs", "gloss", "qloss"), s=1.5, 
               nfolds=10, foldid, type = c("loss", "error"), 
-              plot.it=TRUE, se=TRUE, n.cores=2, trace=FALSE, 
+              plot.it=TRUE, se=TRUE, n.cores=NULL, trace=FALSE, 
               parallel=FALSE, ...)
 }
 \arguments{

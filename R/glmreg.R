@@ -235,6 +235,7 @@ glmreg_fit <- function(x, y, weights, start=NULL, etastart=NULL, mustart=NULL, o
         xx <- sqrt(wtnew) * xx
         one <- rep(1,n)  
         normx <- sqrt(one %*% xx^2)
+        normx[normx == 0] <- 1
         xx <- scale(x, meanx, normx)
     }
     tmp <- .Fortran("outloop",

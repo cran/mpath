@@ -13,7 +13,7 @@ glmregNB(formula, data, weights, offset=NULL, nlambda = 100, lambda=NULL,
          theta.fixed=FALSE, theta0=NULL, init.theta=NULL, link=log, 
          penalty=c("enet","mnet","snet"), method="glmreg_fit", model=TRUE, 
          x.keep=FALSE, y.keep=TRUE, contrasts=NULL, convex=FALSE, 
-         parallel=TRUE, n.cores=2, ...)
+         parallel=TRUE, n.cores=NULL, ...)
 }
 
 \arguments{
@@ -99,7 +99,7 @@ An object with S3 class \code{"glmreg", "glmregNB"} for the various types of mod
 \dontrun{
 data("bioChemists", package = "pscl")
 system.time(fm_nb1 <- glmregNB(art ~ ., data = bioChemists, parallel=FALSE))
-system.time(fm_nb2 <- glmregNB(art ~ ., data = bioChemists, parallel=TRUE, n.cores=2))
+system.time(fm_nb2 <- glmregNB(art ~ ., data = bioChemists, parallel=TRUE, n.cores=NULL))
 coef(fm_nb1)
 ### ridge regression
 fm <- glmregNB(art ~ ., alpha=0, data = bioChemists, lambda=seq(0.001, 1, by=0.01))

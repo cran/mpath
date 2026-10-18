@@ -6,7 +6,7 @@
 \usage{
 cv.irglmreg_fit(x, y, weights, offset, lambda=NULL, balance=TRUE, cfun=4, dfun=1, 
                 s=1.5, nfolds=10, foldid, type = c("loss", "error"), plot.it=TRUE,
-                se=TRUE, n.cores=2, trace=FALSE, parallel=FALSE, ...)
+                se=TRUE, n.cores=NULL, trace=FALSE, parallel=FALSE, ...)
 }
 \arguments{
   \item{x}{\code{x} matrix as in \code{irglmreg}.}

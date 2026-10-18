@@ -14,7 +14,7 @@ irglmreg_fit(x, y, weights, offset, cfun="ccave", dfun="gaussian", s=NULL,
              penalty.factor= NULL, maxit=1000, type.init=c("bst", "co", "heu"), 
              init.family=NULL, mstop.init=10, nu.init=0.1, 
              eps=.Machine$double.eps, epscycle=10, thresh=1e-6, parallel=FALSE,
-             n.cores=2, theta, trace=FALSE, tracelevel=1)
+             n.cores=NULL, theta, trace=FALSE, tracelevel=1)
 }
 
 \arguments{

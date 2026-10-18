@@ -6,7 +6,7 @@
 cv.irsvm_fit(x, y, weights, cfun="ccave", s=c(1, 5), type=NULL, 
              kernel="radial", gamma=2^(-4:10), cost=2^(-4:4), 
              epsilon=0.1, balance=TRUE, nfolds=10, foldid, 
-             trim_ratio=0.9, n.cores=2, ...)
+             trim_ratio=0.9, n.cores=NULL, ...)
 }
 \arguments{
  \item{x}{a data matrix, a vector, or a sparse '\emph{design} matrix' (object  of class
